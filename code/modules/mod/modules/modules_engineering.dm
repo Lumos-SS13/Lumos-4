@@ -93,15 +93,6 @@
 	cooldown_time = 1.5 SECONDS
 	required_slots = list(ITEM_SLOT_GLOVES)
 
-/obj/item/mod/module/tether/used()
-	if(HAS_TRAIT_FROM(mod.wearer, TRAIT_TETHER_ATTACHED, REF(src)))
-		balloon_alert(mod.wearer, "already tethered!")
-		playsound(src, 'sound/items/weapons/gun/general/dry_fire.ogg', 25, TRUE)
-		return FALSE
-	return ..()
-
-
-
 /obj/item/mod/module/tether/on_select_use(atom/target)
 	. = ..()
 	if(!.)
@@ -150,10 +141,7 @@
 /obj/projectile/tether/proc/on_embedded(datum/source, obj/item/payload, atom/hit)
 	SIGNAL_HANDLER
 
-	if (HAS_TRAIT_FROM(hit, TRAIT_TETHER_ATTACHED, REF(parent_module)))
-		return
-
-	firer.AddComponent(/datum/component/tether, hit, 7, "MODtether", payload, parent_module = parent_module, tether_trait_source = REF(parent_module))
+	firer.AddComponent(/datum/component/tether, hit, 7, "MODtether", payload, parent_module = parent_module)
 
 /obj/projectile/tether/Moved(atom/old_loc, movement_dir, forced, list/old_locs, momentum_change)
 	. = ..()
@@ -175,12 +163,7 @@
 		return
 
 	if (istype(target, /obj/item/tether_anchor) || isstructure(target) || ismachinery(target))
-		if(HAS_TRAIT_FROM(target, TRAIT_TETHER_ATTACHED, REF(parent_module)))
-			return
-		var/avoid_target_trait = FALSE
-		if (istype(target, /obj/item/tether_anchor))
-			avoid_target_trait = TRUE
-		firer.AddComponent(/datum/component/tether, target, 7, "MODtether", parent_module = parent_module, tether_trait_source = REF(parent_module), no_target_trait = avoid_target_trait)
+		firer.AddComponent(/datum/component/tether, target, 7, "MODtether", parent_module = parent_module)
 		return
 
 	var/hitx
@@ -207,7 +190,7 @@
 	anchor.pixel_x = hitx
 	anchor.pixel_y = hity
 	anchor.anchored = TRUE
-	firer.AddComponent(/datum/component/tether, anchor, 7, "MODtether", parent_module = parent_module, tether_trait_source = REF(parent_module))
+	firer.AddComponent(/datum/component/tether, anchor, 7, "MODtether", parent_module = parent_module)
 
 /obj/projectile/tether/Destroy()
 	QDEL_NULL(line)
@@ -235,12 +218,8 @@
 	if (!can_interact(user) || !user.CanReach(src) || !isturf(loc))
 		return SECONDARY_ATTACK_CANCEL_ATTACK_CHAIN
 
-	if(HAS_TRAIT_FROM(user, TRAIT_TETHER_ATTACHED, REF(src)))
-		balloon_alert(user, "already tethered!")
-		return
-
 	balloon_alert(user, "attached tether")
-	user.AddComponent(/datum/component/tether, src, 7, "tether", tether_trait_source = REF(src))
+	user.AddComponent(/datum/component/tether, src, 7, "tether")
 	return SECONDARY_ATTACK_CANCEL_ATTACK_CHAIN
 
 /obj/item/tether_anchor/mouse_drop_receive(atom/target, mob/user, params)
@@ -250,13 +229,9 @@
 	if (!isliving(target) || !target.CanReach(src))
 		return
 
-	if(HAS_TRAIT_FROM(target, TRAIT_TETHER_ATTACHED, REF(src)))
-		balloon_alert(user, "already tethered!")
-		return
-
 	if (target == user)
 		balloon_alert(user, "attached tether")
-		user.AddComponent(/datum/component/tether, src, 7, "tether", tether_trait_source = REF(src), no_target_trait = TRUE)
+		user.AddComponent(/datum/component/tether, src, 7, "tether")
 		return
 
 	balloon_alert(user, "attaching tether...")
@@ -264,13 +239,9 @@
 	if (!do_after(user, 5 SECONDS, target))
 		return
 
-	if(HAS_TRAIT_FROM(target, TRAIT_TETHER_ATTACHED, REF(src)))
-		balloon_alert(user, "already tethered!")
-		return
-
 	balloon_alert(user, "attached tether")
 	to_chat(target, span_userdanger("[user] attaches a tether to you!"))
-	target.AddComponent(/datum/component/tether, src, 7, "tether", tether_trait_source = REF(src), no_target_trait = TRUE)
+	target.AddComponent(/datum/component/tether, src, 7, "tether")
 
 /datum/embed_data/tether_projectile
 	embed_chance=65 // spiky
