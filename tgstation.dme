@@ -9487,5 +9487,7 @@
 #include "modular_zubbers\modules\plexagon_selfserve\code\shame_box.dm"
 #include "modular_zubbers\modules\plexagon_selfserve\code\sign.dm"
 #include "modular_zubbers\modules\plexagon_selfserve\code\time_clock.dm"
+#include "modular_zumos\code\modules\tgs\chat_commands.dm"
+#include "modular_zumos\code\modules\tgs\custom_procs.dm"
 // END_INCLUDE
 
