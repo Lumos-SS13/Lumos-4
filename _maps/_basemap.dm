@@ -9,7 +9,7 @@
 		#include "map_files\debug\runtimestation.dmm"
 		#include "map_files\Deltastation\DeltaStation2_Lumos.dmm"
 		#include "map_files\IceBoxStation\IceBoxStation_Lumos.dmm"
-		#include "map_files\MetaStation\MetaStation.dmm"
+		#include "map_files\MetaStation\MetaStation_Lumos.dmm"
 		#include "map_files\Mining\Lavaland.dmm"
 		//#include "map_files\NorthStar\north_star.dmm" BUBBER EDIT - UNUSED
 		#include "map_files\tramstation\tramstation.dmm"
