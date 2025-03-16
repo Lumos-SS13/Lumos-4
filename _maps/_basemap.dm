@@ -16,7 +16,7 @@
 		#include "map_files\NebulaStation\NebulaStation.dmm"
 		// SKYRAT EDIT ADDITON START - Compiling our modular maps too!
 		#include "map_files\VoidRaptor\VoidRaptor.dmm"
-		#include "map_files\KiloStation\KiloStation.dmm"
+		#include "map_files\KiloStation\KiloStation_Lumos.dmm"
 		// SKYRAT EDIT END
 		//#include "map_files\wawastation\wawastation.dmm" BUBBER EDIT - UNUSED
 		// BUBBER EDIT ADDITION START
