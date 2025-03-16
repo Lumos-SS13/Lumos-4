@@ -7,7 +7,7 @@
 		//#include "map_files\Birdshot\birdshot.dmm" BUBBER EDIT - UNUSED
 		#include "map_files\debug\multiz.dmm"
 		#include "map_files\debug\runtimestation.dmm"
-		#include "map_files\Deltastation\DeltaStation2.dmm"
+		#include "map_files\Deltastation\DeltaStation2_Lumos.dmm"
 		#include "map_files\IceBoxStation\IceBoxStation.dmm"
 		#include "map_files\MetaStation\MetaStation.dmm"
 		#include "map_files\Mining\Lavaland.dmm"
