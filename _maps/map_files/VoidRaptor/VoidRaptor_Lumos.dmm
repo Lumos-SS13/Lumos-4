@@ -631,14 +631,17 @@
 /turf/open/floor/engine,
 /area/station/ai_monitored/command/nuke_storage)
 "aiU" = (
-/obj/effect/turf_decal/bot_red,
 /obj/structure/sign/warning/hot_temp/directional/north,
 /obj/structure/rack,
-/obj/item/storage/box/hug/plushes,
 /obj/effect/turf_decal/trimline/dark/filled/warning{
 	dir = 9
 	},
-/obj/item/storage/box/hug/plushes,
+/obj/item/pushbroom{
+	pixel_x = -10
+	},
+/obj/item/mop{
+	pixel_x = 7
+	},
 /turf/open/floor/iron/dark/smooth_large,
 /area/station/security/office)
 "ajb" = (
@@ -7371,6 +7374,8 @@
 /area/station/security/prison/work)
 "cjY" = (
 /obj/structure/table,
+/obj/item/vending_refill/lustwish,
+/obj/item/circuitboard/machine/vendor,
 /turf/open/floor/iron/smooth,
 /area/station/maintenance/starboard/fore)
 "ckd" = (
@@ -8383,10 +8388,10 @@
 /area/station/engineering/atmos)
 "cAy" = (
 /obj/effect/turf_decal/trimline/dark/filled/line,
-/obj/structure/closet/bombcloset/security,
-/obj/machinery/atmospherics/pipe/smart/manifold4w/supply/hidden/layer4,
-/obj/effect/turf_decal/bot,
 /obj/machinery/light/cold/directional/south,
+/obj/machinery/atmospherics/components/unary/vent_pump/on/layer4{
+	dir = 4
+	},
 /turf/open/floor/iron/dark/smooth_edge{
 	dir = 1
 	},
@@ -17053,18 +17058,8 @@
 	dir = 10
 	},
 /obj/item/radio/intercom/directional/west,
-/obj/structure/table,
-/obj/item/storage/box/bodybags{
-	pixel_x = 3;
-	pixel_y = 3
-	},
-/obj/item/storage/box/bodybags,
-/obj/item/pushbroom{
-	pixel_x = -10
-	},
-/obj/item/mop{
-	pixel_x = 7
-	},
+/obj/effect/turf_decal/bot,
+/obj/structure/closet/bombcloset/security,
 /turf/open/floor/iron/dark,
 /area/station/security/office)
 "eWh" = (
@@ -22706,16 +22701,11 @@
 	c_tag = "Security - Morgue"
 	},
 /obj/structure/rack,
-/obj/effect/spawner/random/entertainment/plushie{
-	pixel_y = 9
+/obj/item/storage/box/bodybags{
+	pixel_x = 3;
+	pixel_y = 3
 	},
-/obj/effect/spawner/random/entertainment/plushie{
-	pixel_x = 9;
-	pixel_y = -6
-	},
-/obj/effect/spawner/random/entertainment/plushie{
-	pixel_x = -13
-	},
+/obj/item/storage/box/bodybags,
 /turf/open/floor/iron/dark/smooth_edge,
 /area/station/security/office)
 "gGg" = (
@@ -24556,7 +24546,7 @@
 /area/station/service/chapel/funeral)
 "hgo" = (
 /obj/machinery/door/airlock/grunge{
-	name = "Plushie Storage"
+	name = "Storage"
 	},
 /obj/machinery/door/firedoor,
 /obj/machinery/atmospherics/pipe/smart/manifold4w/scrubbers/hidden/layer2,
@@ -51916,7 +51906,6 @@
 /area/station/service/library)
 "oBR" = (
 /obj/effect/turf_decal/siding/wood,
-/obj/structure/cable,
 /obj/machinery/atmospherics/pipe/smart/manifold4w/scrubbers/hidden/layer2,
 /obj/machinery/atmospherics/pipe/smart/manifold4w/supply/hidden/layer4,
 /obj/structure/disposalpipe/segment,
@@ -56480,16 +56469,8 @@
 /area/station/science/robotics/mechbay)
 "pOs" = (
 /obj/machinery/atmospherics/components/unary/vent_scrubber/on/layer2,
-/obj/structure/rack,
-/obj/effect/spawner/random/entertainment/plushie_delux{
-	pixel_x = 4
-	},
 /obj/effect/turf_decal/trimline/dark/filled/warning{
 	dir = 1
-	},
-/obj/item/toy/plush/skyrat/duffmoth{
-	pixel_x = -11;
-	pixel_y = 6
 	},
 /turf/open/floor/iron/dark,
 /area/station/security/office)
@@ -71770,9 +71751,6 @@
 /area/station/service/hydroponics/garden)
 "tXy" = (
 /obj/effect/turf_decal/trimline/dark/filled/warning,
-/obj/machinery/atmospherics/components/unary/vent_pump/on/layer4{
-	dir = 4
-	},
 /turf/open/floor/iron/dark/smooth_edge{
 	dir = 1
 	},
@@ -75535,8 +75513,6 @@
 	dir = 5
 	},
 /obj/structure/sink/directional/south,
-/obj/structure/rack,
-/obj/item/toy/plush/skyrat/sechound,
 /turf/open/floor/iron/dark,
 /area/station/security/office)
 "uXf" = (
