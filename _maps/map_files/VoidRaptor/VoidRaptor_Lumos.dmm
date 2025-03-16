@@ -49789,8 +49789,8 @@
 	},
 /area/station/cargo/storage)
 "nWu" = (
-/obj/machinery/vending/dorms,
 /obj/machinery/airalarm/directional/east,
+/obj/machinery/vending/coffee,
 /turf/open/floor/iron/large,
 /area/station/commons/toilet)
 "nWw" = (
@@ -66822,8 +66822,8 @@
 /obj/effect/turf_decal/trimline/brown/filled/line{
 	dir = 5
 	},
-/obj/machinery/vending/dorms,
 /obj/effect/turf_decal/bot,
+/obj/effect/spawner/random/vending/snackvend,
 /turf/open/floor/iron/dark,
 /area/station/security/prison)
 "sIy" = (
