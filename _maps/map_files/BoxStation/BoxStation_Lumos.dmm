@@ -3625,9 +3625,6 @@
 /obj/effect/turf_decal/trimline/dark_blue/filled/line{
 	dir = 9
 	},
-/obj/item/storage/box/hug/plushes{
-	pixel_x = -4
-	},
 /obj/structure/table,
 /obj/item/storage/box/handcuffs{
 	pixel_x = 5;
@@ -5690,7 +5687,6 @@
 /turf/open/floor/iron/dark,
 /area/station/ai_monitored/turret_protected/ai_upload)
 "aCO" = (
-/obj/item/toy/plush/lizard_plushie,
 /obj/structure/bed/maint,
 /turf/open/floor/fakebasalt,
 /area/station/maintenance/starboard/fore)
@@ -6641,7 +6637,6 @@
 /obj/structure/railing{
 	dir = 5
 	},
-/obj/item/toy/plush/nukeplushie,
 /turf/open/floor/iron,
 /area/station/maintenance/starboard/fore)
 "aGH" = (
@@ -6805,13 +6800,6 @@
 	},
 /turf/open/floor/iron,
 /area/station/hallway/primary/central)
-"aHs" = (
-/obj/item/clothing/under/plasmaman/prisoner,
-/obj/item/clothing/head/helmet/space/plasmaman/prisoner,
-/obj/item/restraints/handcuffs/cable/zipties/fake,
-/obj/effect/spawner/random/burgerstation/loot/odd_safe,
-/turf/open/floor/plating/airless,
-/area/space/nearstation)
 "aHu" = (
 /obj/machinery/atmospherics/components/unary/vent_pump/on/layer4,
 /turf/open/floor/iron/dark,
@@ -13270,7 +13258,7 @@
 /turf/open/floor/iron/dark,
 /area/station/maintenance/port)
 "bdN" = (
-/obj/machinery/atmospherics/components/unary/vent_pump/siphon/monitored/mix_output{
+/obj/machinery/atmospherics/components/unary/vent_pump/siphon/monitored/nitrous_output{
 	dir = 8
 	},
 /turf/open/floor/engine/n2o,
@@ -24563,6 +24551,7 @@
 /obj/effect/turf_decal/stripes/line{
 	dir = 8
 	},
+/obj/structure/cable,
 /turf/open/floor/iron,
 /area/station/tcommsat/computer)
 "bSh" = (
@@ -26638,12 +26627,6 @@
 /obj/machinery/light/directional/south,
 /turf/open/floor/iron,
 /area/station/hallway/primary/aft)
-"caI" = (
-/obj/item/toy/plush/bigdeer{
-	name = "turbine deer"
-	},
-/turf/open/floor/plating/airless,
-/area/space/nearstation)
 "caK" = (
 /obj/structure/rack,
 /obj/effect/spawner/random/maintenance,
@@ -32937,10 +32920,6 @@
 	},
 /turf/open/floor/iron,
 /area/station/hallway/primary/central)
-"cIP" = (
-/obj/machinery/power/smes,
-/turf/open/floor/plating,
-/area/station/maintenance/department/electrical)
 "cJk" = (
 /obj/effect/decal/cleanable/dirt,
 /obj/structure/window/reinforced/spawner/directional/north,
@@ -40957,6 +40936,7 @@
 	name = "Server Room"
 	},
 /obj/effect/mapping_helpers/airlock/access/any/engineering/tcoms,
+/obj/structure/cable,
 /turf/open/floor/iron/dark,
 /area/station/tcommsat/computer)
 "hIg" = (
@@ -48814,10 +48794,6 @@
 /obj/machinery/smartfridge/chemistry/preloaded,
 /turf/open/floor/iron/white,
 /area/station/medical/pharmacy)
-"myQ" = (
-/obj/item/toy/plush/plasmamanplushie,
-/turf/open/floor/plating/airless,
-/area/space/nearstation)
 "myW" = (
 /turf/open/floor/plastic,
 /area/station/hallway/secondary/service)
@@ -49999,10 +49975,6 @@
 /obj/structure/girder,
 /turf/open/floor/iron/dark,
 /area/station/engineering/main)
-"noN" = (
-/obj/item/toy/plush/slimeplushie,
-/turf/open/floor/engine,
-/area/station/science/xenobiology)
 "npz" = (
 /obj/effect/landmark/start/hangover,
 /turf/open/floor/wood/large,
@@ -51088,6 +51060,7 @@
 	pixel_x = -8;
 	pixel_y = 4
 	},
+/obj/structure/cable,
 /turf/open/floor/plating,
 /area/station/maintenance/department/electrical)
 "nYj" = (
@@ -54778,10 +54751,6 @@
 /obj/machinery/atmospherics/pipe/smart/manifold4w/supply/hidden/layer4,
 /turf/open/floor/iron/dark,
 /area/station/engineering/main)
-"qti" = (
-/obj/effect/turf_decal/bot_blue,
-/turf/closed/wall/r_wall,
-/area/station/security/office)
 "qtJ" = (
 /obj/structure/disposalpipe/sorting/mail/flip{
 	dir = 4
@@ -57185,16 +57154,8 @@
 	pixel_x = -14;
 	name = "statue of the liberator"
 	},
-/obj/item/toy/plush/skyrat/fermis{
-	pixel_x = 3
-	},
 /obj/structure/window/plasma/spawner/directional/east,
-/obj/item/food/burger/purple{
-	pixel_y = -8;
-	pixel_x = -14;
-	name = "science burger";
-	desc = "Rumoured to be the first ever burger made by Albert Einstein. KFT chef, no relation."
-	},
+/obj/item/food/burger/purple,
 /turf/open/floor/glass/plasma,
 /area/station/command/heads_quarters/rd)
 "rQj" = (
@@ -60222,7 +60183,6 @@
 /obj/machinery/atmospherics/pipe/smart/manifold4w/supply/hidden/layer4{
 	dir = 8
 	},
-/obj/effect/spawner/random/entertainment/plushie,
 /turf/open/floor/iron/dark,
 /area/station/engineering/gravity_generator)
 "tKm" = (
@@ -60959,9 +60919,6 @@
 /area/station/commons/fitness)
 "umx" = (
 /obj/structure/chair/sofa/right/brown,
-/obj/item/toy/plush/moth{
-	name = "Dr. Moff"
-	},
 /turf/open/floor/carpet/blue,
 /area/station/medical/psychology)
 "umE" = (
@@ -60970,7 +60927,9 @@
 "une" = (
 /obj/structure/table,
 /obj/machinery/light/directional/west,
-/obj/item/storage/box/hug/plushes,
+/obj/item/restraints/handcuffs,
+/obj/item/restraints/handcuffs,
+/obj/item/restraints/handcuffs,
 /turf/open/floor/iron,
 /area/station/security/execution/transfer)
 "unh" = (
@@ -61172,6 +61131,7 @@
 	name = "Server Room"
 	},
 /obj/effect/mapping_helpers/airlock/access/any/engineering/tcoms,
+/obj/structure/cable,
 /turf/open/floor/iron/dark,
 /area/station/tcommsat/computer)
 "utj" = (
@@ -65894,10 +65854,6 @@
 "xkT" = (
 /obj/machinery/light/directional/north,
 /obj/structure/dresser,
-/obj/item/toy/plush/nukeplushie{
-	pixel_y = 3;
-	pixel_x = -7
-	},
 /turf/open/floor/wood,
 /area/station/command/heads_quarters/blueshield)
 "xlh" = (
@@ -67509,9 +67465,6 @@
 /obj/item/clothing/suit/jacket/straight_jacket,
 /obj/item/clothing/suit/jacket/straight_jacket,
 /obj/item/clothing/suit/jacket/straight_jacket,
-/obj/item/restraints/handcuffs,
-/obj/item/restraints/handcuffs,
-/obj/item/restraints/handcuffs,
 /obj/structure/cable,
 /turf/open/floor/iron,
 /area/station/security/execution/transfer)
@@ -93496,7 +93449,7 @@ bWE
 bXB
 bYC
 bWB
-bWB
+bXC
 bXC
 cch
 cde
@@ -93753,8 +93706,8 @@ bWG
 bXD
 bYz
 bYz
-bWB
-cSE
+bXC
+bYz
 bYz
 cdf
 ced
@@ -99307,7 +99260,7 @@ adR
 adR
 adR
 adR
-qti
+adR
 xjQ
 jaY
 iVu
@@ -99564,7 +99517,7 @@ xzh
 xzh
 sUX
 cgh
-qti
+adR
 sni
 gzK
 imo
@@ -107131,7 +107084,7 @@ bzs
 bzs
 cdL
 bzs
-caI
+uRx
 bzs
 bzs
 bzs
@@ -109097,7 +109050,7 @@ arm
 hyp
 xzh
 xzh
-aHs
+uRx
 tHv
 aGh
 tHv
@@ -109354,7 +109307,7 @@ arm
 hyp
 xzh
 uRx
-myQ
+uRx
 tHv
 tHv
 tHv
@@ -112778,7 +112731,7 @@ xAv
 vYW
 bJN
 xAv
-noN
+xAv
 vYW
 bDb
 xzh
@@ -113994,7 +113947,7 @@ auI
 awT
 xKh
 awQ
-cIP
+iBZ
 alP
 bWL
 aEe
