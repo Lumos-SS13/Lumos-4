@@ -49240,7 +49240,7 @@
 /obj/structure/disposalpipe/segment{
 	dir = 4
 	},
-/turf/open/floor/plating,
+/turf/open/floor/iron/dark/textured,
 /area/station/command/heads_quarters/rd)
 "mOX" = (
 /obj/effect/mapping_helpers/airlock/access/any/engineering/general,
