@@ -4704,7 +4704,7 @@
 /turf/open/floor/iron/dark,
 /area/station/medical/morgue)
 "aKP" = (
-/obj/machinery/photocopier,
+/obj/machinery/photocopier/prebuilt,
 /obj/effect/turf_decal/bot,
 /obj/structure/sign/calendar/directional/north,
 /turf/open/floor/iron/dark/textured_large,
@@ -7023,7 +7023,7 @@
 	},
 /area/station/engineering/atmos/storage)
 "bcE" = (
-/obj/machinery/photocopier,
+/obj/machinery/photocopier/prebuilt,
 /obj/effect/turf_decal/bot_white,
 /turf/open/floor/iron/dark/textured,
 /area/station/security/office)
@@ -7516,7 +7516,7 @@
 	dir = 1
 	},
 /obj/effect/turf_decal/siding/wood,
-/obj/machinery/photocopier,
+/obj/machinery/photocopier/prebuilt,
 /obj/item/radio/intercom/directional/north,
 /turf/open/floor/wood/large,
 /area/station/security/detectives_office)
@@ -17421,8 +17421,8 @@
 /turf/open/floor/carpet/red,
 /area/station/maintenance/department/bridge)
 "cFQ" = (
-/obj/effect/spawner/random/trash/grille_or_waste,
 /obj/structure/sign/warning/biohazard,
+/obj/effect/spawner/random/structure/grille,
 /turf/open/space/openspace,
 /area/space/nearstation)
 "cFS" = (
@@ -26345,7 +26345,7 @@
 /obj/item/clothing/shoes/ducky_shoes{
 	name = "Quackins"
 	},
-/turf/open/water/beach,
+/turf/open/water/deep_beach,
 /area/station/commons/fitness/recreation/pool)
 "dVo" = (
 /obj/effect/decal/cleanable/dirt,
@@ -28948,7 +28948,7 @@
 /obj/effect/turf_decal/siding/wood{
 	dir = 4
 	},
-/obj/machinery/photocopier,
+/obj/machinery/photocopier/prebuilt,
 /obj/machinery/camera/autoname/directional/east,
 /turf/open/floor/wood/large,
 /area/station/service/lawoffice)
@@ -29243,7 +29243,7 @@
 /obj/effect/turf_decal/siding/wood/corner{
 	dir = 8
 	},
-/obj/machinery/photocopier,
+/obj/machinery/photocopier/prebuilt,
 /turf/open/floor/wood/large,
 /area/station/service/library)
 "eqr" = (
@@ -29366,9 +29366,6 @@
 	},
 /turf/open/floor/iron/dark,
 /area/station/cargo/sorting)
-"eri" = (
-/turf/open/space/openspace,
-/area/space/nearstation)
 "erl" = (
 /obj/effect/turf_decal/stripes/white/line{
 	dir = 10
@@ -32821,7 +32818,7 @@
 /turf/open/floor/iron/dark,
 /area/station/cargo/storage)
 "eSx" = (
-/obj/machinery/photocopier,
+/obj/machinery/photocopier/prebuilt,
 /obj/machinery/power/apc/auto_name/directional/north,
 /obj/structure/cable,
 /turf/open/floor/iron/dark,
@@ -34532,7 +34529,7 @@
 /area/station/maintenance/port/aft)
 "ffC" = (
 /obj/effect/turf_decal/siding/wood/end,
-/obj/machinery/photocopier,
+/obj/machinery/photocopier/prebuilt,
 /turf/open/floor/wood/large,
 /area/station/service/chapel/office)
 "ffE" = (
@@ -44967,7 +44964,7 @@
 /turf/open/floor/iron/dark/textured,
 /area/station/commons/fitness/recreation)
 "gIo" = (
-/obj/machinery/photocopier,
+/obj/machinery/photocopier/prebuilt,
 /obj/effect/turf_decal/siding/wood{
 	dir = 5
 	},
@@ -50121,7 +50118,7 @@
 	dir = 10
 	},
 /obj/machinery/firealarm/directional/south,
-/obj/machinery/photocopier,
+/obj/machinery/photocopier/prebuilt,
 /turf/open/floor/iron/dark,
 /area/station/cargo/office)
 "hvR" = (
@@ -69762,14 +69759,11 @@
 /obj/structure/rack,
 /obj/item/storage/box/bodybags,
 /obj/item/clothing/gloves/latex,
-/obj/item/clothing/mask/breath/medical{
-	pixel_y = -2;
-	pixel_x = -2
-	},
 /obj/item/tank/internals/anesthetic,
 /obj/item/healthanalyzer,
 /obj/item/clothing/mask/surgical,
 /obj/machinery/light_switch/directional/south,
+/obj/item/clothing/mask/muzzle/breath,
 /turf/open/floor/iron/dark/small,
 /area/station/science/robotics/augments)
 "koS" = (
@@ -70359,7 +70353,7 @@
 /turf/open/floor/iron/dark,
 /area/station/hallway/primary/port)
 "ksS" = (
-/obj/machinery/photocopier,
+/obj/machinery/photocopier/prebuilt,
 /obj/structure/sign/flag/ssc/directional/south,
 /turf/open/floor/iron/dark,
 /area/station/command/meeting_room)
@@ -72313,6 +72307,7 @@
 /obj/machinery/power/apc/auto_name/directional/east,
 /obj/structure/cable,
 /obj/machinery/airalarm/directional/south,
+/obj/effect/mapping_helpers/airalarm/surgery,
 /turf/open/floor/iron/dark/small,
 /area/station/science/robotics/augments)
 "kFG" = (
@@ -75163,7 +75158,7 @@
 	dir = 4
 	},
 /obj/machinery/light_switch/directional/west,
-/obj/machinery/photocopier,
+/obj/machinery/photocopier/prebuilt,
 /turf/open/floor/iron/dark,
 /area/station/command)
 "lfg" = (
@@ -82260,7 +82255,7 @@
 /obj/effect/turf_decal/siding/wood{
 	dir = 6
 	},
-/obj/machinery/photocopier,
+/obj/machinery/photocopier/prebuilt,
 /turf/open/floor/wood/large,
 /area/station/command/heads_quarters/ce)
 "mkx" = (
@@ -83273,13 +83268,22 @@
 "msw" = (
 /obj/structure/table/reinforced,
 /obj/item/storage/toolbox/mechanical{
-	pixel_y = 14
+	pixel_y = 11;
+	pixel_x = -2
 	},
 /obj/item/storage/toolbox/electrical{
-	pixel_y = 7
+	pixel_y = 7;
+	pixel_x = 3
 	},
-/obj/item/storage/toolbox/artistic,
+/obj/item/storage/toolbox/artistic{
+	pixel_x = -2;
+	pixel_y = 3
+	},
 /obj/structure/window/spawner/directional/south,
+/obj/item/storage/toolbox/crafter{
+	pixel_x = 3;
+	pixel_y = -1
+	},
 /turf/open/floor/iron/dark,
 /area/station/commons/storage/primary)
 "msy" = (
@@ -84890,7 +84894,7 @@
 /obj/effect/turf_decal/siding/thinplating_new/dark/corner{
 	dir = 4
 	},
-/obj/machinery/photocopier,
+/obj/machinery/photocopier/prebuilt,
 /obj/machinery/camera/autoname/directional/south,
 /turf/open/floor/iron/dark/diagonal,
 /area/station/engineering/lobby)
@@ -86174,6 +86178,8 @@
 /obj/effect/turf_decal/trimline/dark/corner{
 	dir = 1
 	},
+/obj/structure/rack,
+/obj/effect/spawner/random/techstorage/custom_shuttle,
 /turf/open/floor/iron/dark/textured,
 /area/station/engineering/storage/tech)
 "mOS" = (
@@ -94419,14 +94425,19 @@
 /turf/open/floor/iron,
 /area/station/maintenance/port/central)
 "obU" = (
-/obj/item/chisel,
-/obj/item/storage/toolbox/artistic,
 /obj/structure/rack,
-/obj/item/storage/crayons,
 /obj/effect/turf_decal/siding/wood{
 	dir = 6
 	},
 /obj/machinery/camera/autoname/directional/east,
+/obj/item/storage/toolbox/artistic{
+	pixel_x = -1;
+	pixel_y = 2
+	},
+/obj/item/storage/toolbox/crafter{
+	pixel_x = 3;
+	pixel_y = -3
+	},
 /turf/open/floor/wood/large,
 /area/station/security/prison/rec)
 "obV" = (
@@ -97827,6 +97838,7 @@
 	dir = 8
 	},
 /obj/structure/railing,
+/obj/effect/mapping_helpers/airalarm/surgery,
 /turf/open/floor/iron/white/smooth_edge{
 	dir = 4
 	},
@@ -100100,7 +100112,7 @@
 /obj/effect/turf_decal/siding/wood/corner{
 	dir = 4
 	},
-/obj/machinery/photocopier,
+/obj/machinery/photocopier/prebuilt,
 /turf/open/floor/wood/large,
 /area/station/service/library/upper)
 "oQA" = (
@@ -102598,6 +102610,9 @@
 	},
 /turf/open/floor/iron/dark,
 /area/station/command)
+"piz" = (
+/turf/open/water/deep_beach,
+/area/station/commons/fitness/recreation/pool)
 "piB" = (
 /obj/effect/decal/cleanable/insectguts,
 /obj/structure/sign/poster/contraband/random/directional/east,
@@ -123641,7 +123656,7 @@
 	dir = 8
 	},
 /obj/structure/closet/cabinet,
-/obj/item/clothing/suit/jacket/det_suit,
+/obj/item/clothing/suit/toggle/jacket/det_trench,
 /obj/item/clothing/head/fedora/det_hat,
 /obj/item/toy/crayon/white,
 /turf/open/floor/wood/large,
@@ -123723,7 +123738,7 @@
 /obj/effect/turf_decal/siding/wood{
 	dir = 9
 	},
-/obj/machinery/photocopier,
+/obj/machinery/photocopier/prebuilt,
 /obj/item/toy/figure/hos{
 	pixel_y = 12;
 	pixel_x = 3
@@ -140765,9 +140780,7 @@
 /turf/open/floor/iron/dark,
 /area/station/hallway/secondary/service)
 "uVy" = (
-/obj/machinery/photocopier{
-	pixel_y = 4
-	},
+/obj/machinery/photocopier/prebuilt,
 /obj/effect/turf_decal/siding/wood{
 	dir = 5
 	},
@@ -142802,9 +142815,7 @@
 	},
 /obj/effect/turf_decal/trimline/white/line,
 /obj/structure/table/reinforced/rglass,
-/obj/machinery/photocopier{
-	pixel_y = 4
-	},
+/obj/machinery/photocopier/prebuilt,
 /turf/open/floor/iron/dark/textured_large,
 /area/station/hallway/secondary/service)
 "viP" = (
@@ -151055,9 +151066,7 @@
 /turf/open/floor/plating,
 /area/station/maintenance/department/science)
 "wwD" = (
-/obj/machinery/photocopier{
-	pixel_y = 3
-	},
+/obj/machinery/photocopier/prebuilt,
 /obj/machinery/newscaster/directional/north,
 /turf/open/floor/wood/large,
 /area/station/service/library/upper)
@@ -151272,6 +151281,10 @@
 "wyi" = (
 /turf/open/floor/iron/stairs/medium,
 /area/station/medical/surgery/theatre)
+"wyj" = (
+/obj/effect/landmark/start/hangover,
+/turf/open/water/deep_beach,
+/area/station/commons/fitness/recreation/pool)
 "wyl" = (
 /obj/effect/turf_decal/trimline/dark/corner{
 	dir = 4
@@ -151871,7 +151884,7 @@
 /turf/open/misc/asteroid/airless,
 /area/space/nearstation)
 "wCZ" = (
-/obj/machinery/photocopier,
+/obj/machinery/photocopier/prebuilt,
 /obj/effect/turf_decal/siding/wood{
 	dir = 6
 	},
@@ -157670,9 +157683,7 @@
 	},
 /obj/machinery/airalarm/directional/east,
 /obj/structure/table/glass,
-/obj/machinery/photocopier{
-	pixel_y = 5
-	},
+/obj/machinery/photocopier/prebuilt,
 /turf/open/floor/iron/white,
 /area/station/science/research)
 "xxU" = (
@@ -159961,19 +159972,17 @@
 /obj/item/tank/internals/anesthetic{
 	pixel_x = -3
 	},
-/obj/item/clothing/mask/breath/medical{
-	pixel_y = -3
-	},
-/obj/item/clothing/mask/breath/medical,
-/obj/item/clothing/mask/breath/medical{
-	pixel_y = 3
-	},
 /obj/structure/rack,
 /obj/effect/turf_decal/siding{
 	dir = 1
 	},
 /obj/effect/turf_decal/trimline/dark/filled/line{
 	dir = 1
+	},
+/obj/item/clothing/mask/muzzle/breath,
+/obj/item/clothing/mask/muzzle/breath,
+/obj/item/clothing/mask/muzzle/breath{
+	pixel_y = -4
 	},
 /turf/open/floor/iron/showroomfloor,
 /area/station/medical/surgery/theatre)
@@ -178954,8 +178963,8 @@ udR
 ffS
 oUH
 sot
-kIf
-kIf
+piz
+piz
 kIf
 oUL
 jUz
@@ -179211,8 +179220,8 @@ uCt
 ffS
 uwg
 skZ
-kIf
-sot
+piz
+wyj
 kIf
 coE
 uKc
@@ -179469,7 +179478,7 @@ ffS
 iId
 kIf
 dVi
-kIf
+piz
 kIf
 mUi
 xer
@@ -246500,10 +246509,10 @@ txW
 txW
 txW
 txW
-eri
-eri
-eri
-eri
+txW
+txW
+txW
+txW
 oOb
 pIn
 uty
@@ -246757,8 +246766,8 @@ txW
 txW
 txW
 txW
-eri
-eri
+txW
+txW
 kaB
 pCa
 oOb
@@ -247014,10 +247023,10 @@ txW
 txW
 txW
 txW
-eri
-eri
-eri
-eri
+txW
+txW
+txW
+txW
 oOb
 dPm
 uty
@@ -247528,10 +247537,10 @@ txW
 txW
 txW
 txW
-eri
-eri
-eri
-eri
+txW
+txW
+txW
+txW
 oOb
 pIn
 uty
@@ -247785,8 +247794,8 @@ txW
 txW
 txW
 txW
-eri
-eri
+txW
+txW
 kaB
 pCa
 yjT
@@ -248042,10 +248051,10 @@ txW
 txW
 txW
 txW
-eri
-eri
-eri
-eri
+txW
+txW
+txW
+txW
 yjT
 iFP
 mKY
@@ -248556,10 +248565,10 @@ txW
 txW
 txW
 txW
-eri
-eri
-eri
-eri
+txW
+txW
+txW
+txW
 oOb
 pIn
 mKY
@@ -248813,8 +248822,8 @@ txW
 txW
 txW
 txW
-eri
-eri
+txW
+txW
 kaB
 pCa
 oOb
@@ -249070,10 +249079,10 @@ txW
 txW
 txW
 txW
-eri
-eri
-eri
-eri
+txW
+txW
+txW
+txW
 yjT
 iFP
 uty
@@ -257506,14 +257515,14 @@ txW
 txW
 txW
 txW
-eri
-eri
+txW
+txW
 dtb
-eri
-eri
-eri
+txW
+txW
+txW
 dtb
-eri
+txW
 txW
 txW
 dtb
@@ -257762,16 +257771,16 @@ txW
 txW
 txW
 txW
-eri
-eri
-eri
-eri
-eri
-eri
-eri
-eri
-eri
-eri
+txW
+txW
+txW
+txW
+txW
+txW
+txW
+txW
+txW
+txW
 mGv
 tGj
 tGj
@@ -258019,16 +258028,16 @@ txW
 txW
 txW
 txW
-eri
-eri
-eri
-eri
-eri
-eri
-eri
-eri
-eri
-eri
+txW
+txW
+txW
+txW
+txW
+txW
+txW
+txW
+txW
+txW
 vGi
 uty
 uty
@@ -258276,16 +258285,16 @@ txW
 txW
 txW
 txW
-eri
-eri
-eri
-eri
-eri
-eri
-eri
-eri
-eri
-eri
+txW
+txW
+txW
+txW
+txW
+txW
+txW
+txW
+txW
+txW
 sXU
 mKY
 uty
@@ -258533,16 +258542,16 @@ txW
 txW
 txW
 txW
-eri
-eri
-eri
-eri
-eri
-eri
-eri
-eri
-eri
-eri
+txW
+txW
+txW
+txW
+txW
+txW
+txW
+txW
+txW
+txW
 sXU
 uty
 uty
@@ -258790,16 +258799,16 @@ txW
 txW
 txW
 txW
-eri
-eri
-eri
-eri
-eri
-eri
-eri
-eri
-eri
-eri
+txW
+txW
+txW
+txW
+txW
+txW
+txW
+txW
+txW
+txW
 nnZ
 sFS
 sFS
@@ -259048,14 +259057,14 @@ txW
 txW
 txW
 txW
-eri
-eri
+txW
+txW
 dtb
-eri
-eri
-eri
+txW
+txW
+txW
 dtb
-eri
+txW
 txW
 txW
 dtb
