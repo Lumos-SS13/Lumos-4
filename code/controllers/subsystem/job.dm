@@ -97,6 +97,13 @@ SUBSYSTEM_DEF(job)
 	if(CONFIG_GET(flag/load_jobs_from_txt))
 		load_jobs_from_config()
 	set_overflow_role(CONFIG_GET(string/overflow_job)) // this must always go after load_jobs_from_config() due to how the legacy systems operate, this always takes precedent.
+
+	// Initialize RETA system - must be after setup_occupations() so all jobs are loaded - code/modules/reta/reta_system.dm
+	log_game("RETA: Jobs subsystem Initialize() calling RETA initialization")
+	initialize_reta_system()
+	populate_reta_job_trims()
+	log_game("RETA: Jobs subsystem Initialize() RETA initialization completed")
+
 	return SS_INIT_SUCCESS
 
 /// Returns a list of jobs that we are allowed to fuck with during random events
@@ -1004,10 +1011,13 @@ SUBSYSTEM_DEF(job)
 			job_debug("[debug_prefix] Error: [get_job_unavailable_error_message(JOB_UNAVAILABLE_FLAVOUR)], Player: [player][add_job_to_log ? ", Job: [possible_job]" : ""]")
 			return JOB_UNAVAILABLE_FLAVOUR
 
+	if (!possible_job.has_enough_hands(player.client.prefs))
+		job_debug("[debug_prefix] Error: [get_job_unavailable_error_message(JOB_UNAVAILABLE_NOHANDS)], Player: [player][add_job_to_log ? ", Job: [possible_job]" : ""]")
+		return JOB_UNAVAILABLE_NOHANDS
+
 	if(possible_job.has_banned_augment(player.client.prefs))
 		job_debug("[debug_prefix] Error: [get_job_unavailable_error_message(JOB_UNAVAILABLE_AUGMENT)], Player: [player][add_job_to_log ? ", Job: [possible_job]" : ""]")
 		return JOB_UNAVAILABLE_AUGMENT
-
 
 	//SKYRAT EDIT END
 

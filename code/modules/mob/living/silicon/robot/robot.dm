@@ -21,6 +21,9 @@
 	RegisterSignal(src, COMSIG_PROCESS_BORGCHARGER_OCCUPANT, PROC_REF(charge))
 	RegisterSignal(src, COMSIG_LIGHT_EATER_ACT, PROC_REF(on_light_eater))
 	RegisterSignal(src, SIGNAL_ADDTRAIT(TRAIT_GOT_DAMPENED), PROC_REF(on_dampen))
+	// BUBBER EDIT: Register buckle/unbuckle signal to update sprite on tallborgs
+	RegisterSignal(src, COMSIG_MOB_BUCKLED, PROC_REF(on_buckled))
+	RegisterSignal(src, COMSIG_MOB_UNBUCKLED, PROC_REF(on_unbuckled))
 
 	inv1 = new /atom/movable/screen/robot/module1()
 	inv2 = new /atom/movable/screen/robot/module2()
@@ -323,7 +326,13 @@
 		eye_lights.layer = -2 //Bubber edit
 		add_overlay(eye_lights)
 
-	if(opened && !(TRAIT_R_UNIQUEPANEL in model.model_features))
+	var/obj/item/shield_module/shield_module = locate(/obj/item/shield_module) in src
+	if(shield_module && shield_module.active)
+		add_overlay(shield_module.shield_overlay)
+	else if (shield_module && !shield_module.active)
+		cut_overlay(shield_module.shield_overlay)
+
+	if(opened && !(TRAIT_R_UNIQUEPANEL in model.model_features)) // BUBBER EDIT - ADDITION
 		if(wiresexposed)
 			add_overlay("ov-opencover +w")
 		else if(cell)
@@ -928,7 +937,7 @@
 	button_icon = 'icons/mob/actions/actions_AI.dmi'
 	button_icon_state = "ai_core"
 
-/datum/action/innate/undeployment/Trigger(trigger_flags)
+/datum/action/innate/undeployment/Trigger(mob/clicker, trigger_flags)
 	if(!..())
 		return FALSE
 	var/mob/living/silicon/robot/shell_to_disconnect = owner
@@ -1096,3 +1105,10 @@
 		buckled_mob.Paralyze(1 SECONDS)
 		unbuckle_mob(buckled_mob)
 	do_sparks(5, 0, src)
+
+// BUBBER EDIT: Update sprites on buckle/unbuckle(for tallborgs)
+/mob/living/silicon/robot/proc/on_buckled(mob/living/silicon/buckling)
+	update_icons()
+
+/mob/living/silicon/robot/proc/on_unbuckled(mob/living/silicon/buckling)
+	update_icons()
