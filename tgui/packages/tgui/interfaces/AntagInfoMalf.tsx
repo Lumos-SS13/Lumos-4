@@ -1,17 +1,17 @@
 import { useState } from 'react';
 import { BlockQuote, Button, Section, Stack, Tabs } from 'tgui-core/components';
-import { BooleanLike } from 'tgui-core/react';
+import type { BooleanLike } from 'tgui-core/react';
 
 import { useBackend } from '../backend';
 import { Window } from '../layouts';
 import { Rules } from './AntagInfoRules'; // SKYRAT EDIT ADDITION
 import { MalfAiModules } from './common/MalfAiModules';
 import {
-  Objective,
+  type Objective,
   ObjectivePrintout,
   ReplaceObjectivesButton,
 } from './common/Objectives';
-import { Item } from './Uplink/GenericUplink';
+import type { Item } from './Uplink/GenericUplink';
 
 const allystyle = {
   fontWeight: 'bold',
@@ -94,9 +94,9 @@ function FlavorSection(props) {
             You don't have to follow it, unless you want some
             ideas for how to spend the round.`}
           */
-          tooltip={`
+          tooltip="
             Please refer to the 'Antagonist Policy' section of the wiki
-            if you have any questions.`}
+            if you have any questions."
           tooltipPosition="bottom-start"
         />
       }

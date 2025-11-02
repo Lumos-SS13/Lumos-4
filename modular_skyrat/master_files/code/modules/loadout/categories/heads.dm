@@ -278,10 +278,6 @@
 *	MISC
 */
 
-/datum/loadout_item/head/baseball
-	name = "Ballcap"
-	item_path = /obj/item/clothing/head/soft/mime
-
 /datum/loadout_item/head/pirate
 	name = "Pirate hat"
 	item_path = /obj/item/clothing/head/costume/pirate
@@ -334,12 +330,10 @@
 /datum/loadout_item/head/maidhead
 	name = "Simple Maid Headband"
 	item_path = /obj/item/clothing/head/costume/skyrat/maid
-	additional_displayed_text = list("Small headband that only fits on top the head.")
 
 /datum/loadout_item/head/maidhead2
 	name = "Frilly Maid Headband"
-	item_path = /obj/item/clothing/head/costume/maidheadband
-	additional_displayed_text = list("Larger headband from the maid rework. Fits around head and ears.")
+	item_path = /obj/item/clothing/head/costume/maid_headband
 
 /datum/loadout_item/head/wig
 	name = "Wig"
@@ -517,6 +511,7 @@
 /datum/loadout_item/head/imperial_white
 	name = "White Naval Officer Cap"
 	item_path = /obj/item/clothing/head/hats/imperial/white
+
 /datum/loadout_item/head/jester
 	name = "Jester hat"
 	item_path = /obj/item/clothing/head/costume/jester
@@ -526,16 +521,12 @@
 	item_path = /obj/item/clothing/head/costume/jesteralt
 
 /datum/loadout_item/head/azulea_oldblood
-	name = "Oldblood's Royal cap"
+	name = "Oldblood's Royal Cap"
 	item_path = /obj/item/clothing/head/hats/caphat/azulean/old_blood
-	restricted_roles = list(JOB_CAPTAIN, JOB_NT_REP)
-	restricted_species = list(SPECIES_AKULA)
 
 /datum/loadout_item/head/azulea_upstart
-	name = "Upstart's Noble cap"
+	name = "Upstart's Noble Cap"
 	item_path = /obj/item/clothing/head/hats/caphat/azulean/upstart
-	restricted_roles = list(JOB_CAPTAIN, JOB_NT_REP)
-	restricted_species = list(SPECIES_AKULA)
 
 /*
 *	JOB BERETS
@@ -638,7 +629,6 @@
 /datum/loadout_item/head/rainbow_bunch
 	name = "Rainbow Bunch"
 	item_path = /obj/item/food/grown/rainbow_flower
-	additional_displayed_text = list(TOOLTIP_RANDOM_COLOR)
 
 // Legacy unpaintable cowboy hat because it fits a character better
 /datum/loadout_item/head/cowboyhat_legacy

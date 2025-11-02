@@ -1,4 +1,4 @@
-/obj/item/organ/external/moth_markings
+/obj/item/organ/moth_markings
 	name = "moth markings"
 	desc = "How did you even get that off...?"
 	icon_state = "random_fly_2"
@@ -9,8 +9,6 @@
 	zone = BODY_ZONE_CHEST
 	slot = ORGAN_SLOT_EXTERNAL_MOTH_MARKINGS
 	organ_flags = ORGAN_UNREMOVABLE
-
-	preference = "feature_moth_markings"
 
 	bodypart_overlay = /datum/bodypart_overlay/mutant/moth_markings
 

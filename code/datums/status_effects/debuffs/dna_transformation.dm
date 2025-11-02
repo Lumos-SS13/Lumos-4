@@ -2,7 +2,7 @@
 /// then turns them back to how they were before transformation.
 /datum/status_effect/temporary_transformation
 	id = "temp_dna_transformation"
-	tick_interval = -1
+	tick_interval = STATUS_EFFECT_NO_TICK
 	duration = 1 MINUTES // set in on creation, this just needs to be any value to process
 	alert_type = null
 	/// A reference to a COPY of the DNA that the mob will be transformed into.
@@ -16,7 +16,7 @@
 	QDEL_NULL(old_dna)
 
 /datum/status_effect/temporary_transformation/on_creation(mob/living/new_owner, new_duration = 1 MINUTES, datum/dna/dna_to_copy)
-	src.duration = (new_duration == INFINITY) ? -1 : new_duration
+	src.duration = new_duration
 	src.new_dna = new()
 	src.old_dna = new()
 	dna_to_copy.copy_dna(new_dna)
@@ -34,7 +34,7 @@
 	transforming.dna.copy_dna(old_dna)
 	// Makes them into the new DNA
 	transforming.visual_only_organs = TRUE // SKYRAT EDIT ADDITION - Customization
-	new_dna.transfer_identity(transforming)
+	new_dna.copy_dna(transforming.dna, COPY_DNA_SPECIES)
 	transforming.visual_only_organs = initial(transforming.visual_only_organs) // SKYRAT EDIT ADDITION - Customization
 	transforming.real_name = new_dna.real_name
 	transforming.name = transforming.get_visible_name()
@@ -47,7 +47,7 @@
 
 	if(!QDELING(owner)) // Don't really need to do appearance stuff if we're being deleted
 		transforming.visual_only_organs = TRUE // SKYRAT EDIT ADDITION - Customization
-		old_dna.transfer_identity(transforming)
+		old_dna.copy_dna(transforming.dna, COPY_DNA_SPECIES)
 		transforming.visual_only_organs = initial(transforming.visual_only_organs) // SKYRAT EDIT ADDITION - Customization
 		transforming.updateappearance(mutcolor_update = TRUE)
 		transforming.domutcheck()
@@ -83,11 +83,11 @@
 
 	// Pause if we're dead, appear dead, or in stasis
 	if(source.stat == DEAD || HAS_TRAIT(source, TRAIT_DEATHCOMA) || HAS_TRAIT(source, TRAIT_STASIS))
-		if(duration == -1)
+		if(duration == STATUS_EFFECT_PERMANENT)
 			return // Already paused
 
 		time_before_pause = duration - world.time
-		duration = -1
+		duration = STATUS_EFFECT_PERMANENT
 
 	// Resume if we're none of the above and also were paused
 	else if(time_before_pause != -1)

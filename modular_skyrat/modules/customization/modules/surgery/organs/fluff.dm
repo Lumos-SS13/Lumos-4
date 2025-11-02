@@ -1,4 +1,4 @@
-/obj/item/organ/external/fluff
+/obj/item/organ/fluff
 	name = "fluff"
 	desc = "Real fluffy."
 	icon_state = "random_fly_1"
@@ -9,8 +9,6 @@
 	zone = BODY_ZONE_CHEST
 	slot = ORGAN_SLOT_EXTERNAL_FLUFF
 	organ_flags = ORGAN_UNREMOVABLE
-
-	preference = "feature_fluff"
 
 	bodypart_overlay = /datum/bodypart_overlay/mutant/fluff
 

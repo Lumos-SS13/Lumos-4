@@ -26,6 +26,8 @@
 #define INVESTIGATE_RECORDS "records"
 #define INVESTIGATE_RESEARCH "research"
 #define INVESTIGATE_WIRES "wires"
+#define INVESTIGATE_NANITES "nanites" // BUBBER EDIT ADDITION
+
 
 // Logging types for log_message()
 #define LOG_ATTACK (1 << 0)
@@ -150,6 +152,7 @@
 #define LOG_CATEGORY_GAME_TRAITOR "game-traitor"
 #define LOG_CATEGORY_GAME_VOTE "game-vote"
 #define LOG_CATEGORY_GAME_WHISPER "game-whisper"
+#define LOG_CATEGORY_GAME_GHOST_POLLS "game-ghost-polls"
 
 // HREF categories
 #define LOG_CATEGORY_HREF "href"

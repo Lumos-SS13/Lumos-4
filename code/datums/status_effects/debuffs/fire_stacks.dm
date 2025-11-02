@@ -7,11 +7,13 @@
 
 */
 /datum/status_effect/fire_handler
-	duration = -1
+	duration = STATUS_EFFECT_PERMANENT
+	id = STATUS_EFFECT_ID_ABSTRACT
 	alert_type = null
 	status_type = STATUS_EFFECT_REFRESH //Custom code
 	on_remove_on_mob_delete = TRUE
 	tick_interval = 2 SECONDS
+	processing_speed = STATUS_EFFECT_PRIORITY
 	/// Current amount of stacks we have
 	var/stacks
 	/// Maximum of stacks that we could possibly get
@@ -176,6 +178,7 @@
 
 	var/decay_multiplier = HAS_TRAIT(owner, TRAIT_HUSK) ? 2 : 1 // husks decay twice as fast
 	adjust_stacks(owner.fire_stack_decay_rate * decay_multiplier * seconds_between_ticks)
+	SEND_SIGNAL(owner, COMSIG_FIRE_STACKS_UPDATED, stacks)
 
 	if(stacks <= 0)
 		qdel(src)
@@ -286,7 +289,7 @@
 	owner.clear_mood_event("on_fire")
 	SEND_SIGNAL(owner, COMSIG_LIVING_EXTINGUISHED, owner)
 	cache_stacks()
-	for(var/obj/item/equipped in (owner.get_equipped_items(INCLUDE_HELD)))
+	for(var/obj/item/equipped as anything in owner.get_equipped_items(INCLUDE_HELD|INCLUDE_PROSTHETICS|INCLUDE_ABSTRACT))
 		equipped.extinguish()
 
 /datum/status_effect/fire_handler/fire_stacks/on_remove()
@@ -373,19 +376,51 @@ BUBBER EDIT RESET THIS TG BACK TO MASTER ONCE YOU GET FISH INFUSION*/
 
 	enemy_types = list(/datum/status_effect/fire_handler/fire_stacks)
 	stack_modifier = -1
+	/// If the mob has the TRAIT_SLIPPERY_WHEN_WET trait, the mob gets this component while it's wet
+	var/datum/component/slippery/slipperiness
+
+/datum/status_effect/fire_handler/wet_stacks/on_apply()
+	if(HAS_TRAIT(owner, TRAIT_SHADED))
+		return FALSE
+	. = ..()
+	RegisterSignals(owner, list(SIGNAL_ADDTRAIT(TRAIT_WET_FOR_LONGER), SIGNAL_REMOVETRAIT(TRAIT_WET_FOR_LONGER)), PROC_REF(update_wet_stack_modifier))
+	update_wet_stack_modifier()
+	RegisterSignal(owner, SIGNAL_ADDTRAIT(TRAIT_SLIPPERY_WHEN_WET), PROC_REF(become_slippery))
+	RegisterSignal(owner, SIGNAL_REMOVETRAIT(TRAIT_SLIPPERY_WHEN_WET), PROC_REF(no_longer_slippery))
+	if(HAS_TRAIT(owner, TRAIT_SLIPPERY_WHEN_WET))
+		become_slippery()
+	ADD_TRAIT(owner, TRAIT_IS_WET,  TRAIT_STATUS_EFFECT(id))
+	owner.add_shared_particles(/particles/droplets)
+
+/datum/status_effect/fire_handler/wet_stacks/on_remove()
+	. = ..()
+	REMOVE_TRAIT(owner, TRAIT_IS_WET, TRAIT_STATUS_EFFECT(id))
+	if(HAS_TRAIT(owner, TRAIT_SLIPPERY_WHEN_WET))
+		no_longer_slippery()
+	owner.remove_shared_particles(/particles/droplets)
+
+/datum/status_effect/fire_handler/wet_stacks/proc/update_wet_stack_modifier()
+	SIGNAL_HANDLER
+	stack_modifier = HAS_TRAIT(owner, TRAIT_WET_FOR_LONGER) ? -3.5 : -1
+
+/datum/status_effect/fire_handler/wet_stacks/proc/become_slippery()
+	SIGNAL_HANDLER
+	slipperiness = owner.AddComponent(/datum/component/slippery, 5 SECONDS, lube_flags = SLIPPERY_WHEN_LYING_DOWN|NO_SLIP_WHEN_WALKING|WEAK_SLIDE)
+	ADD_TRAIT(owner, TRAIT_NO_SLIP_WATER, TRAIT_STATUS_EFFECT(id))
+
+/datum/status_effect/fire_handler/wet_stacks/proc/no_longer_slippery()
+	SIGNAL_HANDLER
+	QDEL_NULL(slipperiness)
+	REMOVE_TRAIT(owner, TRAIT_NO_SLIP_WATER, TRAIT_STATUS_EFFECT(id))
 
 /datum/status_effect/fire_handler/wet_stacks/get_examine_text()
 	return "[owner.p_They()] look[owner.p_s()] a little soaked."
 
 /datum/status_effect/fire_handler/wet_stacks/tick(seconds_between_ticks)
-	adjust_stacks(-0.5 * seconds_between_ticks)
+	var/decay = HAS_TRAIT(owner, TRAIT_WET_FOR_LONGER) ? -0.035 : -0.5
+	adjust_stacks(decay * seconds_between_ticks)
 	if(stacks <= 0)
 		qdel(src)
-
-/datum/status_effect/fire_handler/wet_stacks/update_particles()
-	if(particle_effect)
-		return
-	particle_effect = new(owner, /particles/droplets)
 
 /datum/status_effect/fire_handler/wet_stacks/check_basic_mob_immunity(mob/living/basic/basic_owner)
 	return !(basic_owner.basic_mob_flags & IMMUNE_TO_GETTING_WET)

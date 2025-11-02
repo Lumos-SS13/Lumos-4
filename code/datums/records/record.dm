@@ -168,7 +168,6 @@
 	datum/mind/mind_ref,
 	// BUBBER EDIT BEGIN - Records
 	exploitable_information = "",
-	background_information = "",
 )
 	. = ..()
 	src.locked_dna = locked_dna
@@ -177,8 +176,7 @@
 
 	GLOB.manifest.locked += src
 
-	// BUBBER EDIT BEGIn - Records
-	src.background_information = background_information
+	// BUBBER EDIT BEGIN - Records
 	src.exploitable_information = exploitable_information
 	// BUBBER EDIT END
 
@@ -250,7 +248,7 @@
 		var/mutable_appearance/appearance = character_appearance
 		appearance.setDir(orientation)
 		if(add_height_chart)
-			appearance.underlays += mutable_appearance('icons/obj/machines/photobooth.dmi', "height_chart", alpha = 125, appearance_flags = RESET_ALPHA|RESET_COLOR|RESET_TRANSFORM)
+			appearance.underlays += mutable_appearance('icons/obj/machines/photobooth.dmi', "height_chart", alpha = 125, appearance_flags = RESET_ALPHA|RESET_COLOR|RESET_TRANSFORM|KEEP_APART)
 		picture_image = getFlatIcon(appearance)
 	else
 		picture_image = character_appearance

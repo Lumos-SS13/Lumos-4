@@ -166,7 +166,7 @@
 	armor_flag = BOMB
 	range = 6
 	pressure_decrease = 0.10 //Pressured enviorments are a no go for the railgun
-	speed = 0.1 //NYOOM
+	speed = 10 //NYOOM
 	projectile_piercing = PASSMOB
 
 /obj/projectile/kinetic/repeater
@@ -222,8 +222,6 @@
 							/area/moonstation/surface/unexplored,
 							/area/moonstation/underground,
 							/area/moonstation/underground/unexplored,
-							/area/lavaland/underground/unexplored,
-							/area/lavaland/underground/unexplored/danger,
 							/area/lavaland/surface/outdoors,
 							/area/lavaland/surface/outdoors/unexplored/danger,
 							/area/lavaland/surface/outdoors/unexplored,

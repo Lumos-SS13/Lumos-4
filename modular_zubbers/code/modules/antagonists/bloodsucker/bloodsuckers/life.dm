@@ -10,7 +10,7 @@
 	life_always()
 	var/is_head = is_head(owner.current)
 	if(!is_head && owner.current.get_organ_slot(ORGAN_SLOT_HEART) && !am_staked())
-		life_active(is_head)
+		INVOKE_ASYNC(src, PROC_REF(life_active), is_head)
 
 	SEND_SIGNAL(src, COMSIG_BLOODSUCKER_ON_LIFETICK, seconds_per_tick, times_fired)
 
@@ -78,32 +78,12 @@
 #undef MASQUERADE
 
 /// mult: SILENT feed is 1/3 the amount
-/datum/antagonist/bloodsucker/proc/handle_feeding(mob/living/carbon/target, mult=1, power_level, already_drunk = 0)
-	// Starts at 15 (now 8 since we doubled the Feed time)
-	var/feed_amount = 15 + (power_level * 2)
-	var/blood_taken = feed_amount * mult
-	target.blood_volume = max(target.blood_volume - blood_taken, 0)
-
-	///////////
-	// Shift Body Temp (toward Target's temp, by volume taken)
-	owner.current.bodytemperature = ((bloodsucker_blood_volume * owner.current.bodytemperature) + (blood_taken * target.bodytemperature)) / (bloodsucker_blood_volume + blood_taken)
-	// our volume * temp, + their volume * temp, / total volume
-	///////////
-	// Reduce Value Quantity
-	if(target.stat == DEAD) // Penalty for Dead Blood
-		blood_taken /= 3
-	if(!ishuman(target)) // Penalty for Non-Human Blood
-		blood_taken /= 2
-	else if(!target?.mind) // Penalty for Mindless Blood
-		blood_taken /= 2
+/datum/antagonist/bloodsucker/proc/handle_feeding(mob/living/carbon/target, blood_taken, already_drunk = 0)
 	// Apply to Volume
 	AdjustBloodVolume(blood_taken)
 	total_blood_drank += blood_taken
 	OverfeedHealing(blood_taken)
 	// Reagents (NOT Blood!)
-	if(target.reagents && target.reagents.total_volume)
-		target.reagents.trans_to(owner.current, INGEST, 1) // Run transfer of 1 unit of reagent from them to me.
-	owner.current.playsound_local(null, 'sound/effects/singlebeat.ogg', 40, 1) // Play THIS sound for user only. The "null" is where turf would go if a location was needed. Null puts it right in their head.
 	if(target.mind) // Checks if the target has a mind
 		// closer it is to max, the less level up blood you get
 		var/blood_for_leveling = blood_taken
@@ -228,13 +208,13 @@
 	bloodsuckeruser.cure_husk(BURN)
 
 	if(bloodsuckeruser.get_organ_slot(ORGAN_SLOT_HEART))
-		bloodsuckeruser.regenerate_organs(regenerate_existing = FALSE)
+		bloodsuckeruser.regenerate_organs(remove_hazardous = FALSE)
 
 	if(!HAS_TRAIT(bloodsuckeruser, TRAIT_MASQUERADE))
-		var/obj/item/organ/internal/heart/current_heart = bloodsuckeruser.get_organ_slot(ORGAN_SLOT_HEART)
+		var/obj/item/organ/heart/current_heart = bloodsuckeruser.get_organ_slot(ORGAN_SLOT_HEART)
 		current_heart?.Stop()
 
-	var/obj/item/organ/internal/eyes/current_eyes = bloodsuckeruser.get_organ_slot(ORGAN_SLOT_EYES)
+	var/obj/item/organ/eyes/current_eyes = bloodsuckeruser.get_organ_slot(ORGAN_SLOT_EYES)
 	if(current_eyes && !(current_eyes.organ_flags & ORGAN_ROBOTIC))
 		current_eyes.flash_protect = max(initial(current_eyes.flash_protect) - 1, FLASH_PROTECTION_SENSITIVE)
 		current_eyes.color_cutoffs = BLOODSUCKER_SIGHT_COLOR_CUTOFF
@@ -255,8 +235,8 @@
 
 	// From [powers/panacea.dm]
 	var/list/bad_organs = list(
-		bloodsuckeruser.get_organ_by_type(/obj/item/organ/internal/body_egg),
-		bloodsuckeruser.get_organ_by_type(/obj/item/organ/internal/zombie_infection)
+		bloodsuckeruser.get_organ_by_type(/obj/item/organ/body_egg),
+		bloodsuckeruser.get_organ_by_type(/obj/item/organ/zombie_infection)
 	)
 	for(var/tumors in bad_organs)
 		var/obj/item/organ/yucky_organs = tumors
@@ -303,7 +283,7 @@
 	var/datum/status_effect/frenzy/status_effect = owner.current.has_status_effect(/datum/status_effect/frenzy)
 	if(bloodsucker_blood_volume >= frenzy_exit_threshold() && frenzied && status_effect?.duration == -1)
 		status_effect.duration = world.time + 10 SECONDS
-		owner.current.balloon_alert(owner.current, "Frenzy ends in 10 seconds!")
+		owner.current.balloon_alert(owner.current, "frenzy ends in 10 seconds!")
 	// BLOOD_VOLUME_BAD: [224] - Jitter
 	if(bloodsucker_blood_volume < BLOOD_VOLUME_BAD && prob(0.5) && !is_in_torpor() && !HAS_TRAIT(owner.current, TRAIT_MASQUERADE))
 		owner.current.set_timed_status_effect(3 SECONDS, /datum/status_effect/jitter, only_if_higher = TRUE)
@@ -356,7 +336,7 @@
 	var/obj/item/bodypart/head/head = is_head(poor_fucker)
 	if(!head || poor_fucker.stat != DEAD || !poor_fucker.can_be_revived())
 		return
-	if(istype(poor_fucker.loc, /obj/item/organ/internal/brain))
+	if(istype(poor_fucker.loc, /obj/item/organ/brain))
 		RegisterSignal(poor_fucker.loc, COMSIG_QDELETING, PROC_REF(on_brain_remove))
 		RegisterSignal(poor_fucker.loc, COMSIG_ORGAN_BODYPART_REMOVED, PROC_REF(on_brain_remove))
 
@@ -385,7 +365,7 @@
 
 /datum/antagonist/bloodsucker/proc/on_brainmob_qdel()
 	SIGNAL_HANDLER
-	if(istype(owner.current.loc, /obj/item/organ/internal/brain))
+	if(istype(owner.current.loc, /obj/item/organ/brain))
 		cleanup_talking_head(owner.current.loc)
 	else
 		cleanup_talking_head()
@@ -407,7 +387,7 @@
 	var/mob/living/carbon/user = owner.current
 	owner.current.drop_all_held_items()
 	owner.current.unequip_everything()
-	user.remove_all_embedded_objects()
+	INVOKE_ASYNC(user, TYPE_PROC_REF(/mob/living/carbon, remove_all_embedded_objects))
 	playsound(owner.current, 'sound/effects/tendril_destroyed.ogg', 40, TRUE)
 
 	var/unique_death = SEND_SIGNAL(src, COMSIG_BLOODSUCKER_FINAL_DEATH)
@@ -420,7 +400,7 @@
 			span_warning("[user]'s skin crackles and dries, their skin and bones withering to dust. A hollow cry whips from what is now a sandy pile of remains."),
 			span_userdanger("Your soul escapes your withering body as the abyss welcomes you to your Final Death."),
 			span_hear("You hear a dry, crackling sound."))
-		addtimer(CALLBACK(user, TYPE_PROC_REF(/mob/living, dust)), 5 SECONDS, TIMER_UNIQUE|TIMER_STOPPABLE)
+		addtimer(CALLBACK(user, TYPE_PROC_REF(/atom/movable, dust)), 5 SECONDS, TIMER_UNIQUE|TIMER_STOPPABLE)
 		return
 	user.visible_message(
 		span_warning("[user]'s skin bursts forth in a spray of gore and detritus. A horrible cry echoes from what is now a wet pile of decaying meat."),

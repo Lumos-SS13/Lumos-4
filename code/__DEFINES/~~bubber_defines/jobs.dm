@@ -1,5 +1,5 @@
 #define RECORDS_TEXT_CHAR_REQUIREMENT 15
-#define JOB_UNAVAILABLE_FLAVOUR_SILICON (JOB_UNAVAILABLE_AUGMENT + 1)
+#define JOB_UNAVAILABLE_FLAVOUR_SILICON (JOB_UNAVAILABLE_NOHANDS + 1)
 //A proc to determine if a job is a silicon job.
 #define is_silicon_job(A) (istype(A, /datum/job/ai) || istype(A, /datum/job/cyborg))
 
@@ -39,7 +39,6 @@
 	/obj/item/door_remote/head_of_security, \
 	/obj/item/door_remote/quartermaster, \
 	/obj/item/door_remote/chief_medical_officer, \
-	/obj/item/door_remote/civilian, \
 	/obj/item/circuitboard/machine/techfab/department/engineering, \
 	/obj/item/circuitboard/machine/techfab/department/service, \
 	/obj/item/circuitboard/machine/techfab/department/security, \
@@ -56,7 +55,7 @@
 	/obj/item/pinpointer/nuke, \
 	/obj/item/gun/energy/e_gun, \
 	/obj/item/storage/toolbox/guncase/skyrat/pistol/trappiste_small_case/skild, \
-	/obj/item/storage/belt/sabre, \
+	/obj/item/storage/belt/sheath/sabre, \
 	/obj/item/mod/control/pre_equipped/magnate, \
 	/obj/item/mod/control/pre_equipped/blueshield, \
 	/obj/item/clothing/suit/armor/vest/warden, \

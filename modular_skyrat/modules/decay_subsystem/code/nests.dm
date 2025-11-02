@@ -1,5 +1,3 @@
-#define NEST_FACTION "nest spawned"
-
 /obj/structure/mob_spawner
 	name = "nest"
 	desc = "A nasty looking pile of sticks and debris."
@@ -15,7 +13,7 @@
 	faction = list(NEST_FACTION)
 	var/spawn_delay = 0
 	/// What mob to spawn
-	var/list/monster_types = list(/mob/living/simple_animal/hostile/blackmesa/xen/headcrab)
+	var/list/monster_types = list(/mob/living/basic/blackmesa/xen/headcrab)
 	/// How many mobs can we spawn?
 	var/max_mobs = 3
 	var/spawned_mobs = 0
@@ -118,7 +116,7 @@
 
 /obj/structure/mob_spawner/attacked_by(obj/item/I, mob/living/user)
 	. = ..()
-	do_jiggle()
+	do_jiggle_sr()
 	if(!retaliated)
 		visible_message(span_danger("[src] grubbles angrily!"))
 		var/chosen_mob_type = pick(monster_types)
@@ -231,7 +229,7 @@
 			for(var/i in 1 to number)
 				new path (loc)
 	playsound(src, 'sound/effects/blob/blobattack.ogg', 100)
-	new /mob/living/simple_animal/hostile/vatbeast(loc)
+	new /mob/living/basic/vatbeast(loc)
 	return ..()
 
 

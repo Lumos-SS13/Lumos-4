@@ -81,6 +81,20 @@
 		RND_CATEGORY_MECHFAB_CYBORG_MODULES + RND_SUBCATEGORY_MECHFAB_CYBORG_MODULES_ALL
 	)
 
+/datum/design/borg_obedience
+	name = "Cyborg Obedience Module"
+	id = "obediencemodule"
+	build_type = MECHFAB
+	build_path = /obj/item/borg/upgrade/obediencemodule
+	materials = list(
+		/datum/material/iron = SHEET_MATERIAL_AMOUNT,
+		/datum/material/glass = SHEET_MATERIAL_AMOUNT,
+	)
+	construction_time = 4 SECONDS
+	category = list(
+		RND_CATEGORY_MECHFAB_CYBORG_MODULES + RND_SUBCATEGORY_MECHFAB_CYBORG_MODULES_ALL
+	)
+
 //so we have our own category
 /datum/design/borg_upgrade_surgical_processor_sci
 	name = "Research Surgical Processor"
@@ -117,6 +131,69 @@
 		/datum/material/diamond = SMALL_MATERIAL_AMOUNT * 5,
 	)
 	build_path = /obj/item/mod/module/mind_swap
+	category = list(
+		RND_CATEGORY_MODSUIT_MODULES + RND_SUBCATEGORY_MODSUIT_MODULES_GENERAL
+	)
+
+/datum/design/rld
+	name = "Cyborg Rapid Lighting Device"
+	desc = "A device that allows rapid, range deployment of lights and glowsticks."
+	id = "rld_cyborg"
+	build_type = MECHFAB
+	materials = list(/datum/material/iron = SHEET_MATERIAL_AMOUNT * 7.5, /datum/material/glass =SHEET_MATERIAL_AMOUNT * 2.5, /datum/material/silver = HALF_SHEET_MATERIAL_AMOUNT * 2.5)
+	build_path = /obj/item/borg/upgrade/rld
+	category = list(
+		RND_CATEGORY_MECHFAB_CYBORG_MODULES + RND_SUBCATEGORY_MECHFAB_CYBORG_MODULES_ENGINEERING
+	)
+
+/datum/design/xenoarch/equipment/bag_adv_borg
+	name = "Cyborg Advanced Xenoarchaeology Bag"
+	desc = "An improved bag to pick up strange rocks for science"
+	id = "adv_xenoarchbag_cyborg"
+	build_type = MECHFAB
+	materials = list(
+		/datum/material/iron = SHEET_MATERIAL_AMOUNT * 2,
+		/datum/material/plastic = HALF_SHEET_MATERIAL_AMOUNT,
+		/datum/material/bluespace = HALF_SHEET_MATERIAL_AMOUNT * 0.5,
+	)
+	build_path = /obj/item/borg/upgrade/xenoarch/adv
+	category = list(
+		RND_CATEGORY_MECHFAB_CYBORG_MODULES + RND_SUBCATEGORY_MECHFAB_CYBORG_MODULES_MINING
+	)
+
+/datum/design/pinpointer/vent
+	name = "Vent Pinpointer"
+	desc = "A modularized tracking device. It will locate and point to nearby vents."
+	id = "pinpointer_vent_cyborg"
+	build_type = MECHFAB
+	materials = list(
+		/datum/material/iron = SHEET_MATERIAL_AMOUNT * 5,
+		/datum/material/glass = SHEET_MATERIAL_AMOUNT * 2.5,
+		/datum/material/plastic = SHEET_MATERIAL_AMOUNT,
+	)
+	build_path = /obj/item/borg/upgrade/pinpointer/vent
+	category = list(
+		RND_CATEGORY_MECHFAB_CYBORG_MODULES + RND_SUBCATEGORY_MECHFAB_CYBORG_MODULES_MINING
+	)
+
+/datum/design/module/protean/servo
+	name = "Protean Servo Module"
+	id = "mod_protean_servo"
+	build_type = MECHFAB
+	materials = list(
+		/datum/material/iron = HALF_SHEET_MATERIAL_AMOUNT,
+		/datum/material/glass = SHEET_MATERIAL_AMOUNT,
+	)
+	build_path = /obj/item/mod/module/protean_servo
+
+/datum/design/module/hat_stabilizer
+	name = "Hat Stabilizer Module"
+	id = "mod_hat_stabilizer"
+	build_type = MECHFAB
+	materials = list(
+		/datum/material/iron = SHEET_MATERIAL_AMOUNT * 2,
+	)
+	build_path = /obj/item/mod/module/hat_stabilizer
 	category = list(
 		RND_CATEGORY_MODSUIT_MODULES + RND_SUBCATEGORY_MODSUIT_MODULES_GENERAL
 	)

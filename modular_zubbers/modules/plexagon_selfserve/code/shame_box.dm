@@ -1,7 +1,7 @@
 /obj/item/storage/lockbox/timeclock
 	name = "crew equipment lockbox"
 	desc = "Holds a crew's restricted equipment while they are temporarily assigned off-duty. A service contract between Nanotrasen and Lustwish stipulates that company issued batons, masks, restraints, and other equipment are not to be used for recreational purposes. Employees may purchase recreational provisions from an approved vendor."
-	icon = 'modular_zubbers/modules/plexagon_selfserve/icons/shame_box.dmi'
+	icon = 'modular_zubbers/icons/obj/storage/shame_box.dmi'
 	icon_state = "crewbox+l"
 	icon_locked = "crewbox+l"
 	icon_closed = "crewbox"
@@ -42,7 +42,7 @@
 	var/obj/item/card/id/access_card
 	if(istype(crew_id, /obj/item/modular_computer/pda))
 		var/obj/item/modular_computer/pda/crew_pda = crew_id
-		access_card = crew_pda.computer_id_slot
+		access_card = crew_pda.stored_id
 	else
 		access_card = crew_id
 
