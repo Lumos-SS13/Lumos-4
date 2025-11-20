@@ -2,7 +2,7 @@
 	"version": 1,
 	"map_name": "MetaStation",
 	"map_path": "map_files/MetaStation",
-	"map_file": "MetaStation_Lumos.dmm",
+	"map_file": "MetaStation_lumos.dmm",
 	"shuttles": {
 		"cargo": "cargo_box",
 		"ferry": "ferry_fancy",

@@ -2,7 +2,7 @@
 	"version": 1,
 	"map_name": "Delta Station",
 	"map_path": "map_files/Deltastation",
-	"map_file": "DeltaStation2_Lumos.dmm",
+	"map_file": "DeltaStation2_lumos.dmm",
 	"shuttles": {
 		"emergency": "emergency_delta",
 		"ferry": "ferry_fancy",
