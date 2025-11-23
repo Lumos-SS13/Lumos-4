@@ -34,6 +34,14 @@
 		#include "map_files\moonstation\moonstation.dmm"
 		#include "map_files\BoxStation\BoxStation.dmm"
 		// BUBBER EDIT ADDITION END
+		// LUMOS EDIT ADDITION START
+		#include "map_files\Deltastation\DeltaStation2_lumos.dmm"
+		#include "map_files\IceBoxStation\IceBoxStation_lumos.dmm"
+		#include "map_files\MetaStation\MetaStation_lumos.dmm"
+		#include "map_files\VoidRaptor\VoidRaptor_lumos.dmm"
+		#include "map_files\KiloStation\KiloStation_lumos.dmm"
+		#include "map_files\BoxStation\BoxStation_lumos.dmm"
+		// LUMOS EDIT ADDITION END
 	#endif
 	#ifdef ALL_TEMPLATES
 		#include "templates.dm"
