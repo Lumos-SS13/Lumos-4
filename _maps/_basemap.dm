@@ -33,6 +33,7 @@
 		#include "map_files\biodome\biodome.dmm"
 		#include "map_files\moonstation\moonstation.dmm"
 		#include "map_files\BoxStation\BoxStation.dmm"
+		#include "map_files\Ouroboros\Ouroboros.dmm"
 		// BUBBER EDIT ADDITION END
 		// LUMOS EDIT ADDITION START
 		#include "map_files\Deltastation\DeltaStation2_lumos.dmm"
