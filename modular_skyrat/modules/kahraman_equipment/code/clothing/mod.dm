@@ -1,4 +1,7 @@
 // Its modsuiting time
+//Im taking ideas out of iris station and cramming it in here such as making this suit actually decent to use
+
+
 
 /datum/mod_theme/frontier_colonist
 	name = "frontier hazard protective"
@@ -16,12 +19,13 @@
 	resistance_flags = FIRE_PROOF
 	max_heat_protection_temperature = FIRE_SUIT_MAX_TEMP_PROTECT
 	siemens_coefficient = 0
-	complexity_max = DEFAULT_MAX_COMPLEXITY - 7
-	charge_drain = DEFAULT_CHARGE_DRAIN * 2
-	slowdown_deployed = 1
+	complexity_max = DEFAULT_MAX_COMPLEXITY - 8 //lumos edit
+	charge_drain = DEFAULT_CHARGE_DRAIN * 1.3 //lumos edit
+	slowdown_deployed = 0 //lumos edit
+	slot_flags = ITEM_SLOT_BELT //lumos edit
 	inbuilt_modules = list(
-		/obj/item/mod/module/plate_compression/permanent,
-		/obj/item/mod/module/joint_torsion/permanent
+		/obj/item/mod/module/storage/belt, //its not a backpack anymore but a belt suit //lumos edit
+		/obj/item/mod/module/joint_torsion/permanent //lumos edit
 	)
 	allowed_suit_storage = list(
 		/obj/item/ammo_box,
@@ -39,7 +43,7 @@
 		/obj/item/resonator,
 		/obj/item/t_scanner,
 		/obj/item/analyzer,
-		/obj/item/storage/medkit,
+		/obj/item/storage/medkit, //lumos edit
 	)
 	variants = list(
 		"colonist" = list(
