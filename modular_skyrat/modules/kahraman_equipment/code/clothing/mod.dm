@@ -25,7 +25,7 @@
 	slot_flags = ITEM_SLOT_BELT //lumos edit
 	inbuilt_modules = list(
 		/obj/item/mod/module/storage/belt, //its not a backpack anymore but a belt suit //lumos edit
-		/obj/item/mod/module/joint_torsion/permanent //lumos edit
+		/obj/item/mod/module/joint_torsion/permanent //lumos edit.
 	)
 	allowed_suit_storage = list(
 		/obj/item/ammo_box,
