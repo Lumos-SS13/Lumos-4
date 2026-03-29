@@ -431,10 +431,8 @@
 	build_path = /obj/machinery/computer/rdconsole
 	req_access = list(ACCESS_RESEARCH) // Research access is required to toggle the lock.
 
-//LUMOS EDIT - CHANGE - START
 	var/silence_announcements = FALSE
-	var/locked = FALSE
-//LUMOS EDIT - CHANGE - END
+	var/locked = TRUE
 
 // An unlocked subtype of the board for mapping.
 /obj/item/circuitboard/computer/rdconsole/unlocked
