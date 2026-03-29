@@ -40,15 +40,6 @@
 	access_view = ACCESS_ENGINE_EQUIP
 	contains = list(/obj/item/construction/rcd/improved)
 
-	// Lumos addition start	
-/datum/supply_pack/goody/frontier_colonist
-	name = "frontier hazard protective MODsuit"
-	desc = "An unusual design of suit, in reality being no more than a slim underlayer with a built in coat and sealed helmet."
-	cost = PAYCHECK_COMMAND * 5 //500$
-	contains = list(
-		/obj/item/mod/control/pre_equipped/frontier_colonist,
-	)
-	// Lumos addition end	
 /*
 *	MISC
 */
