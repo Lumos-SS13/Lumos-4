@@ -165,3 +165,19 @@
   SomeCabbage:
   - rscadd: Added 4 new shuttles to the purchasable lineup, with varying prices and
       qualities.
+2026-03-29:
+  Majkl-J:
+  - balance: The leather saddle and peacekeeper saddle are now equipped in belt slots
+  - balance: The peacekeeper saddle is now bulky and can hold a baton and cuffs.
+  - image: Cuff and baton overlays for the peacekeeper saddle
+  ibexgoetia:
+  - bugfix: The off-station implant now includes an implant pad
+2026-03-30:
+  Hemshire:
+  - rscadd: 'New MODSuit
+
+      :cl:'
+  TealSeer:
+  - bugfix: fixed mismatched parts toggle doing nothing
+  Yobrocharlie:
+  - balance: Made the maintsroom slightly easier

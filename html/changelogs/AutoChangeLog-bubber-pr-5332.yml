@@ -1,0 +1,4 @@
+author: "nevimer"
+delete-after: True
+changes:
+  - code_imp: "privacy policy loads on connection rather than server load"
