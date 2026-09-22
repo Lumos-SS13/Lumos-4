@@ -29,10 +29,10 @@
 /datum/element/pet_bonus/proc/on_attack_hand(mob/living/pet, mob/living/petter, list/modifiers)
 	SIGNAL_HANDLER
 
-	if(pet.stat != CONSCIOUS || petter.combat_mode || LAZYACCESS(modifiers, RIGHT_CLICK))
+	if(IS_UNCONSCIOUS(pet) || petter.combat_mode || LAZYACCESS(modifiers, RIGHT_CLICK))
 		return
 
-	new /obj/effect/temp_visual/heart(pet.loc)
+	new /obj/effect/temp_visual/heart(get_turf(pet))
 	SEND_SIGNAL(pet, COMSIG_ANIMAL_PET, petter, modifiers)
 	if(emote_name && prob(33))
 		INVOKE_ASYNC(pet, TYPE_PROC_REF(/mob, emote), emote_name)

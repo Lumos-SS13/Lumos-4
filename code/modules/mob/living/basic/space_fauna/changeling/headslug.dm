@@ -10,8 +10,12 @@
 	icon_living = "headslug"
 	icon_dead = "headslug_dead"
 	gender = NEUTER
+	pass_flags = PASSTABLE | PASSMOB
+	mob_size = MOB_SIZE_SMALL
+	density = FALSE
 	health = 50
 	maxHealth = 50
+	max_stamina = 120
 	melee_damage_lower = 5
 	melee_damage_upper = 5
 	attack_verb_continuous = "chomps"
@@ -74,7 +78,7 @@
 /// Simply infects the target corpse with our changeling eggs. This shouldn't fail, because all checks should have been done in check_and_implant()
 /// Just to be super-duper safe to the player, we do return TRUE if all goes well and read that value in check_and_implant() to be nice to the player.
 /mob/living/basic/headslug/proc/infect(mob/living/carbon/victim)
-	var/obj/item/organ/internal/body_egg/changeling_egg/egg = new(victim)
+	var/obj/item/organ/body_egg/changeling_egg/egg = new(victim)
 
 	egg.origin = mind
 
@@ -91,8 +95,8 @@
 /// This is a bit neutered since these aren't intended to exist outside of player control, but it's a bit weird to just have these guys be completely stationary.
 /// No attacking or anything like that, though. Just something so they seem alive.
 /datum/ai_controller/basic_controller/headslug
+	behavior_tree_json = "code/modules/mob/living/basic/space_fauna/changeling/headslug.bt.json"
 	ai_movement = /datum/ai_movement/basic_avoidance
-	idle_behavior = /datum/idle_behavior/idle_random_walk
 
 /// Neutered version to prevent people from turning themselves into changelings with sentience potions or transformation
 /mob/living/basic/headslug/beakless

@@ -1,8 +1,8 @@
 /datum/design/beanbag_slug
 	name = "Beanbag Slug (Less Lethal)"
 	id = "beanbag_slug"
-	build_type = AUTOLATHE | PROTOLATHE | AWAY_LATHE
-	materials = list(/datum/material/iron =SHEET_MATERIAL_AMOUNT)
+	build_type = AUTOLATHE
+	materials = list(/datum/material/iron = SMALL_MATERIAL_AMOUNT * 3)
 	build_path = /obj/item/ammo_casing/shotgun/beanbag
 	category = list(
 		RND_CATEGORY_INITIAL,
@@ -13,8 +13,8 @@
 /datum/design/rubbershot
 	name = "Rubber Shot (Less Lethal)"
 	id = "rubber_shot"
-	build_type = AUTOLATHE | PROTOLATHE | AWAY_LATHE
-	materials = list(/datum/material/iron = SHEET_MATERIAL_AMOUNT*2)
+	build_type = AUTOLATHE
+	materials = list(/datum/material/iron = SMALL_MATERIAL_AMOUNT * 3)
 	build_path = /obj/item/ammo_casing/shotgun/rubbershot
 	category = list(
 		RND_CATEGORY_INITIAL,
@@ -25,9 +25,9 @@
 /datum/design/c38
 	name = "Speed Loader (.38) (Lethal)"
 	id = "c38"
-	build_type = AUTOLATHE | PROTOLATHE | AWAY_LATHE
-	materials = list(/datum/material/iron = SHEET_MATERIAL_AMOUNT*10)
-	build_path = /obj/item/ammo_box/c38
+	build_type = AUTOLATHE
+	materials = list(/datum/material/iron = SHEET_MATERIAL_AMOUNT*3)
+	build_path = /obj/item/ammo_box/speedloader/c38
 	category = list(
 		RND_CATEGORY_INITIAL,
 		RND_CATEGORY_WEAPONS + RND_SUBCATEGORY_WEAPONS_AMMO,
@@ -125,12 +125,13 @@
 		RND_CATEGORY_WEAPONS + RND_SUBCATEGORY_WEAPONS_PARTS,
 	)
 	departmental_flags = DEPARTMENT_BITFLAG_SECURITY
+	inherit_materials = DESIGN_INHERIT_MATS_SPECIAL //We also have a crafting recipe for this that uses different components.
 
 /datum/design/shotgun_dart
 	name = "Shotgun Dart (Lethal)"
 	id = "shotgun_dart"
 	build_type = AUTOLATHE
-	materials = list(/datum/material/iron = SHEET_MATERIAL_AMOUNT*2)
+	materials = list(/datum/material/iron = SMALL_MATERIAL_AMOUNT * 3)
 	build_path = /obj/item/ammo_casing/shotgun/dart
 	category = list(
 		RND_CATEGORY_HACKED,
@@ -142,7 +143,7 @@
 	name = "Incendiary Slug (Lethal)"
 	id = "incendiary_slug"
 	build_type = AUTOLATHE
-	materials = list(/datum/material/iron = SHEET_MATERIAL_AMOUNT*2)
+	materials = list(/datum/material/iron = SMALL_MATERIAL_AMOUNT * 3)
 	build_path = /obj/item/ammo_casing/shotgun/incendiary
 	category = list(
 		RND_CATEGORY_HACKED,
@@ -178,8 +179,8 @@
 	name = ".357 Casing (VERY Lethal)"
 	id = "a357"
 	build_type = AUTOLATHE
-	materials = list(/datum/material/iron = SHEET_MATERIAL_AMOUNT*2)
-	build_path = /obj/item/ammo_casing/a357
+	materials = list(/datum/material/iron = SMALL_MATERIAL_AMOUNT * 3)
+	build_path = /obj/item/ammo_casing/c357
 	category = list(
 		RND_CATEGORY_HACKED,
 		RND_CATEGORY_WEAPONS + RND_SUBCATEGORY_WEAPONS_AMMO,
@@ -190,7 +191,7 @@
 	name = ".310 Surplus Bullet Casing (VERY Lethal)"
 	id = "strilka310_surplus"
 	build_type = AUTOLATHE
-	materials = list(/datum/material/iron = SHEET_MATERIAL_AMOUNT*2)
+	materials = list(/datum/material/iron = SMALL_MATERIAL_AMOUNT * 3)
 	build_path = /obj/item/ammo_casing/strilka310/surplus
 	category = list(
 		RND_CATEGORY_HACKED,
@@ -202,7 +203,10 @@
 	name = "Ammo Box (10mm) (Lethal)"
 	id = "c10mm"
 	build_type = AUTOLATHE
-	materials = list(/datum/material/iron =SMALL_MATERIAL_AMOUNT * 300)
+	materials = list(/datum/material/iron = SHEET_MATERIAL_AMOUNT * 30)
+	transfered_materials = list(
+		/obj/item/ammo_box/c10mm = list(/datum/material/iron = SHEET_MATERIAL_AMOUNT * 15),
+	)
 	build_path = /obj/item/ammo_box/c10mm
 	category = list(
 		RND_CATEGORY_HACKED,
@@ -214,7 +218,10 @@
 	name = "Ammo Box (.45) (Lethal)"
 	id = "c45"
 	build_type = AUTOLATHE
-	materials = list(/datum/material/iron =SMALL_MATERIAL_AMOUNT * 300)
+	materials = list(/datum/material/iron = SHEET_MATERIAL_AMOUNT * 30)
+	transfered_materials = list(
+		/obj/item/ammo_box/c45 = list(/datum/material/iron = SHEET_MATERIAL_AMOUNT * 15),
+	)
 	build_path = /obj/item/ammo_box/c45
 	category = list(
 		RND_CATEGORY_HACKED,
@@ -223,11 +230,26 @@
 	departmental_flags = DEPARTMENT_BITFLAG_SECURITY
 
 /datum/design/c9mm
-	name = "Ammo Box (9x25mm Mk.12) (Lethal)" //SKYRAT EDIT: Calibre rename - Original: name = "Ammo Box (9mm)"
+	name = "Ammo Box (9x25mm Mk.12) (Lethal)" //SKYRAT EDIT: Calibre rename - Original: name = "Ammo Box
 	id = "c9mm"
 	build_type = AUTOLATHE
-	materials = list(/datum/material/iron =SMALL_MATERIAL_AMOUNT * 300)
+	materials = list(/datum/material/iron = SHEET_MATERIAL_AMOUNT * 30)
+	transfered_materials = list(
+		/obj/item/ammo_box/c9mm = list(/datum/material/iron = SHEET_MATERIAL_AMOUNT * 15),
+	)
 	build_path = /obj/item/ammo_box/c9mm
+	category = list(
+		RND_CATEGORY_HACKED,
+		RND_CATEGORY_WEAPONS + RND_SUBCATEGORY_WEAPONS_AMMO,
+	)
+	departmental_flags = DEPARTMENT_BITFLAG_SECURITY
+
+/datum/design/c9mm_sec
+	name = "Ammo Box (9x25mm Mk.12) (Lethal)"
+	id = "c9mm_sec"
+	build_type = AUTOLATHE
+	materials = list(/datum/material/iron =SMALL_MATERIAL_AMOUNT * 150)
+	build_path = /obj/item/ammo_box/c9mm/security
 	category = list(
 		RND_CATEGORY_HACKED,
 		RND_CATEGORY_WEAPONS + RND_SUBCATEGORY_WEAPONS_AMMO,

@@ -17,6 +17,11 @@
 		. += limb_id == "digitigrade" ? ("digitigrade_1_" + body_zone) : body_zone
 		. += "-[key]_[markings[key][MARKING_INDEX_COLOR]]_[markings[key][MARKING_INDEX_EMISSIVE]]"
 
+	// Hand markings are drawn by this limb too, so they have to be part of its cache key.
+	for(var/key in aux_zone_markings)
+		. += aux_zone
+		. += "-[key]_[aux_zone_markings[key][MARKING_INDEX_COLOR]]_[aux_zone_markings[key][MARKING_INDEX_EMISSIVE]]"
+
 	return .
 
 /**
@@ -29,5 +34,5 @@
  */
 /obj/item/bodypart/proc/set_icon_static(new_icon)
 	var/state_to_verify = "[limb_id]_[body_zone][is_dimorphic ? "_[limb_gender]" : ""]"
-	if(icon_exists(new_icon, state_to_verify, scream = TRUE))
+	if(icon_exists_or_scream(new_icon, state_to_verify))
 		icon_static = new_icon

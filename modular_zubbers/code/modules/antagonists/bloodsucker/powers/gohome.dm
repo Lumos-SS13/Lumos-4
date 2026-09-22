@@ -99,7 +99,7 @@
 	// If we aren't in the dark, anyone watching us will cause us to drop out stuff
 	if(current_turf && current_turf.lighting_object && current_turf.get_lumcount() >= 0.2)
 		for(var/mob/living/watchers in viewers(world.view, get_turf(user)) - user)
-			if(QDELETED(watchers.client) || watchers.stat != CONSCIOUS)
+			if(QDELETED(watchers.client) || IS_UNCONSCIOUS(watchers))
 				continue
 			if(watchers.has_unlimited_silicon_privilege)
 				continue
@@ -112,13 +112,11 @@
 	user.uncuff()
 	if(drop_item)
 		for(var/obj/item/literally_everything in owner)
-			owner.dropItemToGround(literally_everything, TRUE)
+			owner.dropItemToGround(literally_everything)
 
 	playsound(current_turf, 'sound/effects/magic/summon_karp.ogg', 60, 1)
 
-	var/datum/effect_system/steam_spread/bloodsucker/puff = new /datum/effect_system/steam_spread/bloodsucker()
-	puff.set_up(3, 0, current_turf)
-	puff.start()
+	do_smoke(3, FALSE, current_turf, smoke_type = /obj/effect/particle_effect/fluid/smoke/vampsmoke)
 
 	/// STEP FIVE: Create animal at prev location
 	var/mob/living/simple_animal/new_mob = pick_weight(spawning_mobs)
@@ -130,9 +128,6 @@
 
 	DeactivatePower()
 	pay_cost()
-
-/datum/effect_system/steam_spread/bloodsucker
-	effect_type = /obj/effect/particle_effect/fluid/smoke/vampsmoke
 
 #undef GOHOME_START
 #undef GOHOME_FLICKER_ONE

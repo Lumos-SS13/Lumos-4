@@ -12,7 +12,7 @@
 	var/require_model = FALSE
 	var/list/model_type = null
 	/// Bitflags listing model compatibility. Used in the exosuit fabricator for creating sub-categories.
-	var/list/model_flags = NONE
+	var/model_flags = NONE
 
 	/// List of items to add with the module, if any
 	var/list/items_to_add
@@ -67,7 +67,7 @@
 	for(var/item_to_remove in items)
 		var/obj/item/module_item = locate(item_to_remove) in borg.model.modules
 		if (module_item)
-			borg.model.remove_module(module_item, TRUE)
+			borg.model.remove_module(module_item)
 	return TRUE
 
 /obj/item/borg/upgrade/rename
@@ -75,8 +75,9 @@
 	desc = "Used to rename a cyborg."
 	icon = 'icons/obj/devices/circuitry_n_data.dmi'
 	icon_state = "cyborg_upgrade1"
-	var/heldname = ""
+	custom_materials = list(/datum/material/iron = SHEET_MATERIAL_AMOUNT * 2.5)
 	one_use = TRUE
+	var/heldname = ""
 
 /obj/item/borg/upgrade/rename/attack_self(mob/user)
 	var/new_heldname = sanitize_name(tgui_input_text(user, "Enter new robot name", "Cyborg Reclassification", heldname, MAX_NAME_LEN), allow_numbers = TRUE)
@@ -106,6 +107,7 @@
 	model_flags = BORG_MODEL_SECURITY
 	// We handle this in a custom way
 	allow_duplicates = TRUE
+	custom_materials = list(/datum/material/iron = SHEET_MATERIAL_AMOUNT * 10, /datum/material/glass = SHEET_MATERIAL_AMOUNT * 3, /datum/material/gold = SHEET_MATERIAL_AMOUNT, /datum/material/diamond = SHEET_MATERIAL_AMOUNT)
 
 /obj/item/borg/upgrade/disablercooler/action(mob/living/silicon/robot/borg, mob/living/user = usr)
 	. = ..()
@@ -136,6 +138,7 @@
 	name = "ion thruster upgrade"
 	desc = "An energy-operated thruster system for cyborgs."
 	icon_state = "module_general"
+	custom_materials = list(/datum/material/iron = SHEET_MATERIAL_AMOUNT * 5, /datum/material/glass = SHEET_MATERIAL_AMOUNT * 3, /datum/material/uranium = SHEET_MATERIAL_AMOUNT * 3, /datum/material/plasma = SHEET_MATERIAL_AMOUNT * 2.5)
 
 /obj/item/borg/upgrade/thrusters/action(mob/living/silicon/robot/borg, mob/living/user = usr)
 	. = ..()
@@ -161,9 +164,10 @@
 	require_model = TRUE
 	model_type = list(/obj/item/robot_model/miner)
 	model_flags = BORG_MODEL_MINER
+	custom_materials = list(/datum/material/iron = SHEET_MATERIAL_AMOUNT * 5, /datum/material/glass = SHEET_MATERIAL_AMOUNT * 3, /datum/material/diamond = SHEET_MATERIAL_AMOUNT)
 
-	items_to_add = list(/obj/item/pickaxe/drill/cyborg/diamond)
-	items_to_remove = list(/obj/item/pickaxe/drill/cyborg, /obj/item/shovel)
+	items_to_add = list(/obj/item/pickaxe/drill/diamonddrill)
+	items_to_remove = list(/obj/item/pickaxe/drill, /obj/item/shovel)
 
 /obj/item/borg/upgrade/soh
 	name = "mining cyborg satchel of holding"
@@ -172,6 +176,7 @@
 	require_model = TRUE
 	model_type = list(/obj/item/robot_model/miner)
 	model_flags = BORG_MODEL_MINER
+	custom_materials = list(/datum/material/iron = SHEET_MATERIAL_AMOUNT * 5, /datum/material/gold = SHEET_MATERIAL_AMOUNT, /datum/material/uranium = SMALL_MATERIAL_AMOUNT * 5)
 
 	items_to_add = list(/obj/item/storage/bag/ore/holding)
 	items_to_remove = list(/obj/item/storage/bag/ore/cyborg)
@@ -183,9 +188,10 @@
 	require_model = TRUE
 	model_type = list(/obj/item/robot_model/janitor)
 	model_flags = BORG_MODEL_JANITOR
+	custom_materials = list(/datum/material/gold = SHEET_MATERIAL_AMOUNT, /datum/material/uranium = SMALL_MATERIAL_AMOUNT * 5)
 
 	items_to_add = list(/obj/item/storage/bag/trash/bluespace/cyborg)
-	items_to_remove = list(/obj/item/storage/bag/trash/cyborg)
+	items_to_remove = list(/obj/item/storage/bag/trash)
 
 /obj/item/borg/upgrade/amop
 	name = "janitor cyborg advanced mop"
@@ -194,9 +200,10 @@
 	require_model = TRUE
 	model_type = list(/obj/item/robot_model/janitor)
 	model_flags = BORG_MODEL_JANITOR
+	custom_materials = list(/datum/material/glass = SHEET_MATERIAL_AMOUNT, /datum/material/iron = SHEET_MATERIAL_AMOUNT)
 
-	items_to_add = list(/obj/item/mop/advanced/cyborg)
-	items_to_remove = list(/obj/item/mop/cyborg)
+	items_to_add = list(/obj/item/mop/advanced)
+	items_to_remove = list(/obj/item/mop)
 
 /obj/item/borg/upgrade/prt
 	name = "janitor cyborg plating repair tool"
@@ -205,6 +212,7 @@
 	require_model = TRUE
 	model_type = list(/obj/item/robot_model/janitor)
 	model_flags = BORG_MODEL_JANITOR
+	custom_materials = list(/datum/material/iron = SHEET_MATERIAL_AMOUNT * 1.1, /datum/material/glass = SMALL_MATERIAL_AMOUNT * 3.7)
 
 	items_to_add = list(/obj/item/cautery/prt)
 
@@ -215,8 +223,9 @@
 	require_model = TRUE
 	model_type = list(/obj/item/robot_model/janitor)
 	model_flags = BORG_MODEL_JANITOR
+	custom_materials = list(/datum/material/iron = SHEET_MATERIAL_AMOUNT * 1.1, /datum/material/glass = SMALL_MATERIAL_AMOUNT * 3.7)
 
-	items_to_add = list(/obj/item/plunger/cyborg)
+	items_to_add = list(/obj/item/plunger)
 
 /obj/item/borg/upgrade/high_capacity_light_replacer
 	name = "janitor cyborg high capacity replacer"
@@ -225,15 +234,17 @@
 	require_model = TRUE
 	model_type = list(/obj/item/robot_model/janitor)
 	model_flags = BORG_MODEL_JANITOR
+	custom_materials = list(/datum/material/iron = SHEET_MATERIAL_AMOUNT * 1.1, /datum/material/glass = SMALL_MATERIAL_AMOUNT * 7.5)
 
-	items_to_add = list (/obj/item/lightreplacer/cyborg/advanced)
-	items_to_remove = list(/obj/item/lightreplacer/cyborg)
+	items_to_add = list (/obj/item/lightreplacer/advanced)
+	items_to_remove = list(/obj/item/lightreplacer)
 
 /obj/item/borg/upgrade/syndicate
 	name = "illegal equipment module"
 	desc = "Unlocks the hidden, deadlier functions of a cyborg."
 	icon_state = "module_illegal"
 	require_model = TRUE
+	custom_materials = list(/datum/material/iron = SHEET_MATERIAL_AMOUNT * 7.5, /datum/material/glass = SHEET_MATERIAL_AMOUNT * 7.5, /datum/material/diamond = SHEET_MATERIAL_AMOUNT * 5)
 
 /obj/item/borg/upgrade/syndicate/Initialize(mapload)
 	. = ..()
@@ -266,6 +277,7 @@
 	require_model = TRUE
 	model_type = list(/obj/item/robot_model/miner)
 	model_flags = BORG_MODEL_MINER
+	custom_materials = list(/datum/material/iron = SHEET_MATERIAL_AMOUNT * 5, /datum/material/titanium = SHEET_MATERIAL_AMOUNT * 2.5, /datum/material/plasma = SHEET_MATERIAL_AMOUNT * 2)
 
 /obj/item/borg/upgrade/lavaproof/action(mob/living/silicon/robot/borg, mob/living/user = usr)
 	. = ..()
@@ -284,6 +296,7 @@
 	desc = "This module will repair the cyborg over time."
 	icon_state = "module_general"
 	require_model = TRUE
+	custom_materials = list(/datum/material/iron = SHEET_MATERIAL_AMOUNT * 7.5, /datum/material/glass = SHEET_MATERIAL_AMOUNT * 7.5)
 	var/repair_amount = -1
 	/// world.time of next repair
 	var/next_repair = 0
@@ -359,8 +372,8 @@
 			else
 				repair_amount = -1
 				energy_cost = 0.01 * STANDARD_CELL_CHARGE
-			cyborg.adjustBruteLoss(repair_amount)
-			cyborg.adjustFireLoss(repair_amount)
+			cyborg.adjust_brute_loss(repair_amount)
+			cyborg.adjust_fire_loss(repair_amount)
 			cyborg.updatehealth()
 			cyborg.cell.use(energy_cost)
 		else
@@ -406,12 +419,14 @@
 	name = "medical cyborg expanded hypospray"
 	desc = "An upgrade to the Medical model's hypospray, allowing it \
 		to treat a wider range of conditions and problems."
+	custom_materials = list(/datum/material/iron = SHEET_MATERIAL_AMOUNT * 7.5, /datum/material/glass = SHEET_MATERIAL_AMOUNT * 7.5, /datum/material/plasma = SHEET_MATERIAL_AMOUNT * 4, /datum/material/uranium = SHEET_MATERIAL_AMOUNT * 4)
 
 /obj/item/borg/upgrade/piercing_hypospray
 	name = "cyborg piercing hypospray"
 	desc = "An upgrade to a cyborg's hypospray, allowing it to \
 		pierce armor and thick material."
 	icon_state = "module_medical"
+	custom_materials = list(/datum/material/iron = SHEET_MATERIAL_AMOUNT * 7.5, /datum/material/glass = SHEET_MATERIAL_AMOUNT * 7.5, /datum/material/titanium = SHEET_MATERIAL_AMOUNT * 2.5, /datum/material/diamond = SHEET_MATERIAL_AMOUNT * 1.5)
 
 /obj/item/borg/upgrade/piercing_hypospray/action(mob/living/silicon/robot/borg, mob/living/user = usr)
 	. = ..()
@@ -419,15 +434,18 @@
 		return .
 	var/found_hypo = FALSE
 	for(var/obj/item/reagent_containers/borghypo/hypo in borg.model.modules)
-		hypo.bypass_protection = TRUE
-		found_hypo = TRUE
-	for(var/obj/item/reagent_containers/borghypo/hypo in borg.model.emag_modules)
+		if(!hypo.allow_piercing)
+			continue
 		hypo.bypass_protection = TRUE
 		found_hypo = TRUE
 
 	if(!found_hypo)
 		to_chat(user, span_warning("There are no installed hypospray modules to upgrade with piercing!")) //check to see if any hyposprays were upgraded
 		return FALSE
+
+	// If we are actually going to install the upgrade due to the presence of compatible modules, make sure their emagged counterparts get upgraded too.
+	for(var/obj/item/reagent_containers/borghypo/hypo in borg.model.emag_modules)
+		hypo.bypass_protection = TRUE
 
 /obj/item/borg/upgrade/piercing_hypospray/deactivate(mob/living/silicon/robot/borg, mob/living/user = usr)
 	. = ..()
@@ -447,6 +465,7 @@
 	require_model = TRUE
 	model_type = list(/obj/item/robot_model/medical,  /obj/item/robot_model/syndicate_medical)
 	model_flags = BORG_MODEL_MEDICAL
+	custom_materials = list(/datum/material/iron = SHEET_MATERIAL_AMOUNT * 5, /datum/material/titanium = SHEET_MATERIAL_AMOUNT * 3, /datum/material/silver = SHEET_MATERIAL_AMOUNT * 2)
 
 	items_to_add = list(/obj/item/healthanalyzer/advanced)
 	items_to_remove = list(/obj/item/healthanalyzer)
@@ -456,10 +475,6 @@
 	if(!.)
 		return .
 	ADD_TRAIT(cyborg, TRAIT_FASTMED, REF(src))
-	for(var/obj/item/borg/cyborg_omnitool/medical/omnitool_upgrade in cyborg.model.modules)
-		if(omnitool_upgrade.upgraded)
-			to_chat(user, span_warning("This unit is already equipped with an omnitool upgrade!"))
-			return FALSE
 	for(var/obj/item/borg/cyborg_omnitool/medical/omnitool in cyborg.model.modules)
 		omnitool.set_upgraded(TRUE)
 
@@ -468,7 +483,7 @@
 	if(!.)
 		return .
 	REMOVE_TRAIT(cyborg, TRAIT_FASTMED, REF(src))
-	for(var/obj/item/borg/cyborg_omnitool/omnitool in cyborg.model.modules)
+	for(var/obj/item/borg/cyborg_omnitool/medical/omnitool in cyborg.model.modules)
 		omnitool.set_upgraded(FALSE)
 
 /obj/item/borg/upgrade/engineering_omnitool
@@ -479,24 +494,25 @@
 	require_model = TRUE
 	model_type = list(/obj/item/robot_model/engineering,  /obj/item/robot_model/saboteur)
 	model_flags = BORG_MODEL_ENGINEERING
+	custom_materials = list(/datum/material/iron = SHEET_MATERIAL_AMOUNT * 5, /datum/material/titanium = SHEET_MATERIAL_AMOUNT * 3, /datum/material/gold = SHEET_MATERIAL_AMOUNT * 2)
 
 /obj/item/borg/upgrade/engineering_omnitool/action(mob/living/silicon/robot/cyborg, mob/living/user = usr)
 	. = ..()
 	if(!.)
-		return .
-	for(var/obj/item/borg/cyborg_omnitool/engineering/omnitool_upgrade in cyborg.model.modules)
-		if(omnitool_upgrade.upgraded)
-			to_chat(user, span_warning("This unit is already equipped with an omnitool upgrade!"))
-			return FALSE
+		return
 	for(var/obj/item/borg/cyborg_omnitool/engineering/omnitool in cyborg.model.modules)
 		omnitool.set_upgraded(TRUE)
+	for(var/obj/item/weldingtool/largetank/cyborg/welder in cyborg.model.modules)
+		welder.toolspeed = initial(welder.toolspeed) - 0.3
 
 /obj/item/borg/upgrade/engineering_omnitool/deactivate(mob/living/silicon/robot/cyborg, mob/living/user = usr)
 	. = ..()
 	if(!.)
-		return .
-	for(var/obj/item/borg/cyborg_omnitool/omnitool in cyborg.model.modules)
+		return
+	for(var/obj/item/borg/cyborg_omnitool/engineering/omnitool in cyborg.model.modules)
 		omnitool.set_upgraded(FALSE)
+	for(var/obj/item/weldingtool/largetank/cyborg/welder in cyborg.model.modules)
+		welder.toolspeed = initial(welder.toolspeed)
 
 /obj/item/borg/upgrade/defib
 	name = "medical cyborg defibrillator"
@@ -506,17 +522,16 @@
 	require_model = TRUE
 	model_type = list(/obj/item/robot_model/medical)
 	model_flags = BORG_MODEL_MEDICAL
+	custom_materials = list(/datum/material/iron = SHEET_MATERIAL_AMOUNT * 4, /datum/material/glass = SHEET_MATERIAL_AMOUNT * 2.5, /datum/material/silver = SHEET_MATERIAL_AMOUNT * 2, /datum/material/gold = SHEET_MATERIAL_AMOUNT * 1.5)
 
 	items_to_add = list(/obj/item/shockpaddles/cyborg)
 
 /obj/item/borg/upgrade/defib/action(mob/living/silicon/robot/borg, mob/living/user = usr)
-	. = ..()
-	if(!.)
-		return .
 	var/obj/item/borg/upgrade/defib/backpack/defib_pack = locate() in borg //If a full defib unit was used to upgrade prior, we can just pop it out now and replace
 	if(defib_pack)
 		defib_pack.deactivate(borg, user)
 		to_chat(user, span_notice("The defibrillator pops out of the chassis as the compact upgrade installs."))
+	. = ..()
 
 ///A version of the above that also acts as a holder of an actual defibrillator item used in place of the upgrade chip.
 /obj/item/borg/upgrade/defib/backpack
@@ -557,6 +572,7 @@
 	require_model = TRUE
 	model_type = list(/obj/item/robot_model/medical, /obj/item/robot_model/syndicate_medical)
 	model_flags = list(BORG_MODEL_MEDICAL, BORG_MODEL_RESEARCH)
+	custom_materials = list(/datum/material/iron = SHEET_MATERIAL_AMOUNT * 2.5, /datum/material/glass = SHEET_MATERIAL_AMOUNT * 2, /datum/material/silver = SHEET_MATERIAL_AMOUNT * 2)
 
 	items_to_add = list(/obj/item/surgical_processor)
 
@@ -565,6 +581,7 @@
 	desc = "Bluespace Optimized Remote Intelligence Synchronization. An uplink device which takes the place of an MMI in cyborg endoskeletons, creating a robotic shell controlled by an AI."
 	icon = 'icons/obj/devices/circuitry_n_data.dmi'
 	icon_state = "boris"
+	custom_materials = list(/datum/material/glass = SMALL_MATERIAL_AMOUNT * 7.5, /datum/material/iron = SMALL_MATERIAL_AMOUNT * 6, /datum/material/gold = SMALL_MATERIAL_AMOUNT * 2)
 
 /obj/item/borg/upgrade/ai/action(mob/living/silicon/robot/borg, mob/living/user = usr)
 	. = ..()
@@ -588,6 +605,7 @@
 	name = "borg expander"
 	desc = "A cyborg resizer, it makes a cyborg huge."
 	icon_state = "module_general"
+	custom_materials = list(/datum/material/iron = SHEET_MATERIAL_AMOUNT * 1, /datum/material/titanium = SHEET_MATERIAL_AMOUNT * 2.5) //Bubber edit 100 iron -> 1 iron
 
 /obj/item/borg/upgrade/expand/action(mob/living/silicon/robot/borg, mob/living/user = usr)
 	. = ..()
@@ -598,16 +616,11 @@
 		to_chat(usr, span_warning("This unit already has an expand module installed!"))
 		return FALSE
 
-	// SKYRAT EDIT ADDITION BEGIN
-	var/resize_amount = 1.6
-	// SKYRAT EDIT ADDITION END
 	ADD_TRAIT(borg, TRAIT_NO_TRANSFORM, REF(src))
 	var/prev_lockcharge = borg.lockcharge
 	borg.SetLockdown(TRUE)
 	borg.set_anchored(TRUE)
-	var/datum/effect_system/fluid_spread/smoke/smoke = new
-	smoke.set_up(1, holder = borg, location = borg.loc)
-	smoke.start()
+	do_smoke(1, borg, borg.loc)
 	sleep(0.2 SECONDS)
 	for(var/i in 1 to 4)
 		playsound(borg, pick(
@@ -623,7 +636,7 @@
 	borg.set_anchored(FALSE)
 	REMOVE_TRAIT(borg, TRAIT_NO_TRANSFORM, REF(src))
 	borg.hasExpanded = TRUE
-	borg.update_transform(resize_amount) // SKYRAT EDIT CHANGE - ORIGINAL: borg.update_transform(2)
+	borg.update_transform(1.6) // SKYRAT EDIT CHANGE - ORIGINAL: borg.update_transform(2)
 
 /obj/item/borg/upgrade/expand/deactivate(mob/living/silicon/robot/borg, mob/living/user = usr)
 	. = ..()
@@ -634,14 +647,36 @@
 		borg.update_transform(0.625) // SKYRAT EDIT CHANGE - ORIGINAL: borg.update_transform(0.5)
 
 /obj/item/borg/upgrade/rped
-	name = "engineering cyborg RPED"
-	desc = "A rapid part exchange device for the engineering cyborg."
+	name = "engineering cyborg RPED (expanded)"
+	desc = "An expanded rapid part exchange device for the engineering cyborg."
 	icon_state = "module_engineer"
 	require_model = TRUE
 	model_type = list(/obj/item/robot_model/engineering, /obj/item/robot_model/saboteur)
 	model_flags = BORG_MODEL_ENGINEERING
+	custom_materials = list(/datum/material/iron = SHEET_MATERIAL_AMOUNT * 7.5, /datum/material/glass = SHEET_MATERIAL_AMOUNT * 2.5, /datum/material/silver = SHEET_MATERIAL_AMOUNT * 1.25)
 
 	items_to_add = list(/obj/item/storage/part_replacer/cyborg)
+
+/obj/item/borg/upgrade/smallrped
+	name = "engineering cyborg RPED"
+	desc = "A regular version of rapid part exchange device for the engineering cyborg."
+	icon_state = "module_engineer"
+	require_model = TRUE
+	model_type = list(/obj/item/robot_model/engineering, /obj/item/robot_model/saboteur)
+	model_flags = BORG_MODEL_ENGINEERING
+	items_to_add = list(/obj/item/storage/part_replacer/cyborg/small)
+
+/obj/item/borg/upgrade/rped/action(mob/living/silicon/robot/borg, mob/living/user = usr)
+	. = ..()
+	if(!.)
+		return .
+	var/obj/item/borg/upgrade/smallrped/upgrade = locate() in borg
+	var/obj/item/storage/part_replacer/cyborg/small/replacer = locate() in borg.model.modules
+	if(upgrade)
+		to_chat(user, span_notice("The old RPED module is now expanded and gets more space"))
+		replacer.emptyStorage()
+		replacer.forceMove(get_turf(borg))
+		qdel(upgrade)
 
 /obj/item/borg/upgrade/inducer
 	name = "engineering integrated power inducer"
@@ -650,26 +685,8 @@
 	require_model = TRUE
 	model_type = list(/obj/item/robot_model/engineering, /obj/item/robot_model/saboteur)
 	model_flags = BORG_MODEL_ENGINEERING
-
 	items_to_add = list(/obj/item/inducer/cyborg)
-
-/obj/item/inducer/cyborg
-	name = "Internal inducer"
-	icon = 'icons/obj/tools.dmi'
-	icon_state = "inducer-engi"
-	powerdevice = null
-
-/obj/item/inducer/cyborg/get_cell()
-	var/obj/item/robot_model/possible_model = loc
-	var/mob/living/silicon/robot/silicon_friend = istype(possible_model) ? possible_model.robot : possible_model
-	if(istype(silicon_friend))
-		. = silicon_friend.cell
-
-/obj/item/inducer/cyborg/screwdriver_act(mob/living/user, obj/item/tool)
-	return NONE
-
-/obj/item/inducer/cyborg/item_interaction(mob/living/user, obj/item/tool, list/modifiers)
-	return ITEM_INTERACT_FAILURE
+	custom_materials = list(/datum/material/iron = SHEET_MATERIAL_AMOUNT * 5, /datum/material/glass = SHEET_MATERIAL_AMOUNT * 2.5, /datum/material/silver = SHEET_MATERIAL_AMOUNT * 2)
 
 /obj/item/borg/upgrade/pinpointer
 	name = "medical cyborg crew pinpointer"
@@ -678,6 +695,7 @@
 	require_model = TRUE
 	model_type = list(/obj/item/robot_model/medical, /obj/item/robot_model/syndicate_medical)
 	model_flags = BORG_MODEL_MEDICAL
+	custom_materials = list(/datum/material/iron = SMALL_MATERIAL_AMOUNT * 5, /datum/material/glass = SMALL_MATERIAL_AMOUNT * 5)
 
 	items_to_add = list(/obj/item/pinpointer/crew)
 	var/datum/action/crew_monitor
@@ -688,7 +706,7 @@
 		return .
 	crew_monitor = new /datum/action/item_action/crew_monitor(src)
 	crew_monitor.Grant(borg)
-	icon_state = "scanner"
+	icon_state = "crew_monitor"
 
 
 /obj/item/borg/upgrade/pinpointer/deactivate(mob/living/silicon/robot/borg, mob/living/user = usr)
@@ -711,7 +729,7 @@
 
 /obj/item/borg/upgrade/transform
 	name = "borg model picker (Standard)"
-	desc = "Allows you to to turn a cyborg into a standard cyborg."
+	desc = "Allows you to turn a cyborg into a standard cyborg."
 	icon_state = "module_general"
 	var/obj/item/robot_model/new_model = null
 
@@ -722,19 +740,21 @@
 
 /obj/item/borg/upgrade/transform/clown
 	name = "borg model picker (Clown)"
-	desc = "Allows you to to turn a cyborg into a clown, honk."
+	desc = "Allows you to turn a cyborg into a clown, honk."
 	icon_state = "module_honk"
 	new_model = /obj/item/robot_model/clown
+	custom_materials = list(/datum/material/iron = SHEET_MATERIAL_AMOUNT * 7.5, /datum/material/glass = SHEET_MATERIAL_AMOUNT * 7.5, /datum/material/bananium = SMALL_MATERIAL_AMOUNT * 5)
 
-/obj/item/borg/upgrade/circuit_app
-	name = "circuit manipulation apparatus"
-	desc = "An engineering cyborg upgrade allowing for manipulation of circuit boards."
+/obj/item/borg/upgrade/engineering_app
+	name = "engineering manipulation apparatus"
+	desc = "An engineering cyborg upgrade allowing for manipulation of circuit boards and other engineering matter."
 	icon_state = "module_engineer"
 	require_model = TRUE
 	model_type = list(/obj/item/robot_model/engineering, /obj/item/robot_model/saboteur)
 	model_flags = BORG_MODEL_ENGINEERING
+	custom_materials = list(/datum/material/iron = SHEET_MATERIAL_AMOUNT, /datum/material/titanium = SMALL_MATERIAL_AMOUNT * 5)
 
-	items_to_add = list(/obj/item/borg/apparatus/circuit)
+	items_to_add = list(/obj/item/borg/apparatus/engineering)
 
 /obj/item/borg/upgrade/beaker_app
 	name = "beaker storage apparatus"
@@ -743,8 +763,21 @@
 	require_model = TRUE
 	model_type = list(/obj/item/robot_model/medical)
 	model_flags = BORG_MODEL_MEDICAL
+	custom_materials = list(/datum/material/glass = SHEET_MATERIAL_AMOUNT * 1.1, /datum/material/iron = SHEET_MATERIAL_AMOUNT)
 
 	items_to_add = list(/obj/item/borg/apparatus/beaker/extra)
+
+/obj/item/borg/upgrade/bs_syringe
+	name = "advanced syringe"
+	desc = "Bluespace technology that expands capacity of your standard cyborg syringe."
+	icon_state = "module_medical"
+	require_model = TRUE
+	model_type = list(/obj/item/robot_model/medical)
+	model_flags = BORG_MODEL_MEDICAL
+	custom_materials = list(/datum/material/iron = SHEET_MATERIAL_AMOUNT, /datum/material/plasma = SMALL_MATERIAL_AMOUNT * 5, /datum/material/diamond = SMALL_MATERIAL_AMOUNT * 5, /datum/material/bluespace = SMALL_MATERIAL_AMOUNT * 5)
+
+	items_to_add = list(/obj/item/reagent_containers/syringe/bluespace)
+	items_to_remove = list(/obj/item/reagent_containers/syringe)
 
 /obj/item/borg/upgrade/drink_app
 	name = "glass storage apparatus"
@@ -753,6 +786,7 @@
 	require_model = TRUE
 	model_type = list(/obj/item/robot_model/service)
 	model_flags = BORG_MODEL_SERVICE
+	custom_materials = list(/datum/material/glass = SHEET_MATERIAL_AMOUNT, /datum/material/iron = SMALL_MATERIAL_AMOUNT * 5)
 
 	items_to_add = list(/obj/item/borg/apparatus/beaker/drink)
 
@@ -763,8 +797,9 @@
 	require_model = TRUE
 	model_type = list(/obj/item/robot_model/janitor)
 	model_flags = BORG_MODEL_JANITOR
+	custom_materials = list(/datum/material/iron = SHEET_MATERIAL_AMOUNT * 2, /datum/material/glass = SMALL_MATERIAL_AMOUNT * 5)
 
-	items_to_add = list(/obj/item/pushbroom/cyborg)
+	items_to_add = list(/obj/item/pushbroom)
 
 /obj/item/borg/upgrade/condiment_synthesizer
 	name = "Service Cyborg Condiment Synthesiser"
@@ -773,6 +808,7 @@
 	require_model = TRUE
 	model_type = list(/obj/item/robot_model/service)
 	model_flags = BORG_MODEL_SERVICE
+	custom_materials = list(/datum/material/iron = SHEET_MATERIAL_AMOUNT * 7.5, /datum/material/glass = SHEET_MATERIAL_AMOUNT * 6, /datum/material/plasma = SHEET_MATERIAL_AMOUNT * 3, /datum/material/uranium = SHEET_MATERIAL_AMOUNT * 3)
 
 	items_to_add = list(/obj/item/reagent_containers/borghypo/condiment_synthesizer)
 
@@ -783,6 +819,7 @@
 	require_model = TRUE
 	model_type = list(/obj/item/robot_model/service)
 	model_flags = BORG_MODEL_SERVICE
+	custom_materials = list(/datum/material/iron = SHEET_MATERIAL_AMOUNT * 7.5, /datum/material/gold = SMALL_MATERIAL_AMOUNT * 5, /datum/material/silver = SMALL_MATERIAL_AMOUNT * 5)
 
 	items_to_add = list(/obj/item/knife/kitchen/silicon)
 
@@ -793,6 +830,7 @@
 	require_model = TRUE
 	model_type = list(/obj/item/robot_model/service)
 	model_flags = BORG_MODEL_SERVICE
+	custom_materials = list(/datum/material/iron = SHEET_MATERIAL_AMOUNT * 2.5)
 
 	items_to_add = list(/obj/item/borg/apparatus/service)
 
@@ -803,6 +841,7 @@
 	require_model = TRUE
 	model_type = list(/obj/item/robot_model/service)
 	model_flags = BORG_MODEL_SERVICE
+	custom_materials = list(/datum/material/iron = SHEET_MATERIAL_AMOUNT * 10, /datum/material/titanium = SMALL_MATERIAL_AMOUNT * 7.5)
 
 	items_to_add = list(/obj/item/rolling_table_dock)
 
@@ -813,8 +852,31 @@
 	require_model = TRUE
 	model_type = list(/obj/item/robot_model/service)
 	model_flags = BORG_MODEL_SERVICE
+	custom_materials = list(/datum/material/iron = SHEET_MATERIAL_AMOUNT * 7.5, /datum/material/diamond = SMALL_MATERIAL_AMOUNT * 5)
 
 	items_to_add = list(/obj/item/borg/cookbook)
+
+/obj/item/borg/upgrade/botany_upgrade
+	name = "Service Cyborg Botany Tools"
+	desc = "An upgrade to the service model cyborg, that let them do gardening and plant processing."
+	icon_state = "module_service"
+	require_model = TRUE
+	model_type = list(/obj/item/robot_model/service)
+	model_flags = BORG_MODEL_SERVICE
+	custom_materials = list(/datum/material/iron = SHEET_MATERIAL_AMOUNT * 13, /datum/material/glass = SHEET_MATERIAL_AMOUNT * 2)
+
+	items_to_add = list(/obj/item/storage/bag/plants/cyborg, /obj/item/borg/cyborg_omnitool/botany, /obj/item/plant_analyzer)
+
+/obj/item/borg/upgrade/shuttle_blueprints
+	name = "Engineering Cyborg Shuttle Blueprint Database"
+	desc = "An upgrade to the engineering model cyborg allowing for the construction and expansion of shuttles."
+	icon_state = "module_engineer"
+	require_model = TRUE
+	model_type = list(/obj/item/robot_model/engineering, /obj/item/robot_model/saboteur)
+	model_flags = BORG_MODEL_ENGINEERING
+	custom_materials = list(/datum/material/iron = SHEET_MATERIAL_AMOUNT * 5, /datum/material/glass = SHEET_MATERIAL_AMOUNT * 2.5)
+
+	items_to_add = list(/obj/item/shuttle_blueprints/borg)
 
 ///This isn't an upgrade or part of the same path, but I'm gonna just stick it here because it's a tool used on cyborgs.
 //A reusable tool that can bring borgs back to life. They gotta be repaired first, though.
@@ -824,8 +886,9 @@
 	w_class = WEIGHT_CLASS_SMALL
 	icon = 'icons/obj/devices/circuitry_n_data.dmi'
 	icon_state = "cyborg_upgrade1"
+	custom_materials = list(/datum/material/iron = SHEET_MATERIAL_AMOUNT * 10, /datum/material/glass = SHEET_MATERIAL_AMOUNT * 2.5)
 
-/obj/item/borg_restart_board/pre_attack(mob/living/silicon/robot/borgo, mob/living/user, params)
+/obj/item/borg_restart_board/pre_attack(mob/living/silicon/robot/borgo, mob/living/user, list/modifiers, list/attack_modifiers)
 	if(!istype(borgo))
 		return ..()
 	if(!borgo.opened)

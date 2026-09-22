@@ -65,7 +65,7 @@
 /obj/item/storage/backpack/duffelbag/syndie/maid/PopulateContents() //by far the weakest bundle
 	new /obj/item/clothing/under/syndicate/skyrat/maid(src)
 	new /obj/item/clothing/gloves/combat/maid(src)
-	new /obj/item/clothing/head/costume/maidheadband/syndicate(src)
+	new /obj/item/clothing/head/costume/maid_headband/syndicate(src)
 	new /obj/item/clothing/shoes/laceup(src)
 	new /obj/item/radio/headset/syndicate/alt(src)
 	new /obj/item/card/id/advanced/chameleon(src)
@@ -111,7 +111,7 @@
 /obj/item/storage/backpack/duffelbag/syndie/lone_gunman/PopulateContents()
 	new /obj/item/clothing/under/pants/track/robohand(src)
 	new /obj/item/clothing/glasses/sunglasses/robohand(src)
-	new /obj/item/clothing/suit/jacket/trenchcoat/gunman(src)
+	new /obj/item/clothing/suit/toggle/jacket/trenchcoat/gunman(src)
 	new /obj/item/clothing/shoes/combat(src)
 	new /obj/item/radio/headset/syndicate/alt(src)
 	new /obj/item/card/id/advanced/chameleon(src)

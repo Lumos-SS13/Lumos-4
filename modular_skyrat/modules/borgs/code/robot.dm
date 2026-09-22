@@ -13,7 +13,7 @@
 		layer = LYING_MOB_LAYER //so mob lying always appear behind standing mobs
 	density = FALSE // We lose density and stop bumping passable dense things.
 
-	if(model && model.model_features && (TRAIT_R_TALL in model.model_features))
+	if(model && model.model_features && ((TRAIT_R_TALL in model.model_features) || (TRAIT_R_BIG in model.model_features)))
 		maptext_height = 32 //Offset base chat-height value
 
 		// Resting effects
@@ -39,18 +39,16 @@
 
 			table_contents.throw_at(get_ranged_target_turf(table_contents, pick(GLOB.cardinals), range = 1), range = 1, speed = 1)
 
-
 /mob/living/silicon/robot/on_standing_up()
 	if(layer == LYING_MOB_LAYER)
 		layer = initial(layer)
 	density = initial(density) // We were prone before, so we become dense and things can bump into us again.
 	if(model && model.model_features && (TRAIT_R_TALL in model.model_features))
 		maptext_height = 48 //Offset value of tallborgs
+	if(model && model.model_features && (TRAIT_R_BIG in model.model_features))
+		maptext_height = 64
 
-/mob/living/silicon/robot/proc/rest_style()
-	set name = "Switch Rest Style"
-	set category = "AI Commands"
-	set desc = "Select your resting pose."
+GAME_VERB_PROC_DESC(/mob/living/silicon/robot, rest_style, "Switch Rest Style", "Select your resting pose.", "AI Commands")
 	if(!can_rest())
 		to_chat(src, span_warning("You can't do that!"))
 		return
@@ -67,13 +65,11 @@
 		on_lying_down()
 	update_icons()
 
-/mob/living/silicon/robot/proc/robot_lay_down()
-	set name = "Lay down"
-	set category = "AI Commands"
+GAME_VERB_PROC(/mob/living/silicon/robot, robot_lay_down, "Lay down", "AI Commands")
 	if(!can_rest())
 		to_chat(src, span_warning("You can't do that!"))
 		return
-	if(stat != CONSCIOUS) //Make sure we don't enable movement when not concious
+	if(IS_UNCONSCIOUS_OR_CRIT(src)) //Make sure we don't enable movement when not concious
 		return
 	if(robot_resting)
 		to_chat(src, span_notice("You are now getting up."))
@@ -108,8 +104,9 @@
 
 /mob/living/silicon/robot/update_module_innate()
 	..()
-	if(hands)
-		hands.icon = (model.model_select_alternate_icon ? model.model_select_alternate_icon : initial(hands.icon))
+	var/atom/movable/screen/robot_hands = hud_used?.screen_objects[HUD_CYBORG_HANDS]
+	if(robot_hands)
+		robot_hands.icon = (model.model_select_alternate_icon ? model.model_select_alternate_icon : initial(robot_hands.icon))
 
 /**
  * Safe check of the cyborg's model_features list.
@@ -117,7 +114,7 @@
  * model_features is defined in modular_skyrat\modules\altborgs\code\modules\mob\living\silicon\robot\robot_model.dm.
  */
 /mob/living/silicon/robot/proc/can_rest()
-	if(model && model.model_features && ((TRAIT_R_WIDE in model.model_features) || (TRAIT_R_TALL in model.model_features) || (TRAIT_R_SQUADRUPED in model.model_features)))
+	if(model && model.model_features && ((TRAIT_R_WIDE in model.model_features) || (TRAIT_R_TALL in model.model_features) || (TRAIT_R_SQUADRUPED in model.model_features) || (TRAIT_R_BIG in model.model_features)))
 		if(TRAIT_IMMOBILIZED in _status_traits)
 			return FALSE
 		return TRUE

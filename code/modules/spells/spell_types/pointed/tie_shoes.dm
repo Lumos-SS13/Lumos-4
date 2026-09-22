@@ -73,7 +73,7 @@
 	if(HAS_TRAIT(owner, TRAIT_SPLATTERCASTER))
 		shoe_to_cast = /obj/item/clothing/shoes/laceup
 
-	var/obj/item/clothing/shoes/shoes_to_tie = cast_on.shoes
+	var/obj/item/clothing/shoes/shoes_to_tie = cast_on.get_item_by_slot(ITEM_SLOT_FEET)
 
 	if(isnull(shoes_to_tie))
 		if(!summons_shoes)
@@ -90,11 +90,11 @@
 
 	switch(shoes_to_tie.tied)
 		if(SHOES_TIED)
-			if(!shoes_to_tie.can_be_tied)
+			if(shoes_to_tie.fastening_type == SHOES_SLIPON)
 				if(bypass_tie_status)
 					to_chat(owner, span_warning("You magically grant laces to [cast_on]'s shoes!"))
 					cast_on.balloon_alert(owner, "laced!")
-					shoes_to_tie.can_be_tied = TRUE
+					shoes_to_tie.fastening_type = SHOES_LACED
 					if(invocation_type != INVOCATION_NONE)
 						playsound(cast_on, 'sound/effects/magic/summonitems_generic.ogg', 50, TRUE)
 					return TRUE

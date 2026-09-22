@@ -116,6 +116,13 @@
 	labels_left = initial(labels_left) //Yes, it's capped at its initial value
 	return ITEM_INTERACT_SUCCESS
 
+/obj/item/hand_labeler/examine()
+	. = ..()
+	if(labels_left > 0)
+		. += span_notice("It looks like it could label [labels_left] more thing\s.")
+	else
+		. += span_notice("It's out of labels.")
+
 /obj/item/hand_labeler/borg
 	name = "cyborg-hand labeler"
 
@@ -155,6 +162,7 @@
 	resistance_flags = FLAMMABLE
 	max_integrity = 100
 	item_flags = NOBLUDGEON
+	custom_materials = list(/datum/material/iron = SMALL_MATERIAL_AMOUNT * 0.5, /datum/material/glass = SMALL_MATERIAL_AMOUNT * 0.2)
 
 /// The label item applied when labelling something
 /obj/item/label

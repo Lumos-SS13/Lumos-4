@@ -1,6 +1,7 @@
 /obj/machinery/computer/records/medical
 	name = "medical records console"
 	desc = "This can be used to check medical records."
+	icon_state = MAP_SWITCH("computer", "/obj/machinery/computer/records/medical")
 	icon_screen = "medcomp"
 	icon_keyboard = "med_key"
 	req_one_access = list(ACCESS_MEDICAL, ACCESS_DETECTIVE, ACCESS_GENETICS)
@@ -8,22 +9,24 @@
 	light_color = LIGHT_COLOR_BLUE
 
 /obj/machinery/computer/records/medical/syndie
+	icon_state = MAP_SWITCH("computer", "/obj/machinery/computer/records/medical/syndie")
 	icon_keyboard = "syndie_key"
 	req_one_access = list(ACCESS_SYNDICATE)
 
 /obj/machinery/computer/records/medical/laptop
 	name = "medical laptop"
 	desc = "A cheap Nanotrasen medical laptop, it functions as a medical records computer. It's bolted to the table."
-	icon_state = "laptop"
+	icon_state = MAP_SWITCH("laptop", "/obj/machinery/computer/records/medical/laptop")
 	icon_screen = "medlaptop"
 	icon_keyboard = "laptop_key"
 	pass_flags = PASSTABLE
+	projectiles_pass_chance = 100
 
-/obj/machinery/computer/records/medical/attacked_by(obj/item/attacking_item, mob/living/user)
-	. = ..()
-	if(!istype(attacking_item, /obj/item/photo))
-		return
-	insert_new_record(user, attacking_item)
+/obj/machinery/computer/records/medical/item_interaction(mob/living/user, obj/item/tool, list/modifiers)
+	if(!istype(tool, /obj/item/photo))
+		return NONE
+	insert_new_record(user, tool)
+	return ITEM_INTERACT_SUCCESS
 
 /obj/machinery/computer/records/medical/ui_interact(mob/user, datum/tgui/ui)
 	. = ..()
@@ -31,7 +34,6 @@
 		return
 	ui = SStgui.try_update_ui(user, src, ui)
 	if (!ui)
-		character_preview_view = create_character_preview_view(user)
 		ui = new(user, src, "MedicalRecords")
 		ui.set_autoupdate(FALSE)
 		ui.open()
@@ -60,6 +62,7 @@
 			major_disabilities = target.major_disabilities_desc,
 			minor_disabilities = target.minor_disabilities_desc,
 			physical_status = target.physical_status,
+			cause_of_death = target.cause_of_death,
 			mental_status = target.mental_status,
 			name = target.name,
 			notes = notes,
@@ -105,7 +108,7 @@
 			if(!content)
 				return FALSE
 
-			var/datum/medical_note/new_note = new(usr.name, content)
+			var/datum/medical_note/new_note = new(usr.name, content, round_timestamp())
 			while(length(target.medical_notes) > 2)
 				target.medical_notes.Cut(1, 2)
 
@@ -129,6 +132,8 @@
 				return FALSE
 
 			target.physical_status = physical_status
+			if(physical_status != PHYSICAL_DECEASED)
+				target.cause_of_death = null
 
 			return TRUE
 
@@ -141,6 +146,13 @@
 
 			return TRUE
 
+		if("set_cause_of_death")
+			var/death_text = reject_bad_name(params["cause"], allow_numbers = TRUE, max_length = MAX_DESC_LEN, strict = TRUE, cap_after_symbols = FALSE)
+			if(!death_text)
+				return FALSE
+			target.cause_of_death = death_text
+			return TRUE
+
 	return FALSE
 
 /// Deletes medical information from a record.
@@ -150,7 +162,7 @@
 
 	target.age = 18
 	target.chrono_age = 18 // SKYRAT EDIT ADDITION - Chronological age
-	target.blood_type = pick(list("A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"))
+	target.blood_type = pick(list(BLOOD_TYPE_A_PLUS, BLOOD_TYPE_A_MINUS, BLOOD_TYPE_B_PLUS, BLOOD_TYPE_B_MINUS, BLOOD_TYPE_O_PLUS, BLOOD_TYPE_O_MINUS, BLOOD_TYPE_AB_PLUS, BLOOD_TYPE_AB_MINUS))
 	target.dna_string = "Unknown"
 	target.gender = "Unknown"
 	target.major_disabilities = ""

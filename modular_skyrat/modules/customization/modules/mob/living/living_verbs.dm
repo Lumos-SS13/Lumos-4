@@ -5,16 +5,12 @@ GLOBAL_VAR_INIT(temporary_flavor_text_indicator, generate_temporary_flavor_text_
 	temporary_flavor_text_indicator.appearance_flags = APPEARANCE_UI_IGNORE_ALPHA | KEEP_APART
 	return temporary_flavor_text_indicator
 
-/mob/living/verb/set_temporary_flavor()
-	set category = "IC"
-	set name = "Set Temporary Flavor Text"
-	set desc = "Allows you to set a temporary flavor text."
-
-	if(stat != CONSCIOUS)
-		to_chat(usr, span_warning("You can't set your temporary flavor text now..."))
+GAME_VERB_DESC(/mob/living, set_temporary_flavor, "Set Temporary Flavor Text", "Allows you to set a temporary flavor text.", "IC")
+	if(IS_UNCONSCIOUS_OR_CRIT(src))
+		to_chat(src, span_warning("You can't set your temporary flavor text now..."))
 		return
 
-	var/msg = tgui_input_text(usr, "Set the temporary flavor text in your 'examine' verb. This is for describing what people can tell by looking at your character.", "Temporary Flavor Text", temporary_flavor_text, max_length = MAX_FLAVOR_LEN, multiline = TRUE)
+	var/msg = tgui_input_text(src, "Set the temporary flavor text in your 'examine' verb. This is for describing what people can tell by looking at your character.", "Temporary Flavor Text", temporary_flavor_text, max_length = MAX_FLAVOR_LEN, multiline = TRUE)
 	if(msg == null)
 		return
 
@@ -27,4 +23,3 @@ GLOBAL_VAR_INIT(temporary_flavor_text_indicator, generate_temporary_flavor_text_
 	. = ..()
 	if (temporary_flavor_text)
 		. += GLOB.temporary_flavor_text_indicator
-

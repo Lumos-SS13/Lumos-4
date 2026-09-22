@@ -1,4 +1,3 @@
-
 #define USE_SEEN_CLOAK_LEVEL 2
 #define USE_RUN_CLOAK_LEVEL 4
 
@@ -60,14 +59,14 @@
 	if(level_current < USE_RUN_CLOAK_LEVEL && user.move_intent != MOVE_INTENT_WALK)
 		owner.balloon_alert(owner, "you attempt to run, crushing yourself.")
 		user.toggle_move_intent()
-		user.adjustBruteLoss(rand(5, 15))
+		user.adjust_brute_loss(rand(5, 15))
 
 /datum/action/cooldown/bloodsucker/cloak/ContinueActive(mob/living/user, mob/living/target)
 	. = ..()
 	if(!.)
 		return FALSE
 	/// Must be CONSCIOUS
-	if(user.stat != CONSCIOUS)
+	if(IS_UNCONSCIOUS(user))
 		to_chat(owner, span_warning("Your cloak failed due to you falling unconcious!"))
 		return FALSE
 	return TRUE
@@ -82,3 +81,6 @@
 	if(level_current < USE_RUN_CLOAK_LEVEL && was_running && user.move_intent == MOVE_INTENT_WALK)
 		user.toggle_move_intent()
 	user.balloon_alert(user, "cloak turned off.")
+
+#undef USE_SEEN_CLOAK_LEVEL
+#undef USE_RUN_CLOAK_LEVEL

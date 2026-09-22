@@ -140,7 +140,7 @@
 	icon_state = "random_liquid"
 	loot = list(
 		/obj/structure/liquid_pump = 100,
-		/obj/structure/reagent_dispensers/beerkeg = 10,
+		/obj/structure/reagent_dispensers/keg/beer = 10,
 		/obj/structure/reagent_dispensers/cooking_oil = 5,
 		/obj/structure/reagent_dispensers/foamtank = 50,
 		/obj/structure/reagent_dispensers/fueltank = 400,
@@ -256,7 +256,6 @@
 		/obj/machinery/fax = 1,
 		/obj/machinery/microwave = 10,
 		/obj/machinery/plantgenes = 5,
-		/obj/machinery/pollution_scrubber = 10,
 		/obj/machinery/reagentgrinder = 20,
 		/obj/machinery/recharger = 5,
 		/obj/machinery/smartfridge/disks = 10,
@@ -324,7 +323,7 @@
 		/obj/machinery/stove = 20,
 		/obj/machinery/syndicatebomb/training = 40,
 		/obj/machinery/washing_machine = 100,
-		/obj/structure/altar_of_gods = 5,
+		/obj/structure/altar/of_gods = 5,
 		/obj/structure/aquarium/prefilled = 100,
 		/obj/structure/bonfire/grill_pre_attached = 200,
 		/obj/structure/cannon/trash = 50,

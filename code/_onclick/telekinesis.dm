@@ -15,7 +15,7 @@
  * * Returns `COMPONENT_CANCEL_ATTACK_CHAIN` when it performs any action, to further acts on the attack chain.
  */
 /atom/proc/attack_tk(mob/user)
-	if(user.stat || !tkMaxRangeCheck(user, src))
+	if(IS_UNCONSCIOUS_OR_CRIT(user) || !tkMaxRangeCheck(user, src))
 		return
 	new /obj/effect/temp_visual/telekinesis(get_turf(src))
 	add_hiddenprint(user)
@@ -24,7 +24,7 @@
 
 
 /obj/attack_tk(mob/user)
-	if(user.stat)
+	if(IS_UNCONSCIOUS_OR_CRIT(user))
 		return
 	if(anchored)
 		return ..()
@@ -32,7 +32,7 @@
 
 
 /obj/item/attack_tk(mob/user)
-	if(user.stat)
+	if(IS_UNCONSCIOUS_OR_CRIT(user))
 		return
 	return attack_tk_grab(user)
 
@@ -171,7 +171,7 @@
 		var/obj/item/focused_item = focus
 		apply_focus_overlay()
 		if(interacting_with.Adjacent(focus))
-			. = focused_item.melee_attack_chain(user, interacting_with, list2params(modifiers)) ? ITEM_INTERACT_SUCCESS : ITEM_INTERACT_BLOCKING
+			. = focused_item.melee_attack_chain(user, interacting_with, modifiers) ? ITEM_INTERACT_SUCCESS : ITEM_INTERACT_BLOCKING
 			if(check_if_focusable(focus))
 				focus.do_attack_animation(interacting_with, null, focus)
 
@@ -231,7 +231,7 @@
 	return TRUE
 
 /obj/item/tk_grab/proc/check_if_focusable(obj/target)
-	if(!tk_user || !istype(tk_user) || QDELETED(target) || !istype(target) || !tk_user.dna.check_mutation(/datum/mutation/human/telekinesis))
+	if(!tk_user || !istype(tk_user) || QDELETED(target) || !istype(target) || !tk_user.dna.check_mutation(/datum/mutation/telekinesis))
 		qdel(src)
 		return
 	if(!tkMaxRangeCheck(tk_user, target) || target.anchored || !isturf(target.loc))

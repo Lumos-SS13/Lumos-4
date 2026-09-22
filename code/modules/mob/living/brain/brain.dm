@@ -9,19 +9,33 @@
 /mob/living/brain/Initialize(mapload)
 	. = ..()
 	create_dna(src)
-	stored_dna.initialize_dna(random_blood_type())
+	stored_dna.initialize_dna(random_human_blood_type())
 	if(isturf(loc)) //not spawned in an MMI or brain organ (most likely adminspawned)
-		var/obj/item/organ/internal/brain/OB = new(loc) //we create a new brain organ for it.
+		var/obj/item/organ/brain/OB = new(loc) //we create a new brain organ for it.
 		OB.brainmob = src
 		forceMove(OB)
 	if(!container?.mecha && (!container || container.immobilize)) //Unless inside a mecha, brains are rather helpless.
 		add_traits(list(TRAIT_IMMOBILIZED, TRAIT_HANDS_BLOCKED), BRAIN_UNAIDED)
 	ADD_TRAIT(src, TRAIT_SILICON_EMOTES_ALLOWED, INNATE_TRAIT)
+	ADD_TRAIT(src, TRAIT_NEVER_CONSIDERED_ALIVE, INNATE_TRAIT)
 
 /mob/living/brain/on_changed_z_level(turf/old_turf, turf/new_turf, same_z_layer, notify_contents)
-	var/obj/item/organ/internal/brain/brain_loc = loc
-	if(brain_loc && isnull(new_turf) && brain_loc.owner) //we're actively being put inside a new body.
-		return ..(old_turf, get_turf(brain_loc.owner), same_z_layer, notify_contents)
+	//Bubber Edit Start
+	if(isnull(new_turf))
+		var/mob/living/carbon/brain_owner = null
+
+		if(istype(loc, /obj/item/organ/brain))
+			var/obj/item/organ/brain/brain_loc = loc
+			brain_owner = brain_loc.owner
+		else if(istype(loc, /obj/item/mmi))
+			var/obj/item/mmi/mmi_loc = loc
+			if(istype(mmi_loc.loc, /obj/item/organ/brain))
+				var/obj/item/organ/brain/brain_loc = mmi_loc.loc
+				brain_owner = brain_loc.owner
+
+		if(brain_owner)
+			return ..(old_turf, get_turf(brain_owner), same_z_layer, notify_contents)
+	//Bubber Edit End
 	return ..()
 
 /mob/living/brain/proc/create_dna()
@@ -58,10 +72,10 @@
 	return
 
 /mob/living/brain/get_eye_protection()//no eyes
-	return 2
+	return FLASH_PROTECTION_WELDER
 
-/mob/living/brain/get_ear_protection()//no ears
-	return 2
+/mob/living/brain/get_ear_protection(ignore_deafness = FALSE)
+	return ..() + EAR_PROTECTION_HEAVY
 
 /mob/living/brain/flash_act(intensity = 1, override_blindness_check = 0, affect_silicon = 0, visual = 0, type = /atom/movable/screen/fullscreen/flash, length = 25)
 	return // no eyes, no flashing
@@ -71,18 +85,20 @@
 		return FALSE
 	return TRUE
 
-/mob/living/brain/fully_replace_character_name(oldname,newname)
-	..()
-	if(stored_dna)
-		stored_dna.real_name = real_name
+/mob/living/brain/fully_replace_character_name(oldname, newname, log_new_name = FALSE)
+	. = ..()
+	if(!.)
+		return
+
+	stored_dna?.real_name = real_name
 
 /mob/living/brain/forceMove(atom/destination)
 	if(container)
 		return container.forceMove(destination)
-	else if (istype(loc, /obj/item/organ/internal/brain))
-		var/obj/item/organ/internal/brain/B = loc
+	else if (istype(loc, /obj/item/organ/brain))
+		var/obj/item/organ/brain/B = loc
 		B.forceMove(destination)
-	else if (istype(destination, /obj/item/organ/internal/brain))
+	else if (istype(destination, /obj/item/organ/brain))
 		doMove(destination)
 	else if (istype(destination, /obj/item/mmi))
 		doMove(destination)
@@ -102,8 +118,8 @@
 
 /mob/living/brain/proc/get_traumas()
 	. = list()
-	if(istype(loc, /obj/item/organ/internal/brain))
-		var/obj/item/organ/internal/brain/B = loc
+	if(istype(loc, /obj/item/organ/brain))
+		var/obj/item/organ/brain/B = loc
 		. = B.traumas
 
 /mob/living/brain/get_policy_keywords()

@@ -12,6 +12,7 @@
 	icon = 'modular_zubbers/icons/obj/clothing/suits/armor.dmi'
 	worn_icon = 'modular_zubbers/icons/mob/clothing/suits/armor.dmi'
 	worn_icon_digi = 'modular_zubbers/icons/mob/clothing/suits/armor_digi.dmi'
+	worn_icon_teshari = 'modular_zubbers/icons/mob/clothing/suits/armor_teshari.dmi'
 	icon_state = "nerd"
 	blood_overlay_type = "suit"
 
@@ -54,6 +55,15 @@
 	COOLDOWN_DECLARE(next_morphine)
 
 	slowdown = 0
+
+	custom_materials = list(
+		/datum/material/iron = SHEET_MATERIAL_AMOUNT * 20,
+		/datum/material/silver = SHEET_MATERIAL_AMOUNT * 5,
+		/datum/material/gold = SHEET_MATERIAL_AMOUNT * 5,
+		/datum/material/diamond = SHEET_MATERIAL_AMOUNT * 3,
+		/datum/material/uranium = SHEET_MATERIAL_AMOUNT,
+		/datum/material/bluespace = SHEET_MATERIAL_AMOUNT
+	)
 
 /datum/armor/nerdsuit
 	acid = 50

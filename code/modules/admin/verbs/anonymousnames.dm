@@ -7,9 +7,7 @@ GLOBAL_DATUM(current_anonymous_theme, /datum/anonymous_theme)
 
 	this is the setup, it handles announcing crew and other settings for the mode and then creating the datum singleton
 */
-/client/proc/anon_names()
-	set category = "Admin.Events"
-	set name = "Setup Anonymous Names"
+GAME_VERB_PROC(/client, anon_names, "Setup Anonymous Names", "Admin.Events")
 
 	if(GLOB.current_anonymous_theme)
 		var/response = tgui_alert(usr, "Anon mode is currently enabled. Disable?", "cold feet", list("Disable Anon Names", "Keep it Enabled"))
@@ -193,54 +191,6 @@ GLOBAL_DATUM(current_anonymous_theme, /datum/anonymous_theme)
 
 /datum/anonymous_theme/wizards/anonymous_ai_name(is_ai = FALSE)
 	return "Crystallized Knowledge [is_ai ? "Nexus" : "Sliver"] +[rand(1,99)]" //Could two people roll the same number? Yeah, probably. Do I CARE? Nawww
-
-/obj/item/storage/box/wizard_kit
-	name = "Generic Wizard Cosplay Kit"
-
-/obj/item/storage/box/wizard_kit/PopulateContents()
-	new /obj/item/clothing/head/wizard(src)
-	new /obj/item/clothing/suit/wizrobe(src)
-	new /obj/item/clothing/shoes/sandal(src)
-
-/obj/item/storage/box/wizard_kit/red
-	name = "Evocation Wizard Cosplay Kit"
-
-/obj/item/storage/box/wizard_kit/red/PopulateContents()
-	new /obj/item/clothing/head/wizard/red(src)
-	new /obj/item/clothing/suit/wizrobe/red(src)
-	new /obj/item/clothing/shoes/sandal(src)
-
-/obj/item/storage/box/wizard_kit/yellow
-	name = "Translocation Wizard Cosplay Kit"
-
-/obj/item/storage/box/wizard_kit/yellow/PopulateContents()
-	new /obj/item/clothing/head/wizard/yellow(src)
-	new /obj/item/clothing/suit/wizrobe/yellow(src)
-	new /obj/item/clothing/shoes/sandal(src)
-
-/obj/item/storage/box/wizard_kit/magusred
-	name = "Conjuration Wizard Cosplay Kit"
-
-/obj/item/storage/box/wizard_kit/yellow/PopulateContents()
-	new /obj/item/clothing/head/wizard/magus(src)
-	new /obj/item/clothing/suit/wizrobe/magusred(src)
-	new /obj/item/clothing/shoes/sandal(src)
-
-/obj/item/storage/box/wizard_kit/magusblue
-	name = "Transmutation Wizard Cosplay Kit"
-
-/obj/item/storage/box/wizard_kit/yellow/PopulateContents()
-	new /obj/item/clothing/head/wizard/magus(src)
-	new /obj/item/clothing/suit/wizrobe/magusblue(src)
-	new /obj/item/clothing/shoes/sandal(src)
-
-/obj/item/storage/box/wizard_kit/black
-	name = "Necromancy Wizard Cosplay Kit"
-
-/obj/item/storage/box/wizard_kit/black/PopulateContents()
-	new /obj/item/clothing/head/wizard/black(src)
-	new /obj/item/clothing/suit/wizrobe/black(src)
-	new /obj/item/clothing/shoes/sandal(src)
 
 /datum/anonymous_theme/spider_clan
 	name = "Spider Clan"

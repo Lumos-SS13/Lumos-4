@@ -1,15 +1,14 @@
-/client/verb/mentorhelp(msg as text)
-	set category = "Mentor"
-	set name = "Mentorhelp"
-
+//GAME_VERB(/client, mentorhelp, "Mentorhelp", "Mentor", msg as text)
+GAME_VERB(/client, mentorhelp, "Mentorhelp", "Mentor")
+	VERB_ARG(msg, VERB_ARG_TYPE_TEXT, VERB_ARG_SOURCE_INPUT)
 	//clean the input msg
 	if(!msg)
 		return
 
 	//remove out mentorhelp verb temporarily to prevent spamming of mentors.
-	remove_verb(src, /client/verb/mentorhelp)
+	UNASSIGN_GAME_VERB(src, /client, mentorhelp)
 	spawn(30 SECONDS) // Gotta love BYOND, god this is disgusting
-		add_verb(src, /client/verb/mentorhelp)	// 30 second cool-down for mentorhelp
+		ASSIGN_GAME_VERB(src, /client, mentorhelp)	// 30 second cool-down for mentorhelp
 
 	msg = sanitize(copytext_char(msg, 1, MAX_MESSAGE_LEN))
 	if(!msg || !mob)
@@ -73,9 +72,9 @@
 	if(key)
 		if(include_link)
 			if(CONFIG_GET(flag/mentors_mobname_only))
-				. += "<a href='?_src_=mentor;mentor_msg=[REF(target_mob)];[MentorHrefToken(TRUE)]'>"
+				. += "<a href='byond://?_src_=mentor;mentor_msg=[REF(target_mob)];[MentorHrefToken(TRUE)]'>"
 			else
-				. += "<a href='?_src_=mentor;mentor_msg=[ckey];[MentorHrefToken(TRUE)]'>"
+				. += "<a href='byond://?_src_=mentor;mentor_msg=[ckey];[MentorHrefToken(TRUE)]'>"
 
 		if(target_client && target_client?.holder && target_client?.holder.fakekey)
 			. += "Administrator"
@@ -97,6 +96,6 @@
 		. += "*no key*"
 
 	if(include_follow)
-		. += " (<a href='?_src_=mentor;mentor_follow=[REF(target_mob)];[MentorHrefToken(TRUE)]'>F</a>)"
+		. += " (<a href='byond://?_src_=mentor;mentor_follow=[REF(target_mob)];[MentorHrefToken(TRUE)]'>F</a>)"
 
 	return .

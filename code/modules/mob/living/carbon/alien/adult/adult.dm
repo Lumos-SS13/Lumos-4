@@ -1,4 +1,5 @@
 /mob/living/carbon/alien/adult
+	abstract_type = /mob/living/carbon/alien/adult
 	name = "alien"
 	icon_state = "alien"
 	pass_flags = PASSTABLE
@@ -13,7 +14,7 @@
 	var/alt_icon = 'icons/mob/nonhuman-player/alienleap.dmi' //used to switch between the two alien icon files.
 	var/leap_on_click = 0
 	var/pounce_cooldown = 0
-	var/pounce_cooldown_time = 30
+	var/pounce_cooldown_time = 3 SECONDS
 	death_sound = 'sound/mobs/non-humanoids/hiss/hiss6.ogg'
 	bodyparts = list(
 		/obj/item/bodypart/chest/alien,
@@ -22,6 +23,16 @@
 		/obj/item/bodypart/arm/right/alien,
 		/obj/item/bodypart/leg/right/alien,
 		/obj/item/bodypart/leg/left/alien,
+	)
+
+	default_organ_types_by_slot = list(
+		ORGAN_SLOT_BRAIN = /obj/item/organ/brain/alien,
+		ORGAN_SLOT_XENO_HIVENODE = /obj/item/organ/alien/hivenode,
+		ORGAN_SLOT_TONGUE = /obj/item/organ/tongue/alien,
+		ORGAN_SLOT_EYES = /obj/item/organ/eyes/alien,
+		ORGAN_SLOT_LIVER = /obj/item/organ/liver/alien,
+		ORGAN_SLOT_EARS = /obj/item/organ/ears,
+		ORGAN_SLOT_STOMACH = /obj/item/organ/stomach/alien,
 	)
 
 GLOBAL_LIST_INIT(strippable_alien_humanoid_items, create_strippable_list(list(
@@ -36,34 +47,34 @@ GLOBAL_LIST_INIT(strippable_alien_humanoid_items, create_strippable_list(list(
 	AddElement(/datum/element/footstep, FOOTSTEP_MOB_CLAW, 0.5, -11)
 	AddElement(/datum/element/strippable, GLOB.strippable_alien_humanoid_items)
 
-/mob/living/carbon/alien/adult/create_internal_organs()
-	organs += new /obj/item/organ/internal/stomach/alien()
-	return ..()
-
 /mob/living/carbon/alien/adult/cuff_resist(obj/item/I)
 	playsound(src, 'sound/mobs/non-humanoids/hiss/hiss5.ogg', 40, TRUE, TRUE)  //Alien roars when starting to break free
 	..(I, cuff_break = INSTANT_CUFFBREAK)
 
 /mob/living/carbon/alien/adult/resist_grab(moving_resist)
 	if(pulledby.grab_state)
-		visible_message(span_danger("[src] breaks free of [pulledby]'s grip!"), \
-						span_danger("You break free of [pulledby]'s grip!"))
+		visible_message(
+			span_danger("[src] breaks free of [pulledby]'s grip!"),
+			span_danger("You break free of [pulledby]'s grip!"),
+		)
 	pulledby.stop_pulling()
-	. = 0
+	return TRUE
 
 /mob/living/carbon/alien/adult/alien_evolve(mob/living/carbon/alien/adult/new_xeno)
 	drop_all_held_items()
 	..()
 
 //For alien evolution/promotion/queen finder procs. Checks for an active alien of that type
-/proc/get_alien_type(alienpath)
-	for(var/mob/living/carbon/alien/adult/A in GLOB.alive_mob_list)
-		if(!istype(A, alienpath))
+/proc/get_alien_type(alien_path, mob/ignored)
+	for(var/mob/living/carbon/alien/alien in GLOB.carbon_list)
+		if(alien == ignored)
 			continue
-		if(!A.key || A.stat == DEAD) //Only living aliens with a ckey are valid.
+		if(!istype(alien, alien_path))
 			continue
-		return A
-	return FALSE
+		if(!alien.key || alien.stat == DEAD) //Only living aliens with a ckey are valid.
+			continue
+		return alien
+	return null
 
 /mob/living/carbon/alien/adult/check_breath(datum/gas_mixture/breath)
 	if(breath?.total_moles() > 0 && !HAS_TRAIT(src, TRAIT_SNEAK))
@@ -102,7 +113,7 @@ GLOBAL_LIST_INIT(strippable_alien_humanoid_items, create_strippable_list(list(
 /mob/living/carbon/alien/adult/proc/can_consume(atom/movable/poor_soul)
 	if(!isliving(poor_soul) || pulling != poor_soul)
 		return FALSE
-	if(incapacitated || grab_state < GRAB_AGGRESSIVE || stat != CONSCIOUS)
+	if(incapacitated || grab_state < GRAB_AGGRESSIVE)
 		return FALSE
 	if(get_dir(src, poor_soul) != dir) // Gotta face em 4head
 		return FALSE
@@ -127,7 +138,7 @@ GLOBAL_LIST_INIT(strippable_alien_humanoid_items, create_strippable_list(list(
 	if(!can_consume(lucky_winner))
 		return TRUE
 
-	var/obj/item/organ/internal/stomach/alien/melting_pot = get_organ_slot(ORGAN_SLOT_STOMACH)
+	var/obj/item/organ/stomach/alien/melting_pot = get_organ_slot(ORGAN_SLOT_STOMACH)
 	if(!istype(melting_pot))
 		visible_message(span_clown("[src] can't seem to consume [lucky_winner]!"), \
 			span_alien("You feel a pain in your... chest? You can't get [lucky_winner] down."))

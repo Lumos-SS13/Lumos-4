@@ -37,7 +37,21 @@
 	SSair.start_processing_machine(src, mapload)
 	update_appearance()
 	component_parts = list(new /obj/item/circuitboard/machine/thermoelectric_generator)
+	register_context()
 
+/obj/machinery/power/thermoelectric_generator/add_context(atom/source, list/context, obj/item/held_item, mob/user)
+	. = ..()
+	if (!held_item)
+		return CONTEXTUAL_SCREENTIP_SET
+	switch(held_item.tool_behaviour)
+		if(TOOL_SCREWDRIVER)
+			context[SCREENTIP_CONTEXT_LMB] = "[panel_open ? "Close" : "Open"] panel"
+		if(TOOL_WRENCH)
+			if (panel_open)
+				context[SCREENTIP_CONTEXT_LMB] = "[anchored ? "Unan" : "An"]chor"
+			else
+				context[SCREENTIP_CONTEXT_LMB] = "Connect circulators"
+	return CONTEXTUAL_SCREENTIP_SET
 
 /obj/machinery/power/thermoelectric_generator/Destroy()
 	null_circulators()
@@ -193,31 +207,31 @@
 
 	if(!panel_open) //connect/disconnect circulators
 		if(!anchored)
-			balloon_alert(user, span_warning("Anchor [src] before trying to connect the circulators!"))
+			balloon_alert(user, "anchor [src] before trying to connect the circulators!")
 			return TRUE
 		else
 			if(hot_circ && cold_circ)
-				balloon_alert(user, span_notice("You start removing the circulators..."))
+				balloon_alert(user, "you start removing the circulators...")
 				if(I.use_tool(src, user, 30, volume=50))
 					null_circulators()
 					update_appearance()
-					balloon_alert(user, span_notice("You disconnect [src]'s circulator links."))
+					balloon_alert(user, "you disconnect [src]'s circulator links.")
 					playsound(src, 'sound/misc/box_deploy.ogg', 50)
 				return TRUE
 
-			balloon_alert(user, span_notice("You attempt to attach the circulators..."))
+			balloon_alert(user, "you attempt to attach the circulators...")
 			if(I.use_tool(src, user, 30, volume=50))
 				switch(find_circulators())
 					if(0)
-						balloon_alert(user, span_warning("No circulators found!"))
+						balloon_alert(user, "no circulators found!")
 					if(1)
-						balloon_alert(user, span_warning("Only one circulator found!"))
+						balloon_alert(user, "only one circulator found!")
 					if(2)
-						balloon_alert(user, span_notice("You connect [src]'s circulator links."))
+						balloon_alert(user, "you connect [src]'s circulator links.")
 						playsound(src, 'sound/misc/box_deploy.ogg', 50)
 						return TRUE
 					if(3)
-						balloon_alert(user, span_warning("Both circulators are the same mode!"))
+						balloon_alert(user, "both circulators are the same mode!")
 				return TRUE
 
 	set_anchored(!anchored)
@@ -225,7 +239,7 @@
 	if(!anchored)
 		null_circulators()
 	connect_to_network()
-	balloon_alert(user, span_notice("You [anchored?"secure":"unsecure"] [src]."))
+	balloon_alert(user, "you [anchored?"secure":"unsecure"] [src].")
 	update_appearance()
 	return TRUE
 
@@ -234,21 +248,21 @@
 		return TRUE
 
 	if(hot_circ && cold_circ)
-		balloon_alert(user, span_warning("Disconnect the circulators first!"))
+		balloon_alert(user, "disconnect the circulators first!")
 		return TRUE
 	panel_open = !panel_open
 	I.play_tool_sound(src)
-	balloon_alert(user, span_notice("You [panel_open?"open":"close"] the panel on [src]."))
+	balloon_alert(user, "you [panel_open?"open":"close"] the panel on [src].")
 	update_appearance()
 	return TRUE
 
 /obj/machinery/power/thermoelectric_generator/crowbar_act(mob/user, obj/item/I)
 
 	if(anchored)
-		balloon_alert(user, span_warning("[src] is anchored!"))
+		balloon_alert(user, "[src] is anchored!")
 		return TRUE
 	else if(!panel_open)
-		balloon_alert(user, span_warning("Open the panel first!"))
+		balloon_alert(user, "open the panel first!")
 		return TRUE
 	else
 		default_deconstruction_crowbar(I)

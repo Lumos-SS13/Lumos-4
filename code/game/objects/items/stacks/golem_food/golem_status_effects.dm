@@ -18,6 +18,14 @@
 	var/alert_icon_state = "sheet-monkey"
 	/// Tooltip to display when hovering over the alert
 	var/alert_desc = "Something went wrong and this tooltip is not displaying correctly."
+	/// If we are not a golem what color does the filter glow?
+	var/filter_color = LIGHT_COLOR_DEFAULT
+	/// If TRUE, then this status effect is exclusive to other golem status effects and cannot be stacked with them.
+	var/exclusive = TRUE
+	/// For mobs with bodyparts, used to calculate the overall duration based on how many BIO_STONE bodyparts the mob has.
+	var/duration_mult_per_bodypart = 0.15 // 0.1 + (0.15 * 6 bodyparts) = 1
+	/// The minimum duration if the mob has no BIO_STONE bodypart
+	var/minimum_duration_mult = 0.1
 
 /atom/movable/screen/alert/status_effect/golem_status
 	name = "Metamorphic %SOMETHING%"
@@ -63,62 +71,104 @@
 	QDEL_NULL(mineral_overlay)
 	return ..()
 
+///If we find 3 or more golem parts, then we can say that the status effect overlays are noticeable enough, so we won't need the outline filter.
+#define MAX_GOLEM_PARTS_FOUND_FOR_FILTER 2
+
 /datum/status_effect/golem/on_apply()
 	. = ..()
-	if (!ishuman(owner))
-		return FALSE
-	if (owner.has_status_effect(/datum/status_effect/golem))
+	if (owner.has_status_effect(type)) //the initial id of the type will be checked. Make sure to override it if not exclusive
 		return FALSE
 	if (applied_fluff)
 		to_chat(owner, span_notice(applied_fluff))
-	if (!overlay_state_prefix || !iscarbon(owner))
-		return TRUE
-	var/mob/living/carbon/golem_owner = owner
-	for (var/obj/item/bodypart/part in golem_owner.bodyparts)
-		if (part.limb_id != SPECIES_GOLEM)
-			continue
-		var/datum/bodypart_overlay/simple/golem_overlay/overlay = new()
-		overlay.add_to_bodypart(overlay_state_prefix, part)
-		active_overlays += overlay
-	golem_owner.update_body_parts()
+
+	if (overlay_state_prefix)
+		var/golem_parts_found = 0
+		for (var/obj/item/bodypart/part as anything in owner.get_bodyparts())
+			// these overlays won't look good on anything but golem limbs
+			if (part.limb_id != SPECIES_GOLEM)
+				continue
+			var/datum/bodypart_overlay/simple/golem_overlay/overlay = new()
+			overlay.add_to_bodypart(overlay_state_prefix, part)
+			active_overlays += overlay
+			golem_parts_found++
+		if(golem_parts_found)
+			var/mob/living/carbon/golem_owner = owner
+			golem_owner.update_body_parts()
+			if(golem_parts_found > MAX_GOLEM_PARTS_FOUND_FOR_FILTER)
+				return TRUE
+
+	if(filter_color)
+		owner.add_filter("[id]_filter", 2, outline_filter("color" = filter_color, "size" = 1.25))
+		var/the_filter = owner.get_filter("[id]_filter")
+		animate(the_filter, alpha = 0) // start at 0 alpha
+		animate(the_filter, alpha = 150, time = 7.5 SECONDS, loop = -1, easing = SINE_EASING) // fade in and out
+		animate(alpha = 50, time = 7.5 SECONDS, loop = -1, easing = SINE_EASING)
+
 	return TRUE
 
-/datum/status_effect/golem/on_creation(mob/living/new_owner)
+#undef MAX_GOLEM_PARTS_FOUND_FOR_FILTER
+
+/datum/status_effect/golem/on_creation(mob/living/new_owner, multiplier = 1)
+	///instead of straight out multiplying the duration, we use exponents to flatten the duration so it doesn't become exceedingly long for golems
+	var/exponent = 0.5
+	var/duration_mult = minimum_duration_mult
+	if(iscarbon(new_owner))
+		//increase the duration for each stone bodypart, while reducing the benefit of higher multipliers in relation to the inscreased duration
+		duration_mult = 0.1
+		for(var/obj/item/bodypart/part as anything in new_owner.get_bodyparts())
+			if(part.biological_state & BIO_STONE)
+				duration_mult += duration_mult_per_bodypart // should be 1 at 6 stone-y bodyparts
+				exponent = max(0.2, exponent - 0.05) // 0.2 at 6 bodyparts
+	else if(new_owner.mob_biotypes & MOB_MINERAL)
+		exponent = 0.2
+		duration_mult = 1
+	if(multiplier > 1)
+		duration *= (duration_mult * multiplier) ** exponent
+	else // if the multiplier is lower than 1, don't bother using powers.
+		duration *= duration_mult * multiplier
+	var/buff_duration = duration
 	. = ..()
 	if (!.)
-		return FALSE
+		return .
 	var/atom/movable/screen/alert/status_effect/golem_status/status_alert = linked_alert
-	status_alert?.update_details(buff_time = initial(duration))
+	status_alert?.update_details(buff_time = buff_duration)
+	RegisterSignal(new_owner, SIGNAL_REMOVETRAIT(TRAIT_ROCK_METAMORPHIC), PROC_REF(on_metamorphic_lost))
+
+/datum/status_effect/golem/proc/on_metamorphic_lost()
+	SIGNAL_HANDLER
+	qdel(src)
 
 /datum/status_effect/golem/on_remove()
-	to_chat(owner, span_warning("The effect of the [mineral_name] fades."))
+	if(mineral_name)
+		to_chat(owner, span_warning("The effect of the [mineral_name] fades."))
 	QDEL_LIST(active_overlays)
+	owner.remove_filter("[id]_filter")
 	return ..()
 
 /datum/status_effect/golem/get_examine_text()
-	return span_notice("[owner.p_Their()] body has been augmented with veins of [mineral_name].")
+	if(mineral_name)
+		return span_notice("[owner.p_Their()] body has been augmented with veins of [mineral_name].")
 
 /// Body part overlays applied by golem status effects
 /datum/bodypart_overlay/simple/golem_overlay
 	icon = 'icons/mob/human/species/golems.dmi'
-	layers = ALL_EXTERNAL_OVERLAYS
+	layers = list(
+		EXTERNAL_FRONT = BODY_FRONT_LAYER,
+		EXTERNAL_BEHIND = BODY_BEHIND_LAYER,
+		EXTERNAL_ADJACENT = BODY_ADJ_LAYER,
+	)
+	offset_location = ENTIRE_BODY
 	///The bodypart that the overlay is currently applied to
 	var/datum/weakref/attached_bodypart
 
 /datum/bodypart_overlay/simple/golem_overlay/proc/add_to_bodypart(prefix, obj/item/bodypart/part)
 	icon_state = "[prefix]_[part.body_zone]"
 	attached_bodypart = WEAKREF(part)
-	part.add_bodypart_overlay(src)
+	part.add_bodypart_overlay(src, update = FALSE)
 
 /datum/bodypart_overlay/simple/golem_overlay/Destroy(force)
-	var/obj/item/bodypart/referenced_bodypart = attached_bodypart.resolve()
-	if(!referenced_bodypart)
-		return ..()
-	referenced_bodypart.remove_bodypart_overlay(src)
-	if(referenced_bodypart.owner) //Keep in mind that the bodypart could have been severed from the owner by now
-		referenced_bodypart.owner.update_body_parts()
-	else
-		referenced_bodypart.update_icon_dropped()
+	var/obj/item/bodypart/referenced_bodypart = attached_bodypart?.resolve()
+	referenced_bodypart?.remove_bodypart_overlay(src)
 	return ..()
 
 /// Freezes hunger for the duration
@@ -128,6 +178,7 @@
 	applied_fluff = "Glowing crystals sprout from your body. You feel energised!"
 	alert_icon_state = "sheet-uranium"
 	alert_desc = "Internal radiation is providing all of your nutritional needs."
+	filter_color = LIGHT_COLOR_GREEN
 
 /datum/status_effect/golem/uranium/on_apply()
 	. = ..()
@@ -149,6 +200,7 @@
 	applied_fluff = "Shining plates grace your shoulders. You feel holy!"
 	alert_icon_state = "sheet-silver"
 	alert_desc = "Your body repels supernatural influences."
+	filter_color = LIGHT_COLOR_FAINT_BLUE
 
 /datum/status_effect/golem/silver/on_apply()
 	. = ..()
@@ -173,6 +225,7 @@
 	applied_fluff = "Plasma cooling rods sprout from your body. You can take the heat!"
 	alert_icon_state = "sheet-plasma"
 	alert_desc = "You are protected from high pressure and can convert heat damage into power."
+	filter_color = LIGHT_COLOR_PINK
 
 /datum/status_effect/golem/plasma/on_apply()
 	. = ..()
@@ -224,6 +277,7 @@
 	applied_fluff = "Plasteel plates seal you tight. You feel insulated!"
 	alert_icon_state = "sheet-plasteel"
 	alert_desc = "You are sealed against the cold, and against low pressure environments."
+	filter_color = LIGHT_COLOR_DEFAULT
 
 /datum/status_effect/golem/plasteel/on_apply()
 	. = ..()
@@ -243,6 +297,7 @@
 	applied_fluff = "Shining plates form across your body. You feel reflective!"
 	alert_icon_state = "sheet-gold_2"
 	alert_desc = "Your shining body reflects energy weapons."
+	filter_color = LIGHT_COLOR_DIM_YELLOW
 
 /datum/status_effect/golem/gold/on_apply()
 	. = ..()
@@ -263,12 +318,17 @@
 	tick_interval = 0.25 SECONDS
 	alert_icon_state = "sheet-diamond"
 	alert_desc = "Light is bending around you, making you hard to see while still and faster while moving."
+	filter_color = LIGHT_COLOR_ELECTRIC_CYAN
 	/// Alpha to remove per second while stood still
 	var/alpha_per_tick = 20
 	/// Alpha to apply while moving
 	var/moving_alpha = 200
 	/// List of arms we have updated
 	var/list/modified_arms
+	/// Arm -> original attack verbs assoc list
+	var/list/initial_unarmed_verbs = list()
+	/// Arm -> original past attack verbs assocl ist
+	var/list/initial_unarmed_verbs_past = list()
 
 /datum/status_effect/golem/diamond/on_apply()
 	. = ..()
@@ -279,13 +339,11 @@
 	owner.add_movespeed_modifier(/datum/movespeed_modifier/status_effect/light_speed)
 
 	var/mob/living/carbon/carbon_owner = owner
-	for (var/obj/item/bodypart/arm/arm in carbon_owner.bodyparts)
-		if (arm.limb_id != SPECIES_GOLEM)
-			continue
+	for (var/obj/item/bodypart/arm/arm in carbon_owner.get_bodyparts())
 		set_arm_fluff(arm)
 	return TRUE
 
-/datum/status_effect/golem/diamond/tick(delta_time, times_fired)
+/datum/status_effect/golem/diamond/tick(delta_time)
 	owner.alpha = max(owner.alpha - alpha_per_tick, 0)
 
 /// Reset alpha to starting value
@@ -295,8 +353,12 @@
 
 /// Make our arm do slashing effects
 /datum/status_effect/golem/diamond/proc/set_arm_fluff(obj/item/bodypart/arm/arm)
+	initial_unarmed_verbs[arm] = arm.unarmed_attack_verbs
+	initial_unarmed_verbs_past[arm] = arm.unarmed_attack_verbs_continuous
 	arm.unarmed_attack_verbs = list("slash")
+	arm.unarmed_attack_verbs_continuous = list("slashes")
 	arm.grappled_attack_verb = "lacerate"
+	arm.grappled_attack_verb_continuous = "lacerates"
 	arm.unarmed_attack_effect = ATTACK_EFFECT_CLAW
 	arm.unarmed_attack_sound = 'sound/items/weapons/slash.ogg'
 	arm.unarmed_miss_sound = 'sound/items/weapons/slashmiss.ogg'
@@ -310,13 +372,18 @@
 	for (var/obj/item/bodypart/arm/arm as anything in modified_arms)
 		reset_arm_fluff(arm)
 	LAZYCLEARLIST(modified_arms)
+	initial_unarmed_verbs.Cut()
+	initial_unarmed_verbs_past.Cut()
 	return ..()
 
 /// Make our arm do whatever it originally did
 /datum/status_effect/golem/diamond/proc/reset_arm_fluff(obj/item/bodypart/arm/arm)
 	if (!arm)
 		return
-	arm.unarmed_attack_verbs = initial(arm.unarmed_attack_verbs)
+	arm.unarmed_attack_verbs = initial_unarmed_verbs[arm]
+	arm.unarmed_attack_verbs_continuous = initial_unarmed_verbs_past[arm]
+	arm.grappled_attack_verb = initial(arm.grappled_attack_verb)
+	arm.grappled_attack_verb_continuous = initial(arm.grappled_attack_verb_continuous)
 	arm.unarmed_attack_effect = initial(arm.unarmed_attack_effect)
 	arm.unarmed_attack_sound = initial(arm.unarmed_attack_sound)
 	arm.unarmed_miss_sound = initial(arm.unarmed_miss_sound)
@@ -326,6 +393,8 @@
 /datum/status_effect/golem/diamond/proc/on_arm_destroyed(obj/item/bodypart/arm/arm)
 	SIGNAL_HANDLER
 	modified_arms -= arm
+	initial_unarmed_verbs -= arm
+	initial_unarmed_verbs_past -= arm
 
 /// Makes you tougher
 /datum/status_effect/golem/titanium
@@ -334,8 +403,9 @@
 	applied_fluff = "Titanium rings burst from your arms. You feel ready to take on the world!"
 	alert_icon_state = "sheet-titanium"
 	alert_desc = "You are more resistant to physical blows, and pack more of a punch yourself."
+	filter_color = LIGHT_COLOR_HALOGEN
 	/// Amount to reduce brute damage by
-	var/brute_modifier = 0.7
+	var/brute_modifier = 0.8 // golems already have an innate 0.5 brute resistance - this is multiplicate on top of that
 	/// How much extra damage do we do with our fists?
 	var/damage_increase = 3
 	/// Deal this much extra damage to mining mobs, most of which take 0 unarmed damage usually
@@ -350,9 +420,7 @@
 	var/mob/living/carbon/human/human_owner = owner
 	RegisterSignal(human_owner, COMSIG_LIVING_UNARMED_ATTACK, PROC_REF(on_punched))
 	human_owner.physiology.brute_mod *= brute_modifier
-	for (var/obj/item/bodypart/arm/arm in human_owner.bodyparts)
-		if (arm.limb_id != SPECIES_GOLEM)
-			continue
+	for (var/obj/item/bodypart/arm/arm in human_owner.get_bodyparts())
 		buff_arm(arm)
 
 /// Give mining mobs an extra slap
@@ -361,7 +429,7 @@
 	if (!proximity || !isliving(punchee))
 		return NONE
 	var/mob/living/victim = punchee
-	if (victim.body_position == LYING_DOWN || (!(FACTION_MINING in victim.faction) && !(FACTION_BOSS in victim.faction)))
+	if (victim.body_position == LYING_DOWN || !victim.has_faction(list(FACTION_MINING, FACTION_BOSS)))
 		return NONE
 	victim.apply_damage(mining_bonus, BRUTE)
 
@@ -401,6 +469,7 @@
 	applied_fluff = "Bananium veins ooze from your crags. You feel a little funny!"
 	alert_icon_state = "sheet-bananium"
 	alert_desc = "You feel kind of funny."
+	filter_color = LIGHT_COLOR_BRIGHT_YELLOW
 	/// The slipperiness component which we have applied
 	var/datum/component/slippery/slipperiness
 
@@ -422,24 +491,28 @@
 	return owner.body_position == LYING_DOWN
 
 /datum/status_effect/golem/bananium/on_remove()
-	owner.remove_traits(owner, list(TRAIT_WADDLING, TRAIT_NO_SLIP_WATER), TRAIT_STATUS_EFFECT(id))
+	owner.remove_traits(list(TRAIT_WADDLING, TRAIT_NO_SLIP_WATER), TRAIT_STATUS_EFFECT(id))
 	QDEL_NULL(slipperiness)
 	return ..()
 
 #define LIGHTBULB_FILTER "filter_lightbulb_glow"
 
-/// Lights up the golem, NOT using the golem subtype because it is not exclusive with other status effects
-/datum/status_effect/golem_lightbulb
+/datum/status_effect/golem/lightbulb
 	id = "golem_lightbulb"
 	status_type = STATUS_EFFECT_REFRESH
 	duration = 2 MINUTES
 	alert_type = null
+	overlay_state_prefix = null
+	filter_color = null
+	exclusive = FALSE
+	duration_mult_per_bodypart = 0.11 // 0.34 + (0.11 * 6 bodyparts) = 1
+	minimum_duration_mult = 0.34
 	var/glow_range = 3
 	var/glow_power = 1
 	var/glow_color = LIGHT_COLOR_DEFAULT
 	var/obj/effect/dummy/lighting_obj/moblight/lightbulb
 
-/datum/status_effect/golem_lightbulb/on_apply()
+/datum/status_effect/golem/lightbulb/on_apply()
 	. = ..()
 	if (!.)
 		return
@@ -447,7 +520,7 @@
 	lightbulb = owner.mob_light(glow_range, glow_power, glow_color)
 	owner.add_filter(LIGHTBULB_FILTER, 2, list("type" = "outline", "color" = glow_color, "alpha" = 60, "size" = 1))
 
-/datum/status_effect/golem_lightbulb/on_remove()
+/datum/status_effect/golem/lightbulb/on_remove()
 	QDEL_NULL(lightbulb)
 	owner.remove_filter(LIGHTBULB_FILTER)
 	to_chat(owner, span_warning("Your glow fades."))

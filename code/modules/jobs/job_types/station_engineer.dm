@@ -2,7 +2,6 @@
 	title = JOB_STATION_ENGINEER
 	description = "Start the Supermatter, wire the solars, repair station hull \
 		and wiring damage."
-	department_head = list(JOB_CHIEF_ENGINEER)
 	faction = FACTION_STATION
 	total_positions = 5
 	spawn_positions = 5
@@ -59,12 +58,14 @@
 	messenger = /obj/item/storage/backpack/messenger/eng
 
 	backpack_contents = list(
-		/obj/item/construction/rcd/loaded,
+//		/obj/item/construction/rcd/loaded, // BUBBER EDIT REMOVAL -> MOVED TO LOCKER
 	)
 
 	box = /obj/item/storage/box/survival/engineer
 	pda_slot = ITEM_SLOT_LPOCKET
 	skillchips = list(/obj/item/skillchip/job/engineer)
+
+	wintercoat = /obj/item/clothing/suit/hooded/wintercoat/engineering
 
 /datum/outfit/job/engineer/gloved
 	name = "Station Engineer (Gloves)"

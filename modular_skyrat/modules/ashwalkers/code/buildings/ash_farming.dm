@@ -28,7 +28,7 @@
 /**
  * check_attack is meant to listen for the COMSIG_ATOM_ATTACKBY signal, where it essentially functions like the attackby proc
  */
-/datum/component/simple_farm/proc/check_attack(datum/source, obj/item/attacking_item, mob/user)
+/datum/component/simple_farm/proc/check_attack(datum/source, obj/item/attacking_item, mob/user, list/modifiers)
 	SIGNAL_HANDLER
 
 	//if its a seed, lets try to plant
@@ -40,7 +40,7 @@
 			return
 
 		locate_farm = new(get_turf(atom_parent))
-		user.mind.adjust_experience(/datum/skill/primitive, 5)
+		user.mind?.adjust_experience(/datum/skill/primitive, 5)
 		locate_farm.pixel_x = pixel_shift[1]
 		locate_farm.pixel_y = pixel_shift[2]
 		locate_farm.layer = atom_parent.layer + 0.1
@@ -140,11 +140,11 @@
 		else
 			icon_state = "[planted_seed.icon_grow][planted_seed.growthstages]"
 
-		name = lowertext(planted_seed.plantname)
+		name = LOWER_TEXT(planted_seed.plantname)
 
 	else
 		icon_state = "[planted_seed.icon_grow]1"
-		name = lowertext("harvested [planted_seed.plantname]")
+		name = LOWER_TEXT("harvested [planted_seed.plantname]")
 
 	return ..()
 
@@ -155,7 +155,7 @@
 
 	COOLDOWN_START(src, harvest_timer, harvest_cooldown)
 	create_harvest()
-	user.mind.adjust_experience(/datum/skill/primitive, 5)
+	user.mind?.adjust_experience(/datum/skill/primitive, 5)
 	update_appearance()
 	return ..()
 
@@ -174,13 +174,13 @@
 
 		COOLDOWN_START(src, harvest_timer, harvest_cooldown)
 		create_harvest(attacking_item, user)
-		user.mind.adjust_experience(/datum/skill/primitive, 15)
+		user.mind?.adjust_experience(/datum/skill/primitive, 15)
 		update_appearance()
 		return
 
 	//if its fertilizer, boost our level
 	else if(istype(attacking_item, /obj/item/stack/worm_fertilizer))
-		user.mind.adjust_experience(/datum/skill/primitive, 5)
+		user.mind?.adjust_experience(/datum/skill/primitive, 5)
 		if(farm_level >= SKILL_LEVEL_LEGENDARY)
 			balloon_alert(user, "farm already max level!")
 			return
@@ -195,7 +195,7 @@
 
 	//if its worms, increase our worms
 	else if(istype(attacking_item, /obj/item/food/bait/worm))
-		user.mind.adjust_experience(/datum/skill/primitive, 5)
+		user.mind?.adjust_experience(/datum/skill/primitive, 5)
 		if(stored_worms >= 5)
 			balloon_alert(user, "plant already full on worms!")
 			return
@@ -266,7 +266,7 @@
 /**
  * will create a harvest of the seeds product, with a chance to create a mutated version
  */
-/obj/structure/simple_farm/proc/create_harvest(var/obj/item/storage/bag/plants/plant_bag, var/mob/user)
+/obj/structure/simple_farm/proc/create_harvest(obj/item/storage/bag/plants/plant_bag, mob/user)
 	if(!planted_seed)
 		return
 

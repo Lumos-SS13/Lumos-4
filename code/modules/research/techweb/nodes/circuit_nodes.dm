@@ -59,6 +59,8 @@
 		"comp_ntnet_receive",
 		"comp_ntnet_send",
 		"comp_ntnet_send_list_literal",
+		"comp_nfc_send",
+		"comp_nfc_receive",
 		"comp_pinpointer",
 		"comp_pressuresensor",
 		"comp_radio",
@@ -71,9 +73,9 @@
 		"comp_soundemitter",
 		"comp_species",
 		"comp_speech",
-		"comp_speech",
 		"comp_split",
 		"comp_string_contains",
+		"comp_string_replace",
 		"comp_tempsensor",
 		"comp_textcase",
 		"comp_timepiece",
@@ -84,6 +86,10 @@
 		"comp_typecast",
 		"comp_typecheck",
 		"comp_view_sensor",
+		"comp_wire_bundle",
+		"comp_wirenet_receive",
+		"comp_wirenet_send",
+		"comp_wirenet_send_literal",
 	)
 
 /datum/techweb_node/circuit_shells
@@ -98,11 +104,14 @@
 		"dispenser_shell",
 		"door_shell",
 		"gun_shell",
+		"implant_shell",
 		"keyboard_shell",
 		"module_shell",
 		"money_bot_shell",
 		"scanner_gate_shell",
 		"scanner_shell",
+		"undertile_shell",
+		"wallmount_shell",
 		"comp_equip_action",
 	)
 	research_costs = list(TECHWEB_POINT_TYPE_GENERIC = TECHWEB_TIER_1_POINTS)

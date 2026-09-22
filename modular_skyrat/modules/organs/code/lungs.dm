@@ -1,6 +1,6 @@
 #define ADAPTIVE_TOLERANCE 2
 
-/obj/item/organ/internal/lungs/adaptive
+/obj/item/organ/lungs/adaptive
 	name = "debug-adaptive lungs"
 	desc = "if you have these, or see these, someone fucked up"
 	icon = 'modular_skyrat/modules/organs/icons/lungs.dmi'
@@ -10,7 +10,7 @@
 	/// The type of air mix (hot/cold) that we are tuned for
 	var/air_mix = null
 
-/obj/item/organ/internal/lungs/adaptive/cold
+/obj/item/organ/lungs/adaptive/cold
 	name = "cold-adapted lungs"
 	desc = "A set of lungs adapted to low temperatures, though they are more susceptible to high temperatures"
 	icon_state = "lungs_cold"
@@ -25,7 +25,7 @@
 	heat_level_3_threshold = 913.15
 	heat_level_1_damage = HEAT_GAS_DAMAGE_LEVEL_2
 
-/obj/item/organ/internal/lungs/adaptive/hot
+/obj/item/organ/lungs/adaptive/hot
 	name = "heat-adapted lungs"
 	desc = "A set of lungs adapted to high temperatures, though they are more susceptible to low temperatures"
 	icon_state = "lungs_heat"
@@ -40,7 +40,7 @@
 	heat_level_2_damage = HEAT_GAS_DAMAGE_LEVEL_1
 	heat_level_3_damage = HEAT_GAS_DAMAGE_LEVEL_2
 
-/obj/item/organ/internal/lungs/adaptive/Initialize(mapload)
+/obj/item/organ/lungs/adaptive/Initialize(mapload)
 	var/datum/gas_mixture/immutable/planetary/mix = SSair.planetary[air_mix]
 
 	if(!mix?.total_moles()) // this typically means we don't have the respective cold/hot z-level, like if we're using the LOWMEMORYMODE define
@@ -49,7 +49,7 @@
 	// Take a "breath" of the air
 	var/datum/gas_mixture/breath = mix.remove(mix.total_moles() * BREATH_PERCENTAGE)
 
-	var/list/breath_gases = breath.gases
+	var/list/breath_moles = breath.moles
 
 	breath.assert_gases(
 		/datum/gas/oxygen,
@@ -60,11 +60,11 @@
 		/datum/gas/miasma,
 	)
 
-	var/oxygen_pp = breath.get_breath_partial_pressure(breath_gases[/datum/gas/oxygen][MOLES])
-	var/plasma_pp = breath.get_breath_partial_pressure(breath_gases[/datum/gas/plasma][MOLES])
-	var/carbon_dioxide_pp = breath.get_breath_partial_pressure(breath_gases[/datum/gas/carbon_dioxide][MOLES])
-	var/bz_pp = breath.get_breath_partial_pressure(breath_gases[/datum/gas/bz][MOLES])
-	var/miasma_pp = breath.get_breath_partial_pressure(breath_gases[/datum/gas/miasma][MOLES])
+	var/oxygen_pp = breath.get_breath_partial_pressure(breath_moles[/datum/gas/oxygen])
+	var/plasma_pp = breath.get_breath_partial_pressure(breath_moles[/datum/gas/plasma])
+	var/carbon_dioxide_pp = breath.get_breath_partial_pressure(breath_moles[/datum/gas/carbon_dioxide])
+	var/bz_pp = breath.get_breath_partial_pressure(breath_moles[/datum/gas/bz])
+	var/miasma_pp = breath.get_breath_partial_pressure(breath_moles[/datum/gas/miasma])
 
 	safe_oxygen_min = floor(min(safe_oxygen_min, oxygen_pp - ADAPTIVE_TOLERANCE))
 
@@ -82,7 +82,7 @@
 
 	return ..()
 
-/obj/item/organ/internal/lungs/toxin
+/obj/item/organ/lungs/toxin
 	name = "toxin-adapted lungs"
 	icon = 'modular_skyrat/modules/organs/icons/lungs.dmi'
 	desc = "A set of lungs adapted to toxic environments, though more susceptible to extreme temperatures."
@@ -94,7 +94,7 @@
 	heat_level_2_threshold = 387.15
 	heat_level_3_threshold = 913.15
 
-/obj/item/organ/internal/lungs/oxy
+/obj/item/organ/lungs/oxy
 	name = "low-oxygen-adapted lungs"
 	icon = 'modular_skyrat/modules/organs/icons/lungs.dmi'
 	desc = "A set of lungs adapted to lower-pressure environments, though more susceptible to extreme temperatures."

@@ -32,8 +32,7 @@
 
 	required_organ = ORGAN_SLOT_BRAIN
 
-	symptom_delay_min = 100
-	symptom_delay_max = 100
+	symptom_delay = 100
 
 	threshold_descs = list(
 		"Stage Speed 8" = "Causes the transformation process to begin on stage 3 instead of 5.",
@@ -56,7 +55,7 @@
 	var/damage_to_deal = (A.stage * power) - 2
 	if(damage_to_deal <= 0)
 		return
-	A.affected_mob.adjustToxLoss(damage_to_deal)
+	A.affected_mob.adjust_tox_loss(damage_to_deal)
 
 /datum/symptom/changelingzombie/Start(datum/disease/advance/A)
 	. = ..()
@@ -66,8 +65,8 @@
 		required_stage = 3
 	if(A.totalTransmittable() > 4)
 		toxic = TRUE
-		symptom_delay_min = 1
-		symptom_delay_max = 1
+		symptom_delay = 1
+
 	if(A.totalResistance() > 12)
 		should_cure_changeling_zombie = FALSE
 

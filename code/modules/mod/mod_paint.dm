@@ -10,6 +10,7 @@
 	desc = "This kit will repaint your MODsuit to something unique."
 	icon = 'icons/obj/clothing/modsuit/mod_construction.dmi'
 	icon_state = "paintkit"
+	custom_materials = list(/datum/material/iron = SMALL_MATERIAL_AMOUNT * 5, /datum/material/plastic = SMALL_MATERIAL_AMOUNT * 5)
 	var/obj/item/mod/control/editing_mod
 	var/atom/movable/screen/map_view/proxy_view
 	var/list/current_color
@@ -30,6 +31,7 @@
 	if(!ui)
 		ui = new(user, src, "MODpaint", name)
 		ui.open()
+		proxy_view.display_to(user, ui.window)
 
 /obj/item/mod/paint/ui_host()
 	return editing_mod
@@ -139,7 +141,7 @@
 
 /obj/item/mod/skin_applier
 	name = "MOD skin applier"
-	desc = "This one-use skin applier will add a skin to MODsuits of a specific type."
+	desc = "This one-use skin applier will add a skin to MODsuits of a specific type. Must be used on an inactive control unit."
 	icon = 'icons/obj/clothing/modsuit/mod_construction.dmi'
 	icon_state = "skinapplier"
 	var/skin = "civilian"
@@ -148,20 +150,27 @@
 	. = ..()
 	name = "MOD [skin] skin applier"
 
-/obj/item/mod/skin_applier/pre_attack(atom/attacked_atom, mob/living/user, params)
+/obj/item/mod/skin_applier/interact_with_atom(atom/attacked_atom, mob/living/user, params)
 	if(!istype(attacked_atom, /obj/item/mod/control))
-		return ..()
+		return NONE
 	var/obj/item/mod/control/mod = attacked_atom
 	if(mod.active || mod.activating)
-		balloon_alert(user, "suit is active!")
-		return TRUE
+		balloon_alert(user, "unit active!")
+		return ITEM_INTERACT_BLOCKING
 	if(!(skin in mod.theme.variants))
-		balloon_alert(user, "incompatible theme!")
-		return TRUE
+		balloon_alert(user, "wrong theme for skin!")
+		return ITEM_INTERACT_BLOCKING
 	mod.theme.set_skin(mod, skin)
 	balloon_alert(user, "skin applied")
 	qdel(src)
-	return TRUE
+	return ITEM_INTERACT_SUCCESS
 
 /obj/item/mod/skin_applier/honkerative
+	desc = /obj/item/mod/skin_applier::desc + " Additionally, this kit attempts to install a waddling module. Honk!"
 	skin = "honkerative"
+
+/obj/item/mod/skin_applier/honkerative/interact_with_atom(obj/item/mod/control/controlunit, mob/living/user, params)
+	. = ..()
+	if(!(. & ITEM_INTERACT_SUCCESS))
+		return
+	controlunit.install(new /obj/item/mod/module/waddle(get_turf(user)), user)

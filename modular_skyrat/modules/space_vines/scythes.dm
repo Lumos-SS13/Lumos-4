@@ -1,11 +1,11 @@
 /obj/item/scythe
 	name = "scythe"
 	desc = "A sharp and curved blade on a long fibremetal handle, this tool makes it easy to reap what you sow."
-	icon = 'modular_skyrat/modules/space_vines/items_and_weapons.dmi'
+	icon = 'modular_skyrat/modules/space_vines/icons/items_and_weapons.dmi'
 	icon_state = "scythe_t1"
-	worn_icon = 'modular_skyrat/modules/space_vines/back.dmi'
-	lefthand_file = 'modular_skyrat/modules/space_vines/polearms_lefthand.dmi'
-	righthand_file = 'modular_skyrat/modules/space_vines/polearms_righthand.dmi'
+	worn_icon = 'modular_skyrat/modules/space_vines/icons/back.dmi'
+	lefthand_file = 'modular_skyrat/modules/space_vines/icons/polearms_lefthand.dmi'
+	righthand_file = 'modular_skyrat/modules/space_vines/icons/polearms_righthand.dmi'
 	force = 13
 	throwforce = 5
 	throw_speed = 2
@@ -39,12 +39,20 @@
 /obj/item/scythe/tier1
 	name = "scythe (tier 1)"
 	icon_state = "scythe_t1"
+	custom_materials = list(
+		/datum/material/iron = HALF_SHEET_MATERIAL_AMOUNT,
+		/datum/material/glass = HALF_SHEET_MATERIAL_AMOUNT,
+	)
 
 /obj/item/scythe/tier2
 	name = "scythe (tier 2)"
 	icon_state = "scythe_t2"
 	force = 15
 	hit_range = 1
+	custom_materials = list(
+		/datum/material/iron = HALF_SHEET_MATERIAL_AMOUNT,
+		/datum/material/glass = HALF_SHEET_MATERIAL_AMOUNT,
+	)
 
 /obj/item/scythe/tier3
 	name = "scythe (tier 3)"

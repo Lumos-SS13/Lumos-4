@@ -37,7 +37,22 @@
 	.=..()
 	component_parts = list(new /obj/item/circuitboard/machine/circulator)
 	update_appearance()
+	register_context()
 
+/obj/machinery/atmospherics/components/binary/circulator/add_context(atom/source, list/context, obj/item/held_item, mob/user)
+	. = ..()
+	if(!held_item)
+		context[SCREENTIP_CONTEXT_RMB] = "Flip"
+		return CONTEXTUAL_SCREENTIP_SET
+	switch(held_item.tool_behaviour)
+		if(TOOL_SCREWDRIVER)
+			context[SCREENTIP_CONTEXT_LMB] = "[panel_open ? "Close" : "Open"] panel"
+		if(TOOL_WRENCH)
+			context[SCREENTIP_CONTEXT_LMB] = "[anchored ? "Unan" : "An"]chor"
+			context[SCREENTIP_CONTEXT_RMB] = "Rotate"
+		if(TOOL_MULTITOOL)
+			context[SCREENTIP_CONTEXT_LMB] = "Change to [mode ? "hot" : "cold"] mode"
+	return CONTEXTUAL_SCREENTIP_SET
 
 /obj/machinery/atmospherics/components/binary/circulator/Destroy()
 	if(generator)
@@ -141,16 +156,16 @@
 /obj/machinery/atmospherics/components/binary/circulator/wrench_act(mob/living/user, obj/item/I)
 
 	if(!panel_open)
-		balloon_alert(user, span_warning("Open the panel first!"))
+		balloon_alert(user, "open the panel first!")
 		return TRUE
 
 	if(generator)
-		balloon_alert(user, span_warning("Disconnect [generator] first!"))
+		balloon_alert(user, "disconnect [generator] first!")
 		return TRUE
 
 	set_anchored(!anchored)
 	I.play_tool_sound(src)
-	balloon_alert(user, span_notice("You [anchored?"secure":"unsecure"] [src]."))
+	balloon_alert(user, "you [anchored?"secure":"unsecure"] [src].")
 
 	var/obj/machinery/atmospherics/node1 = nodes[1]
 	var/obj/machinery/atmospherics/node2 = nodes[2]
@@ -203,22 +218,22 @@
 
 /obj/machinery/atmospherics/components/binary/circulator/multitool_act(mob/living/user, obj/item/I)
 	if(generator)
-		balloon_alert(user, span_warning("Disconnect [generator] first!"))
+		balloon_alert(user, "disconnect [generator] first!")
 		return TRUE
 
 	mode = !mode
-	balloon_alert(user, span_notice("You set [src] to [mode?"cold":"hot"] mode."))
+	balloon_alert(user, "you set [src] to [mode?"cold":"hot"] mode.")
 	return TRUE
 
 /obj/machinery/atmospherics/components/binary/circulator/screwdriver_act(mob/user, obj/item/I)
 	if(..())
 		return TRUE
 	if(generator)
-		balloon_alert(user, span_warning("Disconnect the generator first!"))
+		balloon_alert(user, "disconnect the generator first!")
 		return TRUE
 	panel_open = !panel_open
 	I.play_tool_sound(src)
-	balloon_alert(user, span_notice("You [panel_open?"open":"close"] the panel on [src]."))
+	balloon_alert(user, "you [panel_open?"open":"close"] the panel on [src].")
 	update_icon_nopipes()
 	return TRUE
 
@@ -234,7 +249,7 @@
 
 /obj/machinery/atmospherics/components/binary/circulator/crowbar_act(mob/user, obj/item/I)
 	if(anchored)
-		balloon_alert(user, span_warning("[src] is anchored!"))
+		balloon_alert(user, "[src] is anchored!")
 		return TRUE
 	if(!panel_open)
 		circulator_flip()
@@ -260,15 +275,21 @@
 	pixel_x = 0
 	pixel_y = 0
 
-/obj/machinery/atmospherics/components/binary/circulator/verb/circulator_flip()
-	set name = "Flip"
-	set category = "Object"
-	set src in oview(1)
-
+GAME_VERB_SRC(/obj/machinery/atmospherics/components/binary/circulator, circulator_flip, oview(1), "Flip", "Object")
 	if(!ishuman(usr))
 		return
+	flip(usr)
+
+/obj/machinery/atmospherics/components/binary/circulator/attack_hand_secondary(mob/user, list/modifiers)
+	if(!ishuman(user))
+		return
+	flip(user)
+	return SECONDARY_ATTACK_CANCEL_ATTACK_CHAIN
+
+// DO A FLIP
+/obj/machinery/atmospherics/components/binary/circulator/proc/flip(mob/living/carbon/human/user)
 	flipped = !flipped
-	balloon_alert(usr, span_notice("You flip [src]."))
+	balloon_alert(user, "you flip [src].")
 	playsound(src, 'sound/items/tools/change_drill.ogg', 50)
 	update_icon_nopipes()
 

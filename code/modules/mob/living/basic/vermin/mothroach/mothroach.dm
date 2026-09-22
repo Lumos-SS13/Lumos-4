@@ -16,7 +16,6 @@
 	maxHealth = 25
 	speed = 1.25
 	gold_core_spawnable = FRIENDLY_SPAWN
-	can_be_held = TRUE
 	worn_slot_flags = ITEM_SLOT_HEAD
 
 	verb_say = "flutters"
@@ -37,19 +36,9 @@
 	var/static/list/pet_commands = list(
 		/datum/pet_command/idle,
 		/datum/pet_command/free,
-		/datum/pet_command/follow,
+		/datum/pet_command/follow/start_active,
 		/datum/pet_command/perform_trick_sequence,
 	)
-
-/datum/emote/mothroach
-	mob_type_allowed_typecache = /mob/living/basic/mothroach
-	mob_type_blacklist_typecache = list()
-
-/datum/emote/mothroach/squeaks
-	key = "squeaks"
-	key_third_person = "squeaks"
-	message = "squeaks!"
-	emote_type = EMOTE_VISIBLE | EMOTE_AUDIBLE
 
 /mob/living/basic/mothroach/Initialize(mapload)
 	. = ..()
@@ -59,8 +48,10 @@
 	ai_controller.set_blackboard_key(BB_BASIC_FOODS, typecacheof(food_types))
 	AddElement(/datum/element/ai_retaliate)
 	AddElement(/datum/element/pet_bonus, "squeak")
+	AddElement(/datum/element/can_be_held)
+	AddElement(/datum/element/swabable, CELL_LINE_TABLE_MOTHROACH, CELL_VIRUS_TABLE_GENERIC_MOB, 1, 5)
 	add_verb(src, /mob/living/proc/toggle_resting)
-	ADD_TRAIT(src, TRAIT_VENTCRAWLER_ALWAYS, INNATE_TRAIT)
+	add_traits(list(TRAIT_MOTH_EMOTES_ALLOWED, TRAIT_VENTCRAWLER_ALWAYS), INNATE_TRAIT)
 
 /mob/living/basic/mothroach/toggle_resting()
 	. = ..()
@@ -79,7 +70,7 @@
 	else
 		playsound(loc, 'sound/mobs/humanoids/moth/scream_moth.ogg', 50, TRUE)
 
-/mob/living/basic/mothroach/attackby(obj/item/attacking_item, mob/living/user, params)
+/mob/living/basic/mothroach/attackby(obj/item/attacking_item, mob/living/user, list/modifiers, list/attack_modifiers)
 	. = ..()
 	if(src.stat == DEAD)
 		return

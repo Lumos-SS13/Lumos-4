@@ -5,6 +5,7 @@
 	icon = 'icons/obj/devices/remote.dmi'
 	icon_state = "botpad_controller"
 	w_class = WEIGHT_CLASS_SMALL
+	custom_materials = list(/datum/material/iron = HALF_SHEET_MATERIAL_AMOUNT, /datum/material/glass = HALF_SHEET_MATERIAL_AMOUNT)
 	// ID of the remote, used for linking up
 	var/id = "botlauncher"
 	var/obj/machinery/botpad/connected_botpad
@@ -43,7 +44,7 @@
 		connected_botpad.connected_remote = src
 		connected_botpad.id = id
 		multitool.set_buffer(null)
-		to_chat(user, span_notice("You connect the controller to the pad with data from the [multitool.name]'s buffer."))
+		to_chat(user, span_notice("You connect the controller to the pad with data from \the [multitool]'s buffer."))
 		return ITEM_INTERACT_SUCCESS
 
 /obj/item/botpad_remote/proc/try_launch(mob/living/user)

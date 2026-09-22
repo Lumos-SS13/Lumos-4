@@ -1,8 +1,8 @@
 /datum/job/corrections_officer
 	title = JOB_CORRECTIONS_OFFICER
+	rpg_title = "Beefeater"
 	description = "Guard the permabrig, stand around looking imposing, get fired for abusing the prisoners"
 	auto_deadmin_role_flags = DEADMIN_POSITION_SECURITY
-	department_head = list("The Warden and Head of Security")
 	faction = FACTION_STATION
 	total_positions = 1
 	spawn_positions = 1
@@ -18,6 +18,7 @@
 
 	outfit = /datum/outfit/job/corrections_officer
 	plasmaman_outfit = /datum/outfit/plasmaman/security
+	akula_outfit = /datum/outfit/akula/security_officer
 	display_order = JOB_DISPLAY_ORDER_CORRECTIONS_OFFICER
 	liver_traits = list(TRAIT_LAW_ENFORCEMENT_METABOLISM)
 	departments_list = list(
@@ -32,10 +33,18 @@
 		/obj/effect/spawner/random/contraband/prison = 5, //Gives them something fun to hold over the prisoners, or hide from them.
 		/obj/item/melee/baton/security/boomerang/loaded = 1
 	)
-	rpg_title = "Bailiff"
-	family_heirlooms = list(/obj/item/book/manual/wiki/security_space_law, /obj/item/clothing/head/security_cap, /obj/item/clothing/mask/whistle)
+
+	family_heirlooms = list(/obj/item/book/manual/wiki/security_space_law, /obj/item/clothing/head/beret/sec, /obj/item/clothing/mask/whistle)
 
 	job_flags = JOB_ANNOUNCE_ARRIVAL | JOB_CREW_MANIFEST | JOB_EQUIP_RANK | JOB_CREW_MEMBER | JOB_NEW_PLAYER_JOINABLE | JOB_REOPEN_ON_ROUNDSTART_LOSS | JOB_ASSIGN_QUIRKS | JOB_CAN_BE_INTERN
+	banned_quirks = list(SEC_RESTRICTED_QUIRKS)
+	banned_augments = list(SEC_RESTRICTED_AUGMENTS)
+	is_hand_required = TRUE
+	alt_titles = list(
+		"Corrections Officer",
+		"Brig Officer",
+		"Prison Guard",
+	)
 
 // OUTFIT
 /datum/outfit/job/corrections_officer
@@ -45,14 +54,14 @@
 	suit = /obj/item/clothing/suit/toggle/jacket/corrections_officer
 	shoes = /obj/item/clothing/shoes/laceup
 	ears = /obj/item/radio/headset/headset_sec
-	glasses = /obj/item/clothing/glasses/sunglasses
-	backpack_contents = list(/obj/item/melee/baton/security/loaded/departmental/prison, /obj/item/restraints/handcuffs = 2, /obj/item/clothing/mask/whistle, /obj/item/gun/energy/disabler)
+	glasses = /obj/item/clothing/glasses/hud/medsechud
+	backpack_contents = list(/obj/item/melee/baton/security/loaded/departmental/prison, /obj/item/restraints/handcuffs = 2, /obj/item/clothing/mask/whistle, /obj/item/gun/energy/e_gun/advtaser)
 	implants = list(/obj/item/implant/mindshield)
 	backpack = /obj/item/storage/backpack/security
 	satchel = /obj/item/storage/backpack/satchel/sec
 	duffelbag = /obj/item/storage/backpack/duffelbag/sec
 	messenger = /obj/item/storage/backpack/messenger/sec
-	head = /obj/item/clothing/head/security_garrison
+	head = /obj/item/clothing/head/beret/sec
 	box = /obj/item/storage/box/survival/security
 	belt = /obj/item/modular_computer/pda/security
 

@@ -182,7 +182,7 @@
 		var/mob/living/living_owner = owner
 		var/blood_cost = cost_override ? cost_override : bloodcost
 		if(HAS_TRAIT(living_owner, TRAIT_NOBLOOD))
-			living_owner.adjustBruteLoss(blood_cost * 0.1)
+			living_owner.adjust_brute_loss(blood_cost * 0.1)
 		else
 			living_owner.blood_volume = max(0, living_owner.blood_volume - blood_cost)
 		return
@@ -239,7 +239,7 @@
 		DeactivatePower()
 		return FALSE
 	// We can keep this up (For now), so Pay Cost!
-	if(power_flags & BP_AM_COSTLESS_UNCONSCIOUS && owner.stat != CONSCIOUS)
+	if(power_flags & BP_AM_COSTLESS_UNCONSCIOUS && IS_UNCONSCIOUS(owner))
 		return TRUE
 	if(constant_bloodcost < 0)
 		return TRUE

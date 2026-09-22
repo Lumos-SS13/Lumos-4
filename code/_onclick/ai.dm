@@ -52,6 +52,9 @@
 		if(LAZYACCESS(modifiers, CTRL_CLICK))
 			CtrlShiftClickOn(A)
 			return
+		if(LAZYACCESS(modifiers, MIDDLE_CLICK))
+			ShiftMiddleClickOn(A)
+			return
 		ShiftClickOn(A)
 		return
 	if(LAZYACCESS(modifiers, ALT_CLICK)) // alt and alt-gr (rightalt)
@@ -73,11 +76,13 @@
 	if(world.time <= next_move)
 		return
 
-	if(waypoint_mode)
-		waypoint_mode = 0
+	if(setting_waypoint)
+		setting_waypoint = FALSE
 		set_waypoint(A)
 		return
 
+	if(SEND_SIGNAL(A, COMSIG_ATOM_ATTACK_AI, src, params) & COMPONENT_CANCEL_ATTACK_CHAIN)
+		return
 	A.attack_ai(src)
 
 /*
@@ -87,9 +92,13 @@
 	it functions and re-insert it above.
 */
 /mob/living/silicon/ai/UnarmedAttack(atom/A, proximity_flag, list/modifiers)
+	if(SEND_SIGNAL(A, COMSIG_ATOM_ATTACK_AI, src) & COMPONENT_CANCEL_ATTACK_CHAIN)
+		return
 	A.attack_ai(src)
 
 /mob/living/silicon/ai/RangedAttack(atom/A)
+	if(SEND_SIGNAL(A, COMSIG_ATOM_ATTACK_AI, src) & COMPONENT_CANCEL_ATTACK_CHAIN)
+		return
 	A.attack_ai(src)
 
 /atom/proc/attack_ai(mob/user)
@@ -115,7 +124,9 @@
 	target.AICtrlShiftClick(src)
 
 /mob/living/silicon/ai/ShiftClickOn(atom/target)
-	target.AIShiftClick(src)
+	if(target.AIShiftClick(src))
+		return
+	return ..()
 
 /mob/living/silicon/ai/CtrlClickOn(atom/target)
 	target.AICtrlClick(src)
@@ -154,7 +165,7 @@
 	return
 
 /atom/proc/AIShiftClick(mob/living/silicon/ai/user)
-	return
+	return FALSE
 
 /atom/proc/AICtrlShiftClick(mob/living/silicon/ai/user)
 	return
@@ -179,10 +190,11 @@
 
 /obj/machinery/door/airlock/AIShiftClick(mob/living/silicon/ai/user)  // Opens and closes doors!
 	if(obj_flags & EMAGGED)
-		return
+		return FALSE
 
 	user_toggle_open(user)
 	add_hiddenprint(user)
+	return TRUE
 
 /obj/machinery/door/airlock/AICtrlShiftClick(mob/living/silicon/ai/user)  // Sets/Unsets Emergency Access Override
 	if(obj_flags & EMAGGED)
@@ -222,10 +234,10 @@
 /// Toggle APC lighting settings
 /obj/machinery/power/apc/AIShiftClick(mob/living/silicon/ai/user)
 	if(!can_use(user, loud = TRUE))
-		return
+		return FALSE
 
 	if(!is_operational || failure_timer)
-		return
+		return FALSE
 
 	lighting = lighting ? APC_CHANNEL_OFF : APC_CHANNEL_ON
 	if (user)
@@ -235,6 +247,7 @@
 		user.log_message("turned [enabled_or_disabled] the [src] lighting settings", LOG_GAME)
 	update_appearance()
 	update()
+	return TRUE
 
 /// Toggle APC equipment settings
 /obj/machinery/power/apc/ai_click_alt(mob/living/silicon/ai/user)
@@ -259,15 +272,24 @@
 		togglelock(user)
 	return SECONDARY_ATTACK_CANCEL_ATTACK_CHAIN
 
+/mob/living/silicon/ai/ShiftMiddleClickOn(atom/A)
+	if(control_disabled || incapacitated)
+		return
+	if(!can_see(A))
+		return
+	if(!point_at(A, TRUE))
+		return
+	log_message("points at [A] using holopad", LOG_EMOTE)
+
 /* AI Turrets */
 /obj/machinery/turretid/ai_click_alt(mob/living/silicon/ai/user) //toggles lethal on turrets
-	if(ailock)
+	if(is_ai_locked(user))
 		return CLICK_ACTION_BLOCKING
 	toggle_lethal(user)
 	return CLICK_ACTION_SUCCESS
 
 /obj/machinery/turretid/AICtrlClick(mob/living/silicon/ai/user) //turns off/on Turrets
-	if(ailock)
+	if(is_ai_locked(user))
 		return
 	toggle_on(user)
 
@@ -284,4 +306,4 @@
 //
 
 /mob/living/silicon/ai/TurfAdjacent(turf/target_turf)
-	return (GLOB.cameranet && GLOB.cameranet.checkTurfVis(target_turf))
+	return (SScameras.is_visible_by_cameras(target_turf))

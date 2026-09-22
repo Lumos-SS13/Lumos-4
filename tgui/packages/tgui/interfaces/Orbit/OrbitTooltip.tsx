@@ -1,5 +1,6 @@
-import { LabeledList, NoticeBox } from '../../components';
-import { Antagonist, Observable } from './types';
+import { LabeledList, NoticeBox } from 'tgui-core/components';
+
+import type { Antagonist, Observable } from './types';
 
 type Props = {
   item: Observable | Antagonist;
@@ -17,7 +18,7 @@ export function OrbitTooltip(props: Props) {
   }
 
   const extraInfo = extra?.split(':');
-  const displayHealth = !!health && health >= 0 ? `${health}%` : 'Critical';
+  const displayHealth = health && health >= 0 ? `${health}%` : 'Critical';
   const showAFK = 'client' in item && !item.client;
   const displayJob = realNameDisplay ? mind_job : job;
 
@@ -36,7 +37,7 @@ export function OrbitTooltip(props: Props) {
             {!!full_name && (
               <LabeledList.Item label="Real ID">{full_name}</LabeledList.Item>
             )}
-            {!!displayJob && !antag && (
+            {!!displayJob && (
               <LabeledList.Item label="Job">{displayJob}</LabeledList.Item>
             )}
             {!!antag && (

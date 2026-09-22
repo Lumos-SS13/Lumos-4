@@ -4,7 +4,6 @@
 		keep the crew alive, be prepared to do anything and everything or die \
 		horribly trying."
 	auto_deadmin_role_flags = DEADMIN_POSITION_HEAD|DEADMIN_POSITION_SECURITY
-	department_head = list("CentCom")
 	faction = FACTION_STATION
 	total_positions = 1
 	spawn_positions = 1
@@ -24,6 +23,7 @@
 	paycheck_department = ACCOUNT_CMD // SKYRAT EDIT - Original: paycheck_department = ACCOUNT_SEC
 
 	mind_traits = list(HEAD_OF_STAFF_MIND_TRAITS)
+	desensitized_base = DESENSITIZED_THRESHOLD
 	liver_traits = list(TRAIT_ROYAL_METABOLISM)
 
 	display_order = JOB_DISPLAY_ORDER_CAPTAIN
@@ -43,7 +43,7 @@
 		/obj/item/skillchip/sabrage = 5,
 	)
 
-	job_flags = STATION_JOB_FLAGS | HEAD_OF_STAFF_JOB_FLAGS
+	job_flags = STATION_JOB_FLAGS | HEAD_OF_STAFF_JOB_FLAGS | JOB_ANTAG_PROTECTED
 	rpg_title = "Star Duke"
 
 	human_authority = JOB_AUTHORITY_HUMANS_ONLY
@@ -67,12 +67,12 @@
 	uniform = /obj/item/clothing/under/rank/captain
 	suit = /obj/item/clothing/suit/armor/vest/capcarapace
 	backpack_contents = list(
-		/obj/item/melee/baton/telescopic = 1,
+		/obj/item/melee/baton/telescopic/gold = 1,
 		/obj/item/station_charter = 1,
 		)
 	belt = /obj/item/modular_computer/pda/heads/captain
 	ears = /obj/item/radio/headset/heads/captain/alt
-	glasses = /obj/item/clothing/glasses/sunglasses
+	glasses = /obj/item/clothing/glasses/hud/security/sunglasses/guard/command // BUBBER EDIT ADDITION - command HUDsunglasses
 	gloves = /obj/item/clothing/gloves/captain
 	head = /obj/item/clothing/head/hats/caphat
 	shoes = /obj/item/clothing/shoes/laceup
@@ -91,9 +91,11 @@
 	implants = list(/obj/item/implant/mindshield)
 	skillchips = list(/obj/item/skillchip/disk_verifier)
 
+	wintercoat = /obj/item/clothing/suit/hooded/wintercoat/captain
+
 	var/special_charter
 
-/datum/outfit/job/captain/pre_equip(mob/living/carbon/human/H, visualsOnly)
+/datum/outfit/job/captain/pre_equip(mob/living/carbon/human/H, visuals_only)
 	. = ..()
 	special_charter = CHECK_MAP_JOB_CHANGE(JOB_CAPTAIN, "special_charter")
 	if(!special_charter)
@@ -106,9 +108,9 @@
 	else if(!r_hand)
 		r_hand = /obj/item/station_charter/banner
 
-/datum/outfit/job/captain/post_equip(mob/living/carbon/human/equipped, visualsOnly)
+/datum/outfit/job/captain/post_equip(mob/living/carbon/human/equipped, visuals_only)
 	. = ..()
-	if(visualsOnly || !special_charter)
+	if(visuals_only || !special_charter)
 		return
 
 	var/obj/item/station_charter/banner/celestial_charter = locate() in equipped.held_items

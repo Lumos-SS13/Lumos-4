@@ -30,6 +30,10 @@
  */
 /proc/generate_random_name_species_based(gender, unique, datum/species/species_type, include_all = FALSE)
 	ASSERT(ispath(species_type, /datum/species))
+	// BUBBER EDIT ADDITION BEGIN - Ashwalkers
+	if(istype(species_type, /datum/species/lizard))
+		return generate_ashwalker_name()
+	// BUBBER EDIT ADDITION END - Ashwalkers
 	var/datum/language_holder/holder = GLOB.prototype_language_holders[species_type::species_language_holder]
 
 	var/list/languages_to_pick_from = list()
@@ -66,9 +70,6 @@
 	return generate_random_name(gender, unique, list(/datum/language/machine = 1))
 
 /mob/living/basic/bot/generate_random_mob_name(unique)
-	return generate_random_name(gender, unique, list(/datum/language/machine = 1))
-
-/mob/living/simple_animal/bot/generate_random_mob_name(unique)
 	return generate_random_name(gender, unique, list(/datum/language/machine = 1))
 
 GLOBAL_VAR(command_name)
@@ -114,34 +115,42 @@ GLOBAL_VAR(command_name)
 
 /proc/new_station_name()
 	var/random = rand(1,5)
-	var/name = ""
 	var/new_station_name = ""
+
+	var/prefix = ""
+	var/main = ""
 
 	//Rare: Pre-Prefix
 	if (prob(10))
-		name = pick(GLOB.station_prefixes)
-		new_station_name = name + " "
-		name = ""
+		prefix = pick(GLOB.station_prefixes)
 
 	if(prob(0.1))
 		random = 999999999 //ridiculously long name in written numbers
 
 	// Prefix
-	var/holiday_name = length(GLOB.holidays) && pick(GLOB.holidays)
-	if(holiday_name)
-		var/datum/holiday/holiday = GLOB.holidays[holiday_name]
+	var/picked_holiday = length(GLOB.holidays) && pick(GLOB.holidays)
+	if(picked_holiday)
+		var/datum/holiday/holiday = GLOB.holidays[picked_holiday]
 		if(istype(holiday, /datum/holiday/friday_thirteenth))
 			random = 13
-		name = holiday.getStationPrefix()
-		//get normal name
-	if(!name)
-		name = pick(GLOB.station_names)
-	if(name)
-		new_station_name += name + " "
+
+		var/holiday_prefix = holiday.get_station_prefix()
+		if(holiday_prefix)
+			prefix = holiday_prefix
+
+		var/holiday_base_name = holiday.get_station_name()
+		if(holiday_base_name)
+			main = holiday_base_name
+
+	// Prefix
+	if(prefix)
+		new_station_name += "[prefix] "
+
+	// Normal name
+	new_station_name += "[main || pick(GLOB.station_names)] "
 
 	// Suffix
-	name = pick(GLOB.station_suffixes)
-	new_station_name += name + " "
+	new_station_name += "[pick(GLOB.station_suffixes)] "
 
 	// ID Number
 	switch(random)
@@ -186,15 +195,6 @@ GLOBAL_VAR(command_name)
 
 	return name
 
-
-//Traitors and traitor silicons will get these. Revs will not.
-GLOBAL_VAR(syndicate_code_phrase) //Code phrase for traitors.
-GLOBAL_VAR(syndicate_code_response) //Code response for traitors.
-
-//Cached regex search - for checking if codewords are used.
-GLOBAL_DATUM(syndicate_code_phrase_regex, /regex)
-GLOBAL_DATUM(syndicate_code_response_regex, /regex)
-
 	/*
 	Should be expanded.
 	How this works:
@@ -223,14 +223,16 @@ GLOBAL_DATUM(syndicate_code_response_regex, /regex)
 		25; 5
 	)
 
-	var/list/safety = list(1,2,3)//Tells the proc which options to remove later on.
-	var/nouns = strings(ION_FILE, "ionabstract")
-	var/objects = strings(ION_FILE, "ionobjects")
-	var/adjectives = strings(ION_FILE, "ionadjectives")
-	var/threats = strings(ION_FILE, "ionthreats")
-	var/foods = strings(ION_FILE, "ionfood")
-	var/drinks = strings(ION_FILE, "iondrinks")
-	var/locations = strings(LOCATIONS_FILE, "locations")
+	var/list/safety = list(1, 2, 3)//Tells the proc which options to remove later on.
+	var/list/nouns = strings(ION_FILE, "ionabstract")
+	var/list/objects = strings(ION_FILE, "ionobjects")
+	var/list/adjectives = strings(ION_FILE, "ionadjectives")
+	var/list/threats = strings(ION_FILE, "ionthreats")
+	var/list/foods = strings(ION_FILE, "ionfood")
+	var/list/drinks = strings(ION_FILE, "iondrinks")
+	var/list/locations = list()
+	for(var/area/area_type as anything in list(/area/space) | GLOB.the_station_areas)
+		locations |= format_text(area_type::name)
 
 	var/list/names = list()
 	for(var/datum/record/crew/target in GLOB.manifest.general)//Picks from crew manifest.
@@ -372,5 +374,34 @@ GLOBAL_DATUM(syndicate_code_response_regex, /regex)
 			return "a blood filter"
 		if(TOOL_ROLLINGPIN)
 			return "a rolling pin"
+		if(TOOL_RUSTSCRAPER)
+			return "a rust scraper"
 		else
 			return "something... but the gods didn't set this up right (Please report this bug)"
+
+///Find the first name of a mob from a passed string with regex
+/proc/first_name(given_name)
+	var/static/regex/firstname = new("^\[^\\s-\]+") //First word before whitespace or "-"
+	firstname.Find(given_name)
+	return firstname.match
+
+/// Find the last name of a mob from a passed string with regex
+/proc/last_name(given_name)
+	var/static/regex/lasttname = new("\[^\\s-\]+$") //First word before whitespace or "-"
+	lasttname.Find(given_name)
+	return lasttname.match
+
+/// Find whitespace or dashes in the passed string with regex and returns TRUE if found
+/proc/is_mononym(given_name)
+	var/static/regex/breaks = regex(@"\s")
+	if(breaks.Find(given_name))
+		return FALSE
+	return TRUE
+
+/// Generates and returns a list of both arabic and roman numerals for 1 through 99
+/proc/generate_number_strings()
+	var/list/numbers = list()
+	for(var/i in 1 to 99)
+		numbers += "[i]"
+		numbers += "\Roman[i]"
+	return numbers

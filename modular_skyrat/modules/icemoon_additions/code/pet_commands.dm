@@ -8,13 +8,13 @@
 
 /datum/component/obeys_commands/on_examine(mob/living/source, mob/user, list/examine_list)
 	. = ..()
-	. += span_italics("You can alt+click [source.p_them()] when adjacent to see available commands.")
-	. += span_italics("You can also examine [source.p_them()] closely to check on [source.p_their()] wounds. Many companions can be healed with sutures or creams!")
+	examine_list += span_notice("You can alt+click [source.p_them()] when adjacent to see available commands.")
+	examine_list += span_notice("You can also examine [source.p_them()] closely to check on [source.p_their()] wounds. Many companions can be healed with sutures or creams!")
 
 /datum/component/obeys_commands/proc/on_examine_more(mob/living/source, mob/user, list/examine_list)
 	SIGNAL_HANDLER
 
-	if (IS_DEAD_OR_INCAP(source))
+	if (source.incapacitated)
 		return
 	if (!(user in source.ai_controller?.blackboard[BB_FRIENDS_LIST]))
 		return

@@ -1,7 +1,4 @@
-import { BooleanLike } from 'common/react';
-import { Dispatch, SetStateAction, useState } from 'react';
-
-import { useBackend } from '../backend';
+import { type Dispatch, type SetStateAction, useState } from 'react';
 import {
   Box,
   Button,
@@ -10,7 +7,10 @@ import {
   Section,
   Stack,
   Table,
-} from '../components';
+} from 'tgui-core/components';
+import type { BooleanLike } from 'tgui-core/react';
+
+import { useBackend } from '../backend';
 import { Window } from '../layouts';
 
 enum Screen {
@@ -32,6 +32,7 @@ type Data = {
   notice_message: string;
   requests: Request[];
   messages: Message[];
+  is_on_station: BooleanLike;
 };
 
 type Request = {
@@ -72,7 +73,7 @@ const RequestLogsScreen = (props) => {
               <Table.Cell>Delete</Table.Cell>
               <Table.Cell>Message</Table.Cell>
               <Table.Cell>Stamp</Table.Cell>
-              <Table.Cell>Departament</Table.Cell>
+              <Table.Cell>Department</Table.Cell>
               <Table.Cell>Authentication</Table.Cell>
             </Table.Row>
             {requests?.map((request) => (
@@ -170,7 +171,7 @@ const MainScreenAuth = (props: AuthScreenProps) => {
   const { auth_password, setPassword } = props;
 
   const { act, data } = useBackend<Data>();
-  const { status, is_malf } = data;
+  const { status, is_malf, is_on_station } = data;
 
   return (
     <>
@@ -178,7 +179,7 @@ const MainScreenAuth = (props: AuthScreenProps) => {
         <Section>
           <Input
             value={auth_password}
-            onChange={(e, value) => setPassword(value)}
+            onChange={setPassword}
             placeholder="Password"
           />
           <Button
@@ -229,7 +230,7 @@ const MainScreenAuth = (props: AuthScreenProps) => {
         </Table.Row>
         <Table.Row>
           <Table.Cell>
-            <Button
+            <Button.Confirm
               content={'Clear Message Logs'}
               onClick={() => act('clear_message_logs')}
             />
@@ -238,19 +239,24 @@ const MainScreenAuth = (props: AuthScreenProps) => {
         </Table.Row>
         <Table.Row>
           <Table.Cell>
-            <Button
+            <Button.Confirm
               content={'Clear Request Console Logs'}
               onClick={() => act('clear_request_logs')}
             />
           </Table.Cell>
           <Table.Cell>Clears request console logs</Table.Cell>
         </Table.Row>
-        <Table.Row>
-          <Table.Cell>
-            <Button content={'Set Custom Key'} onClick={() => act('set_key')} />
-          </Table.Cell>
-          <Table.Cell>Changes decryption key</Table.Cell>
-        </Table.Row>
+        {!!is_on_station && (
+          <Table.Row>
+            <Table.Cell>
+              <Button
+                content={'Set Custom Key'}
+                onClick={() => act('set_key')}
+              />
+            </Table.Cell>
+            <Table.Cell>Changes decryption key</Table.Cell>
+          </Table.Row>
+        )}
         <Table.Row>
           <Table.Cell>
             <Button
@@ -281,7 +287,7 @@ const MainScreenNotAuth = (props: AuthScreenProps) => {
         <Section>
           <Input
             value={auth_password}
-            onChange={(e, value) => setPassword(value)}
+            onChange={setPassword}
             placeholder="Password"
           />
           <Button onClick={() => act('auth', { auth_password: auth_password })}>

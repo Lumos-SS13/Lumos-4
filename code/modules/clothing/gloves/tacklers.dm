@@ -8,6 +8,7 @@
 	resistance_flags = NONE
 	custom_premium_price = PAYCHECK_COMMAND * 3.5
 	clothing_traits = list(TRAIT_FINGERPRINT_PASSTHROUGH,TRAIT_FAST_CUFFING)
+	equip_sound = 'sound/items/equip/glove_equip.ogg'
 	/// For storing our tackler datum so we can remove it after
 	var/datum/component/tackler
 	/// See: [/datum/component/tackler/var/stamina_cost]
@@ -23,11 +24,11 @@
 	/// See: [/datum/component/tackler/var/skill_mod]
 	var/skill_mod = 1
 	///How much these gloves affect fishing difficulty
-	var/fishing_modifier = -5
+	var/fishing_modifier = -7
 
 /obj/item/clothing/gloves/tackler/Initialize(mapload)
 	. = ..()
-	AddComponent(/datum/component/adjust_fishing_difficulty, fishing_modifier) //fishing tackle equipment (ba dum tsh)
+	AddElement(/datum/element/adjust_fishing_difficulty, fishing_modifier) //fishing tackle equipment (ba dum tsh)
 
 /obj/item/clothing/gloves/tackler/Destroy()
 	tackler = null
@@ -54,6 +55,7 @@
 	desc = "Sleek, aerodynamic gripper gloves that are less effective at actually performing takedowns, but more effective at letting the user sail through the hallways and cause accidents."
 	icon_state = "tackledolphin"
 	inhand_icon_state = null
+	custom_materials = list(/datum/material/plastic = SHEET_MATERIAL_AMOUNT * 1.25)
 
 	tackle_stam_cost = 15
 	base_knockdown = 0.5 SECONDS
@@ -61,7 +63,7 @@
 	tackle_speed = 2
 	min_distance = 2
 	skill_mod = -2
-	fishing_modifier = -8
+	fishing_modifier = -10
 
 /obj/item/clothing/gloves/tackler/combat
 	name = "gorilla gloves"
@@ -95,6 +97,7 @@
 	desc = "The ultimate in high risk, high reward, perfect for when you need to stop a criminal from fifty feet away or die trying. Banned in most Spinward gridiron football and rugby leagues."
 	icon_state = "tacklerocket"
 	inhand_icon_state = null
+	custom_materials = list(/datum/material/plastic = SHEET_MATERIAL_AMOUNT, /datum/material/plasma = HALF_SHEET_MATERIAL_AMOUNT)
 
 	tackle_stam_cost = 50
 	base_knockdown = 2 SECONDS
@@ -113,11 +116,12 @@
 	base_knockdown = 1.75 SECONDS
 	min_distance = 2
 	skill_mod = -1
-	fishing_modifier = -3
+	fishing_modifier = -5
+	custom_materials = list(/datum/material/plastic = SMALL_MATERIAL_AMOUNT)
 
 /obj/item/clothing/gloves/tackler/football
 	name = "football gloves"
 	desc = "Gloves for football players! Teaches them how to tackle like a pro."
 	icon_state = "tackle_gloves"
 	inhand_icon_state = null
-	fishing_modifier = -3
+	fishing_modifier = -4

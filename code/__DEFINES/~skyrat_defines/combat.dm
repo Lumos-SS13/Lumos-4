@@ -45,7 +45,7 @@
 	if(istype(buckled, /obj/vehicle/ridden))
 		buckled.unbuckle_mob(src)
 	KnockToFloor(TRUE, ignore_canknockdown, knockdown_amt)
-	adjustStaminaLoss(stamina_damage)
+	adjust_stamina_loss(stamina_damage)
 	if(disarm)
 		drop_all_held_items()
 	if(brief_stun)
@@ -89,7 +89,7 @@
 			. = TRUE
 			try_headslam(user, target, affecting)
 		if(BODY_ZONE_CHEST)
-			if(istype(user.mind.martial_art, /datum/martial_art/cqc))
+			if(locate(/datum/martial_art/cqc) in user.martial_arts)
 			// If you know CQC, You can't suplex and instead have the ability to use the chokehold, Sorry.
 			// Sleeping people on demand is stronger anyway.
 				return FALSE
@@ -139,7 +139,7 @@
 /// Attempts to perform a headslam, with the user slamming target's head into the floor. (Does not account for the potential nonexistence of aforementioned floor, e.g. space.)
 /datum/species/proc/try_headslam(mob/living/carbon/human/user, mob/living/carbon/human/target, obj/item/bodypart/affecting)
 	var/time_doing = 4 SECONDS
-	if(target.stat != CONSCIOUS)
+	if(IS_UNCONSCIOUS_OR_CRIT(target))
 		time_doing = 2 SECONDS
 		target.visible_message(span_danger("[user] holds [target]'s head tightly..."), ignored_mobs = user)
 		to_chat(user, span_danger("You grasp [target]'s head to prepare to slam it down..."))
@@ -163,8 +163,8 @@
 	// wound bonus because if you're doing this you probably really don't like the other guy so you're looking forward to inconveniencing them (with a fracture)
 	var/fun_times_at_the_headbash_factory = (head_knock ? 8 : 3)
 	if(head_knock)
-		target.adjustOrganLoss(ORGAN_SLOT_BRAIN, 15)
-	target.apply_damage(15, BRUTE, affecting, armor_block, wound_bonus = fun_times_at_the_headbash_factory, bare_wound_bonus = fun_times_at_the_headbash_factory)
+		target.adjust_organ_loss(ORGAN_SLOT_BRAIN, 15)
+	target.apply_damage(15, BRUTE, affecting, armor_block, wound_bonus = fun_times_at_the_headbash_factory, exposed_wound_bonus = fun_times_at_the_headbash_factory)
 	playsound(target, 'sound/effects/hit_kick.ogg', 70)
 	log_combat(user, target, "headsmashes", "against the floor")
 

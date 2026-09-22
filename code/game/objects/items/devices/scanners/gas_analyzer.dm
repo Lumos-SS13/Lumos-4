@@ -16,7 +16,6 @@
 	throw_range = 7
 	tool_behaviour = TOOL_ANALYZER
 	custom_materials = list(/datum/material/iron=SMALL_MATERIAL_AMOUNT * 0.3, /datum/material/glass=SMALL_MATERIAL_AMOUNT * 0.2)
-	grind_results = list(/datum/reagent/mercury = 5, /datum/reagent/iron = 5, /datum/reagent/silicon = 5)
 	interaction_flags_click = NEED_LITERACY|NEED_LIGHT|ALLOW_RESTING
 	pickup_sound = 'sound/items/handling/gas_analyzer/gas_analyzer_pickup.ogg'
 	drop_sound = 'sound/items/handling/gas_analyzer/gas_analyzer_drop.ogg'
@@ -44,6 +43,9 @@
 		slapcraft_recipes = slapcraft_recipe_list,\
 	)
 
+/obj/item/analyzer/grind_results()
+	return list(/datum/reagent/mercury = 5, /datum/reagent/iron = 5, /datum/reagent/silicon = 5)
+
 /obj/item/analyzer/equipped(mob/user, slot, initial)
 	. = ..()
 	ADD_TRAIT(user, TRAIT_DETECT_STORM, CLOTHING_TRAIT)
@@ -57,7 +59,7 @@
 	. += span_notice("Right-click [src] to open the gas reference.")
 	. += span_notice("Alt-click [src] to activate the barometer function.")
 
-/obj/item/analyzer/suicide_act(mob/living/carbon/user)
+/obj/item/analyzer/suicide_act(mob/living/user)
 	user.visible_message(span_suicide("[user] begins to analyze [user.p_them()]self with [src]! The display shows that [user.p_theyre()] dead!"))
 	return BRUTELOSS
 
@@ -80,7 +82,7 @@
 
 	for(var/V in SSweather.processing)
 		var/datum/weather/W = V
-		if(W.barometer_predictable && (T.z in W.impacted_z_levels) && W.area_type == user_area.type && !(W.stage == END_STAGE))
+		if((W.weather_flags & WEATHER_BAROMETER) && (T.z in W.impacted_z_levels) && W.area_type == user_area.type && !(W.stage == END_STAGE))
 			ongoing_weather = W
 			break
 
@@ -90,7 +92,7 @@
 			return CLICK_ACTION_BLOCKING
 
 		to_chat(user, span_notice("The next [ongoing_weather] will hit in [butchertime(ongoing_weather.next_hit_time - world.time)]."))
-		if(ongoing_weather.aesthetic)
+		if(!(ongoing_weather.weather_flags & FUNCTIONAL_WEATHER))
 			to_chat(user, span_warning("[src]'s barometer function says that the next storm will breeze on by."))
 	else
 		var/next_hit = SSweather.next_hit_by_zlevel["[T.z]"]
@@ -136,22 +138,26 @@
 	return list("gasmixes" = last_gasmix_data)
 
 /obj/item/analyzer/attack_self(mob/user, modifiers)
-	if(user.stat != CONSCIOUS || !user.can_read(src)) //SKYRAT EDIT: Blind People Can Analyze Again
+	if(IS_UNCONSCIOUS_OR_CRIT(user) || !user.can_read(src) || user.is_blind())
 		return
 	atmos_scan(user=user, target=get_turf(src), silent=FALSE)
 	on_analyze(source=src, target=get_turf(src))
 
 /obj/item/analyzer/attack_self_secondary(mob/user, modifiers)
-	if(user.stat != CONSCIOUS || !user.can_read(src)) //SKYRAT EDIT: Blind People Can Analyze Again
+	if(IS_UNCONSCIOUS_OR_CRIT(user) || !user.can_read(src) || user.is_blind())
 		return
 
 	ui_interact(user)
 
 /obj/item/analyzer/ranged_interact_with_atom(atom/interacting_with, mob/living/user, list/modifiers)
+	if(istype(interacting_with, /obj/effect/anomaly) && can_see(user, interacting_with, ranged_scan_distance))
+		var/obj/effect/anomaly/ranged_anomaly = interacting_with
+		ranged_anomaly.analyzer_act(user, src)
+		return ITEM_INTERACT_SUCCESS
 	return interact_with_atom(interacting_with, user, modifiers)
 
 /obj/item/analyzer/interact_with_atom(atom/interacting_with, mob/living/user, list/modifiers)
-	if(can_see(user, interacting_with, ranged_scan_distance))
+	if(!HAS_TRAIT(interacting_with, TRAIT_COMBAT_MODE_SKIP_INTERACTION) && can_see(user, interacting_with, ranged_scan_distance))
 		atmos_scan(user, (interacting_with.return_analyzable_air() ? interacting_with : get_turf(interacting_with)))
 	return NONE // Non-blocking
 
@@ -206,10 +212,10 @@
 		if(total_moles > 0)
 			message += span_notice("Moles: [round(total_moles, 0.01)] mol")
 
-			var/list/cached_gases = air.gases
-			for(var/id in cached_gases)
-				var/gas_concentration = cached_gases[id][MOLES]/total_moles
-				message += span_notice("[cached_gases[id][GAS_META][META_GAS_NAME]]: [round(cached_gases[id][MOLES], 0.01)] mol ([round(gas_concentration*100, 0.01)] %)")
+			var/list/cached_gas_name = GAS_META[META_GAS_NAME]
+			for(var/id, amount in air.moles)
+				var/gas_concentration = amount / total_moles
+				message += span_notice("[cached_gas_name[id]]: [round(amount, 0.01)] mol ([round(gas_concentration*100, 0.01)] %)")
 			message += span_notice("Temperature: [round(temperature - T0C,0.01)] &deg;C ([round(temperature, 0.01)] K)")
 			message += span_notice("Volume: [volume] L")
 			message += span_notice("Pressure: [round(pressure, 0.01)] kPa")
@@ -220,7 +226,7 @@
 			message += span_notice("Volume: [volume] L") // don't want to change the order volume appears in, suck it
 
 	// we let the join apply newlines so we do need handholding
-	to_chat(user, examine_block(jointext(message, "\n")), type = MESSAGE_TYPE_INFO)
+	to_chat(user, boxed_message(jointext(message, "\n")), type = MESSAGE_TYPE_INFO)
 	return TRUE
 
 /obj/item/analyzer/ranged
@@ -230,5 +236,7 @@
 	worn_icon_state = "analyzer"
 	w_class = WEIGHT_CLASS_NORMAL
 	custom_materials = list(/datum/material/iron = SMALL_MATERIAL_AMOUNT, /datum/material/glass = SMALL_MATERIAL_AMOUNT * 0.2, /datum/material/gold = SMALL_MATERIAL_AMOUNT*3, /datum/material/bluespace=SMALL_MATERIAL_AMOUNT*2)
-	grind_results = list(/datum/reagent/mercury = 5, /datum/reagent/iron = 5, /datum/reagent/silicon = 5)
 	ranged_scan_distance = 15
+
+/obj/item/analyzer/ranged/grind_results()
+	return list(/datum/reagent/mercury = 5, /datum/reagent/iron = 5, /datum/reagent/silicon = 5)

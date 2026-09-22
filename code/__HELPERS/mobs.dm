@@ -6,8 +6,20 @@
 /// Two mobs one is facing a person, but the other is perpendicular
 #define FACING_INIT_FACING_TARGET_TARGET_FACING_PERPENDICULAR 3 //Do I win the most informative but also most stupid define award?
 
-/proc/random_blood_type()
-	return pick(4;"O-", 36;"O+", 3;"A-", 28;"A+", 1;"B-", 20;"B+", 1;"AB-", 5;"AB+")
+/// Returns one of the human blood types at random, weighted by their rarity
+/proc/random_human_blood_type()
+	RETURN_TYPE(/datum/blood_type)
+	return get_blood_type(pick_weight(
+		list(
+			BLOOD_TYPE_O_MINUS = 4,
+			BLOOD_TYPE_O_PLUS = 36,
+			BLOOD_TYPE_A_MINUS = 3,
+			BLOOD_TYPE_A_PLUS = 28,
+			BLOOD_TYPE_B_MINUS= 1,
+			BLOOD_TYPE_B_PLUS = 20,
+			BLOOD_TYPE_AB_MINUS = 1,
+			BLOOD_TYPE_AB_PLUS = 5,
+		)))
 
 /proc/random_eye_color()
 	switch(pick(20;"brown",20;"hazel",20;"grey",15;"blue",15;"green",1;"amber",1;"albino"))
@@ -201,124 +213,6 @@ GLOBAL_LIST_INIT(skin_tone_names, list(
 		else
 			return "unknown"
 
-//some additional checks as a callback for for do_afters that want to break on losing health or on the mob taking action
-/mob/proc/break_do_after_checks(list/checked_health, check_clicks)
-	if(check_clicks && next_move > world.time)
-		return FALSE
-	return TRUE
-
-//pass a list in the format list("health" = mob's health var) to check health during this
-/mob/living/break_do_after_checks(list/checked_health, check_clicks)
-	if(islist(checked_health))
-		if(health < checked_health["health"])
-			return FALSE
-		checked_health["health"] = health
-	return ..()
-
-
-/**
- * Timed action involving one mob user. Target is optional.
- *
- * Checks that `user` does not move, change hands, get stunned, etc. for the
- * given `delay`. Returns `TRUE` on success or `FALSE` on failure.
- *
- * @param {mob} user - The mob performing the action.
- *
- * @param {number} delay - The time in deciseconds. Use the SECONDS define for readability. `1 SECONDS` is 10 deciseconds.
- *
- * @param {atom} target - The target of the action. This is where the progressbar will display.
- *
- * @param {flag} timed_action_flags - Flags to control the behavior of the timed action.
- *
- * @param {boolean} progress - Whether to display a progress bar / cogbar.
- *
- * @param {datum/callback} extra_checks - Additional checks to perform before the action is executed.
- *
- * @param {string} interaction_key - The assoc key under which the do_after is capped, with max_interact_count being the cap. Interaction key will default to target if not set.
- *
- * @param {number} max_interact_count - The maximum amount of interactions allowed.
- *
- * @param {boolean} hidden - By default, any action 1 second or longer shows a cog over the user while it is in progress. If hidden is set to TRUE, the cog will not be shown.
- */
-/proc/do_after(mob/user, delay, atom/target, timed_action_flags = NONE, progress = TRUE, datum/callback/extra_checks, interaction_key, max_interact_count = 1, hidden = FALSE)
-	if(!user)
-		return FALSE
-	if(!isnum(delay))
-		CRASH("do_after was passed a non-number delay: [delay || "null"].")
-
-	if(!interaction_key && target)
-		interaction_key = target //Use the direct ref to the target
-	if(interaction_key) //Do we have a interaction_key now?
-		var/current_interaction_count = LAZYACCESS(user.do_afters, interaction_key) || 0
-		if(current_interaction_count >= max_interact_count) //We are at our peak
-			return
-		LAZYSET(user.do_afters, interaction_key, current_interaction_count + 1)
-
-	var/atom/user_loc = user.loc
-	var/atom/target_loc = target?.loc
-
-	var/drifting = FALSE
-	if(GLOB.move_manager.processing_on(user, SSnewtonian_movement))
-		drifting = TRUE
-
-	var/holding = user.get_active_held_item()
-
-	if(!(timed_action_flags & IGNORE_SLOWDOWNS))
-		delay *= user.cached_multiplicative_actions_slowdown
-
-	var/datum/progressbar/progbar
-	var/datum/cogbar/cog
-
-	if(progress)
-		if(user.client)
-			progbar = new(user, delay, target || user)
-
-		if(!hidden && delay >= 1 SECONDS)
-			cog = new(user)
-
-	SEND_SIGNAL(user, COMSIG_DO_AFTER_BEGAN)
-
-	var/endtime = world.time + delay
-	var/starttime = world.time
-	. = TRUE
-	while (world.time < endtime)
-		stoplag(1)
-
-		if(!QDELETED(progbar))
-			progbar.update(world.time - starttime)
-
-		if(drifting && !GLOB.move_manager.processing_on(user, SSnewtonian_movement))
-			drifting = FALSE
-			user_loc = user.loc
-
-		if(QDELETED(user) \
-			|| (!(timed_action_flags & IGNORE_USER_LOC_CHANGE) && !drifting && user.loc != user_loc) \
-			|| (!(timed_action_flags & IGNORE_HELD_ITEM) && user.get_active_held_item() != holding) \
-			|| (!(timed_action_flags & IGNORE_INCAPACITATED) && HAS_TRAIT(user, TRAIT_INCAPACITATED)) \
-			|| (extra_checks && !extra_checks.Invoke()))
-			. = FALSE
-			break
-
-		if(target && (user != target) && \
-			(QDELETED(target) \
-			|| (!(timed_action_flags & IGNORE_TARGET_LOC_CHANGE) && target.loc != target_loc)))
-			. = FALSE
-			break
-
-	if(!QDELETED(progbar))
-		progbar.end_progress()
-
-	cog?.remove()
-
-	if(interaction_key)
-		var/reduced_interaction_count = (LAZYACCESS(user.do_afters, interaction_key) || 0) - 1
-		if(reduced_interaction_count > 0) // Not done yet!
-			LAZYSET(user.do_afters, interaction_key, reduced_interaction_count)
-			return
-		// all out, let's clear er out fully
-		LAZYREMOVE(user.do_afters, interaction_key)
-	SEND_SIGNAL(user, COMSIG_DO_AFTER_ENDED)
-
 /// Returns the total amount of do_afters this mob is taking part in
 /mob/proc/do_after_count()
 	var/count = 0
@@ -390,9 +284,11 @@ GLOBAL_LIST_INIT(skin_tone_names, list(
 
 	return spawned_mobs
 
+#define SEE_DEADCHAT_ADMIN (1<<0)
+#define SEE_DEADCHAT_NORMAL (1<<1)
 // Displays a message in deadchat, sent by source. source is not linkified, message is, to avoid stuff like character names to be linkified.
 // Automatically gives the class deadsay to the whole message (message + source)
-/proc/deadchat_broadcast(message, source=null, mob/follow_target=null, turf/turf_target=null, speaker_key=null, message_type=DEADCHAT_REGULAR, admin_only=FALSE)
+/proc/deadchat_broadcast(message, source=null, mob/follow_target=null, turf/turf_target=null, speaker_key=null, message_type=DEADCHAT_REGULAR, admin_only=FALSE, original_message)
 	message = span_deadsay("[source][span_linkify(message)]")
 
 	if(admin_only)
@@ -410,13 +306,13 @@ GLOBAL_LIST_INIT(skin_tone_names, list(
 		if(admin_only)
 			if(!M.client?.holder)
 				continue
-		var/override = FALSE
+		var/override = NONE
 		if(M.client?.holder && (chat_toggles & CHAT_DEAD))
-			override = TRUE
+			override = SEE_DEADCHAT_ADMIN
 		if(HAS_TRAIT(M, TRAIT_SIXTHSENSE) && message_type == DEADCHAT_REGULAR)
-			override = TRUE
+			override = SEE_DEADCHAT_NORMAL
 		if(SSticker.current_state == GAME_STATE_FINISHED)
-			override = TRUE
+			override = SEE_DEADCHAT_NORMAL
 		if(isnewplayer(M) && !override)
 			continue
 		if(M.stat != DEAD && !override)
@@ -440,6 +336,7 @@ GLOBAL_LIST_INIT(skin_tone_names, list(
 
 		if(isobserver(M))
 			var/rendered_message = message
+			override = SEE_DEADCHAT_NORMAL
 
 			if(follow_target)
 				var/F
@@ -455,6 +352,12 @@ GLOBAL_LIST_INIT(skin_tone_names, list(
 			to_chat(M, rendered_message, avoid_highlighting = speaker_key == M.key)
 		else
 			to_chat(M, message, avoid_highlighting = speaker_key == M.key)
+
+		// Ghost runechat
+		if(original_message && ((override & SEE_DEADCHAT_NORMAL) || M.see_invisible >= follow_target.invisibility) && (!SSlag_switch.measures[DISABLE_DEAD_RUNECHAT] || HAS_TRAIT(M, TRAIT_BYPASS_MEASURES)) && M.runechat_prefs_check(M))
+			M.create_chat_message(follow_target, /datum/language/common, original_message, list(SPAN_ITALICS))
+#undef SEE_DEADCHAT_ADMIN
+#undef SEE_DEADCHAT_NORMAL
 
 //Used in chemical_mob_spawn. Generates a random mob based on a given gold_core_spawnable value.
 /proc/create_random_mob(spawn_location, mob_class = HOSTILE_SPAWN)
@@ -483,32 +386,6 @@ GLOBAL_LIST_INIT(skin_tone_names, list(
 		chosen = pick(mob_spawn_meancritters)
 	var/mob/living/spawned_mob = new chosen(spawn_location)
 	return spawned_mob
-
-/proc/passtable_on(target, source)
-	var/mob/living/L = target
-	if (!HAS_TRAIT(L, TRAIT_PASSTABLE) && L.pass_flags & PASSTABLE)
-		ADD_TRAIT(L, TRAIT_PASSTABLE, INNATE_TRAIT)
-	ADD_TRAIT(L, TRAIT_PASSTABLE, source)
-	L.pass_flags |= PASSTABLE
-
-/proc/passtable_off(target, source)
-	var/mob/living/L = target
-	REMOVE_TRAIT(L, TRAIT_PASSTABLE, source)
-	if(!HAS_TRAIT(L, TRAIT_PASSTABLE))
-		L.pass_flags &= ~PASSTABLE
-
-/proc/passwindow_on(target, source)
-	var/mob/living/target_mob = target
-	if (!HAS_TRAIT(target_mob, TRAIT_PASSWINDOW) && target_mob.pass_flags & PASSWINDOW)
-		ADD_TRAIT(target_mob, TRAIT_PASSWINDOW, INNATE_TRAIT)
-	ADD_TRAIT(target_mob, TRAIT_PASSWINDOW, source)
-	target_mob.pass_flags |= PASSWINDOW
-
-/proc/passwindow_off(target, source)
-	var/mob/living/target_mob = target
-	REMOVE_TRAIT(target_mob, TRAIT_PASSWINDOW, source)
-	if(!HAS_TRAIT(target_mob, TRAIT_PASSWINDOW))
-		target_mob.pass_flags &= ~PASSWINDOW
 
 /proc/dance_rotate(atom/movable/AM, datum/callback/callperrotate, set_original_dir=FALSE)
 	set waitfor = FALSE
@@ -539,7 +416,7 @@ GLOBAL_LIST_INIT(skin_tone_names, list(
 		. += borg
 
 //Returns a list of AI's
-/proc/active_ais(check_mind=FALSE, z = null, skip_syndicate, only_syndicate)
+/proc/active_ais(check_mind = FALSE, z = null, skip_syndicate = FALSE, only_syndicate = FALSE, priority = FALSE) // Bubber Edit: Adds priority aug.
 	. = list()
 	for(var/mob/living/silicon/ai/ai as anything in GLOB.ai_list)
 		if(ai.stat == DEAD)
@@ -551,12 +428,19 @@ GLOBAL_LIST_INIT(skin_tone_names, list(
 			continue
 		if(only_syndicate && !syndie_ai)
 			continue
-		if(check_mind)
-			if(!ai.mind)
-				continue
-		if(z && !(z == ai.z) && (!is_station_level(z) || !is_station_level(ai.z))) //if a Z level was specified, AND the AI is not on the same level, AND either is off the station...
+		if(check_mind && !ai.mind)
 			continue
-		. += ai
+		if(!isnull(z) && z != ai.z && (!is_station_level(z) || !is_station_level(ai.z))) //if a Z level was specified, AND the AI is not on the same level, AND either is off the station...
+			continue
+		/// BUBBER EDIT START - Adds priority Aug
+		if(!priority)
+			. += ai
+		else
+			if(IS_MALF_AI(ai))	// malf ai first.
+				. += ai
+				break
+			. += ai
+		/// BUBBER EDIT END
 
 //Find an active ai with the least borgs. VERBOSE PROCNAME HUH!
 /proc/select_active_ai_with_fewest_borgs(z)
@@ -595,7 +479,7 @@ GLOBAL_LIST_INIT(skin_tone_names, list(
  * * temp_diff (required) The difference between two temperatures
  * * change_rate (optional)(Default: 0.06) The rate of range multiplier
  */
-/proc/get_temp_change_amount(temp_diff, change_rate = 0.06)
+/proc/get_temp_change_amount(temp_diff, change_rate = BODYTEMP_STANDARD_CHANGE_RATE)
 	if(temp_diff < 0)
 		return -(BODYTEMP_AUTORECOVERY_DIVISOR / 2) * log(1 - (temp_diff * change_rate))
 	return (BODYTEMP_AUTORECOVERY_DIVISOR / 2) * log(1 + (temp_diff * change_rate))
@@ -612,7 +496,7 @@ GLOBAL_LIST_INIT(skin_tone_names, list(
 	var/list/sortmob = sort_names(GLOB.mob_list)
 	for(var/mob/living/silicon/ai/mob_to_sort in sortmob)
 		moblist += mob_to_sort
-	for(var/mob/camera/mob_to_sort in sortmob)
+	for(var/mob/eye/mob_to_sort in sortmob)
 		moblist += mob_to_sort
 	for(var/mob/living/silicon/pai/mob_to_sort in sortmob)
 		moblist += mob_to_sort
@@ -646,8 +530,11 @@ GLOBAL_LIST_INIT(skin_tone_names, list(
 /proc/get_mob_by_ckey(key)
 	if(!key)
 		return
-	var/list/mobs = sort_mobs()
-	for(var/mob/mob in mobs)
+	var/mob/persistent_mob = GLOB.persistent_clients_by_ckey[key]?.mob
+	if(persistent_mob)
+		return persistent_mob
+	// hopefully the above will always handle it, but any time a coder thinks "no way this will happen", murphy's law guarantees it somehow will
+	for(var/mob/mob as anything in GLOB.mob_list)
 		if(mob.ckey == key)
 			return mob
 
@@ -744,10 +631,6 @@ GLOBAL_LIST_INIT(skin_tone_names, list(
 		slot_strings += "hand"
 	if(slot_flags & ITEM_SLOT_DEX_STORAGE)
 		slot_strings += "dextrous storage"
-	if(slot_flags & ITEM_SLOT_BACKPACK)
-		slot_strings += "backpack"
-	if(slot_flags & ITEM_SLOT_BELTPACK)
-		slot_strings += "belt" // ?
 	return slot_strings
 
 ///Returns the direction that the initiator and the target are facing
@@ -773,7 +656,7 @@ GLOBAL_LIST_INIT(skin_tone_names, list(
 		mob_occupant = occupant
 
 	else if(isorgan(occupant))
-		var/obj/item/organ/internal/brain/brain = occupant
+		var/obj/item/organ/brain/brain = occupant
 		mob_occupant = brain.brainmob
 
 	return mob_occupant
@@ -794,7 +677,10 @@ GLOBAL_LIST_INIT(skin_tone_names, list(
 			newname = requesting_client?.prefs?.read_preference(preference_type)
 		else
 			var/datum/preference/preference = GLOB.preference_entries[preference_type]
-			newname = preference.create_informed_default_value(requesting_client.prefs)
+			if (requesting_client?.prefs)
+				newname = preference.create_informed_default_value(requesting_client.prefs)
+			else
+				newname = preference.create_default_value()
 
 		for(var/mob/living/checked_mob in GLOB.player_list)
 			if(checked_mob == src)
@@ -875,3 +761,38 @@ GLOBAL_DATUM_INIT(dview_mob, /mob/dview, new)
 	else
 		. = invoked_callback.Invoke()
 	usr = temp
+
+/**
+ * Iterates over all mobs that can see the passed movable and adds specific mood events to them based on their personalities.
+ *
+ * * source: The source of the mood event, usually the mob doing something
+ * * mood_key: String source for the mood event
+ * * personality_to_mood: A list mapping personality types to mood event types. Example: list(/datum/personality/chill = /datum/mood_event/chill_guy)
+ * * range: The range in which to check for viewers. Default is view range.
+ * * additional args may be supplied to pass into the mood event constructor.
+ */
+/proc/add_personality_mood_to_viewers(atom/movable/source, mood_key, list/personality_to_mood, range, ...)
+	for(var/mob/living/nearby in viewers(range, source))
+		if(nearby == source || IS_UNCONSCIOUS(nearby) || nearby.is_blind())
+			continue
+		for(var/personality, moodlet in personality_to_mood)
+			if(HAS_PERSONALITY(nearby, personality))
+				nearby.add_mood_event(arglist( list("[mood_key]_[personality]", moodlet) + args.Copy(4) ))
+				break
+
+///Gets an emote sound from a specific list of sounds. Supports lists and genders. Used by emote datums for default sounds, and tongues, masks etc. for overrides.
+/proc/get_emote_sound_from_list(sound, mob/living/user)
+	if(islist(sound))
+		var/list/sounds = sound
+		var/list/possible_sounds = sounds.Copy()
+		var/gender = astype(user, /mob/living/carbon/human)?.physique || user.gender
+		if(gender in possible_sounds)
+			possible_sounds = possible_sounds[gender]
+			if(!islist(possible_sounds))
+				return possible_sounds //it's a single sound
+		else
+			possible_sounds -= list(MALE, FEMALE, PLURAL, NEUTER)
+			if(!length(possible_sounds))
+				return null
+		sound = pick(possible_sounds)
+	return sound

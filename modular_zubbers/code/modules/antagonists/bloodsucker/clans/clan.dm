@@ -33,6 +33,7 @@
 	// what percentage of blood you need to spend to level up, divided by 100
 	var/level_cost = BLOODSUCKER_LEVELUP_PERCENTAGE
 
+// TODO add handling for body transfers
 /datum/bloodsucker_clan/New(datum/antagonist/bloodsucker/owner_datum)
 	. = ..()
 	src.bloodsuckerdatum = owner_datum
@@ -235,7 +236,7 @@
 	bloodsuckerdatum.update_static_data_for_all_viewers()
 
 	// unlock ghoulizing if we have a ghoul slot
-	if(bloodsuckerdatum.max_ghouls() >= 1 && !(/datum/crafting_recipe/ghoulrack in bloodsuckerdatum.owner?.learned_recipes))
+	if(bloodsuckerdatum.max_ghouls() >= 1 && !(/datum/crafting_recipe/ghoulrack in bloodsuckerdatum.owner?.learned_crafting_recipes))
 		bloodsuckerdatum.owner.teach_crafting_recipe(/datum/crafting_recipe/ghoulrack)
 		bloodsuckerdatum.owner.teach_crafting_recipe(/datum/crafting_recipe/candelabrum)
 		bloodsuckerdatum.owner.teach_crafting_recipe(/datum/crafting_recipe/bloodthrone)
@@ -276,6 +277,9 @@
 	if(!ghouldatum.owner.can_make_special(creator = bloodsuckerdatum.owner))
 		to_chat(master, span_notice("This Ghoul is unable to gain a Special rank due to innate features."))
 		return FALSE
+	if(isprotean(servant))
+		to_chat(master, span_notice("You are unable to make this species your favorite Ghoul."))
+		return FALSE
 	if(bloodsuckerdatum.GetBloodVolume() < SPECIAL_GHOUL_COST)
 		to_chat(master, span_notice("You need at least 150 blood to make a Ghoul a Favorite Ghoul."))
 		return FALSE
@@ -293,7 +297,7 @@
 		option.info = "[initial(ghouldatums.name)] - [span_boldnotice(initial(ghouldatums.ghoul_description))]"
 		radial_display[initial(ghouldatums.name)] = option
 	if(!length(options))
-		master.balloon_alert(master, "Out of Special Ghoul slots!")
+		master.balloon_alert(master, "out of Special Ghoul slots!")
 		return FALSE
 
 	to_chat(master, span_notice("You can change who this Ghoul is, who are they to you? This will cost [SPECIAL_GHOUL_COST] blood."))

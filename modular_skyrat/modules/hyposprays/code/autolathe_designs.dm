@@ -7,6 +7,7 @@
 		/datum/material/glass = SHEET_MATERIAL_AMOUNT * 0.5,
 		/datum/material/iron = SHEET_MATERIAL_AMOUNT * 0.5,
 	)
+	inherit_materials = DESIGN_DONT_INHERIT_MATS
 	build_path = /obj/item/reagent_containers/cup/vial/small
 	category = list(
 		RND_CATEGORY_EQUIPMENT + RND_SUBCATEGORY_EQUIPMENT_MEDICAL,
@@ -20,6 +21,7 @@
 		/datum/material/glass = SHEET_MATERIAL_AMOUNT,
 		/datum/material/iron = SHEET_MATERIAL_AMOUNT * 0.5,
 	)
+	inherit_materials = DESIGN_DONT_INHERIT_MATS
 	build_path = /obj/item/reagent_containers/cup/vial/large
 
 // Hypospray cases
@@ -31,6 +33,7 @@
 		/datum/material/plastic = SHEET_MATERIAL_AMOUNT * 3,
 		/datum/material/iron = SHEET_MATERIAL_AMOUNT,
 	)
+	inherit_materials = DESIGN_DONT_INHERIT_MATS
 	build_path = /obj/item/storage/hypospraykit/empty
 	category = list(
 		RND_CATEGORY_EQUIPMENT + RND_SUBCATEGORY_EQUIPMENT_MEDICAL,
@@ -45,6 +48,7 @@
 		/datum/material/iron = SHEET_MATERIAL_AMOUNT * 3,
 		/datum/material/silver = SHEET_MATERIAL_AMOUNT * 1,
 	)
+	inherit_materials = DESIGN_DONT_INHERIT_MATS
 	build_path = /obj/item/storage/hypospraykit/cmo/empty
 
 // Hyposprays
@@ -73,7 +77,8 @@
 		/datum/material/glass = SHEET_MATERIAL_AMOUNT * 4,
 		/datum/material/silver = SHEET_MATERIAL_AMOUNT * 2,
 	)
-	build_path = /obj/item/device/custom_kit/deluxe_hypo2
+	transfered_materials = list(/obj/item/custom_kit/deluxe_hypo2 = list(/datum/material/plastic = SHEET_MATERIAL_AMOUNT * 8))
+	build_path = /obj/item/custom_kit/deluxe_hypo2
 	category = list(
 		RND_CATEGORY_TOOLS + RND_SUBCATEGORY_EQUIPMENT_MEDICAL,
 	)
@@ -99,29 +104,3 @@
 		"hypomkii_deluxe",
 	)
 	return ..()
-
-// Tarkon and similar get enough to work with, but if they want deluxe kits/hypos they still need to trade with the station for 'em.
-/datum/techweb_node/oldstation_surgery/New()
-	design_ids += list(
-		"hypokit",
-		"hypomkii",
-	)
-	return ..()
-
-
-
-/// For reasons unknown, pens are included as an autolathe design here, in the hypospray module of all places.
-/// I'm not touching this unless a maint asks me to because it feels weird and haunted, like the picture of a potato that bricks Source if you remove it.
-/datum/design/pen
-	name = "Pen"
-	id = "pen"
-	build_type = AUTOLATHE | AWAY_LATHE
-	materials = list(
-		/datum/material/iron = SMALL_MATERIAL_AMOUNT,
-		/datum/material/glass = SMALL_MATERIAL_AMOUNT,
-	)
-	build_path = /obj/item/pen
-	category = list(
-		RND_CATEGORY_INITIAL,
-		RND_CATEGORY_EQUIPMENT + RND_SUBCATEGORY_EQUIPMENT_MISC,
-	)

@@ -1,6 +1,6 @@
-/datum/mutation/human/geladikinesis
+/datum/mutation/geladikinesis
 	name = "Geladikinesis"
-	desc = "Allows the user to concentrate moisture and sub-zero forces into snow."
+	desc = "The subject can solidify moisture in the air into snow at will."
 	quality = POSITIVE
 	text_gain_indication = span_notice("Your hand feels cold.")
 	instability = POSITIVE_INSTABILITY_MINOR
@@ -20,9 +20,9 @@
 	delete_old = FALSE
 	delete_on_failure = FALSE
 
-/datum/mutation/human/cryokinesis
+/datum/mutation/cryokinesis
 	name = "Cryokinesis"
-	desc = "Draws negative energy from the sub-zero void to freeze surrounding temperatures at subject's will."
+	desc = "The subject can draw negative energy from the void to fire a bolt of freezing energy at will."
 	quality = POSITIVE //upsides and downsides
 	text_gain_indication = span_notice("Your hand feels cold.")
 	instability = POSITIVE_INSTABILITY_MODERATE

@@ -16,8 +16,10 @@ GLOBAL_LIST_EMPTY(conveyors_by_id)
 	desc = "A conveyor belt."
 	layer = BELOW_OPEN_DOOR_LAYER
 	processing_flags = NONE
-	/// The current state of the switch.
+	/// The current state of the conveyor.
 	var/operating = CONVEYOR_OFF
+	/// The state a switch last told us to be in
+	var/last_command = CONVEYOR_OFF
 	/// This is the default (forward) direction, set by the map dir.
 	var/forwards
 	/// The opposite of forwards. It's set in a special var for corner belts, which aren't using the opposite direction when in reverse.
@@ -40,6 +42,8 @@ GLOBAL_LIST_EMPTY(conveyors_by_id)
 	var/wire_mode = FALSE
 	/// weakref to attached cable if wire mode
 	var/datum/weakref/attached_wire_ref
+	/// remembers if a wire is powering us or not
+	var/powered_wire = FALSE
 
 /obj/machinery/conveyor/Initialize(mapload, new_dir, new_id)
 	. = ..()
@@ -59,6 +63,7 @@ GLOBAL_LIST_EMPTY(conveyors_by_id)
 		COMSIG_ATOM_AFTER_SUCCESSFUL_INITIALIZED_ON = PROC_REF(conveyable_enter)
 	)
 	AddElement(/datum/element/connect_loc, loc_connections)
+	AddElement(/datum/element/force_move_pulled)
 	update_move_direction()
 	LAZYADD(GLOB.conveyors_by_id[id], src)
 	if(wire_mode)
@@ -69,7 +74,8 @@ GLOBAL_LIST_EMPTY(conveyors_by_id)
 	. = ..()
 	if(inverted)
 		. += span_notice("It is currently set to go in reverse.")
-	. += "\nLeft-click with a <b>wrench</b> to rotate."
+	. += "\nLeft-click with a <b>wrench</b> to rotate clockwise."
+	. += "Right-click with a <b>wrench</b> to rotate counterclockwise."
 	. += "Left-click with a <b>screwdriver</b> to invert its direction."
 	. += "Right-click with a <b>screwdriver</b> to flip its belt around."
 	. += "Left-click with a <b>multitool</b> to toggle whether this conveyor receives power via cable. Toggling connects and disconnects."
@@ -81,7 +87,8 @@ GLOBAL_LIST_EMPTY(conveyors_by_id)
 		context[SCREENTIP_CONTEXT_LMB] = "Extend current conveyor belt"
 		return CONTEXTUAL_SCREENTIP_SET
 	if(held_item?.tool_behaviour == TOOL_WRENCH)
-		context[SCREENTIP_CONTEXT_LMB] = "Rotate conveyor belt"
+		context[SCREENTIP_CONTEXT_LMB] = "Rotate conveyor belt clockwise"
+		context[SCREENTIP_CONTEXT_RMB] = "Rotate conveyor belt counterclockwise"
 		return CONTEXTUAL_SCREENTIP_SET
 	if(held_item?.tool_behaviour == TOOL_SCREWDRIVER)
 		context[SCREENTIP_CONTEXT_LMB] = "Invert conveyor belt"
@@ -109,13 +116,14 @@ GLOBAL_LIST_EMPTY(conveyors_by_id)
 	processing_flags = START_PROCESSING_ON_INIT
 
 /obj/machinery/conveyor/auto/Initialize(mapload, newdir)
+	last_command = CONVEYOR_FORWARD
 	. = ..()
-	set_operating(TRUE)
+	set_operating(last_command)
 
 /obj/machinery/conveyor/auto/update()
 	. = ..()
 	if(.)
-		set_operating(TRUE)
+		set_operating(last_command)
 
 /obj/machinery/conveyor/auto/inverted
 	icon_state = "conveyor_map_inverted"
@@ -126,6 +134,7 @@ GLOBAL_LIST_EMPTY(conveyors_by_id)
 	build_neighbors()
 
 /obj/machinery/conveyor/Destroy()
+	last_command = CONVEYOR_OFF
 	set_operating(FALSE)
 	LAZYREMOVE(GLOB.conveyors_by_id[id], src)
 	attached_wire_ref = null
@@ -240,7 +249,8 @@ GLOBAL_LIST_EMPTY(conveyors_by_id)
 	if(machine_stat & NOPOWER)
 		set_operating(FALSE)
 		return FALSE
-
+	if(operating != last_command)
+		set_operating(last_command)
 	update_appearance()
 	// If we're on, start conveying so moveloops on our tile can be refreshed if they stopped for some reason
 	if(operating != CONVEYOR_OFF)
@@ -248,8 +258,10 @@ GLOBAL_LIST_EMPTY(conveyors_by_id)
 			start_conveying(movable)
 	return TRUE
 
-/obj/machinery/conveyor/proc/conveyable_enter(datum/source, atom/convayable)
+/obj/machinery/conveyor/proc/conveyable_enter(datum/source, atom/movable/convayable)
 	SIGNAL_HANDLER
+	if(convayable.loc != loc) // If we are not on the same turf (order of operations memes) go to hell
+		return
 	if(operating == CONVEYOR_OFF)
 		GLOB.move_manager.stop_looping(convayable, SSconveyors)
 		return
@@ -281,78 +293,85 @@ GLOBAL_LIST_EMPTY(conveyors_by_id)
 	GLOB.move_manager.stop_looping(thing, SSconveyors)
 
 // attack with item, place item on conveyor
-/obj/machinery/conveyor/attackby(obj/item/attacking_item, mob/living/user, params)
-	if(attacking_item.tool_behaviour == TOOL_CROWBAR)
-		user.visible_message(span_notice("[user] struggles to pry up [src] with [attacking_item]."), \
-		span_notice("You struggle to pry up [src] with [attacking_item]."))
-
-		if(!attacking_item.use_tool(src, user, 4 SECONDS, volume = 40))
-			return
-		set_operating(FALSE)
-		var/obj/item/stack/conveyor/belt_item = new /obj/item/stack/conveyor(loc, 1, TRUE, null, null, id)
-		if(!QDELETED(belt_item)) //God I hate stacks
-			transfer_fingerprints_to(belt_item)
-
-		to_chat(user, span_notice("You remove [src]."))
-		qdel(src)
-
-	else if(attacking_item.tool_behaviour == TOOL_WRENCH)
-		attacking_item.play_tool_sound(src)
-		setDir(turn(dir, -45))
-		to_chat(user, span_notice("You rotate [src]."))
-
-	else if(attacking_item.tool_behaviour == TOOL_SCREWDRIVER)
-		attacking_item.play_tool_sound(src)
-		inverted = !inverted
-		update_move_direction()
-		to_chat(user, span_notice("You set [src]'s direction [inverted ? "backwards" : "back to default"]."))
-	else if(attacking_item.tool_behaviour == TOOL_MULTITOOL)
-		attacking_item.play_tool_sound(src)
-		wire_mode = !wire_mode
-		update_cable()
-		power_change()
-		if(wire_mode)
-			START_PROCESSING(SSmachines, src)
-		else
-			STOP_PROCESSING(SSmachines, src)
-		to_chat(user, span_notice("You set [src]'s wire mode [wire_mode ? "on" : "off"]."))
-	else if(istype(attacking_item, /obj/item/stack/conveyor))
+/obj/machinery/conveyor/item_interaction(mob/living/user, obj/item/tool, list/modifiers)
+	if(istype(tool, /obj/item/stack/conveyor))
 		// We should place a new conveyor belt machine on the output turf the conveyor is pointing to.
 		var/turf/target_turf = get_step(get_turf(src), forwards)
-		if(!target_turf)
-			return ..()
+		if(!target_turf || isclosedturf(target_turf))
+			return ITEM_INTERACT_BLOCKING
 		for(var/obj/machinery/conveyor/belt in target_turf)
 			to_chat(user, span_warning("You cannot place a conveyor belt on top of another conveyor belt."))
-			return ..()
+			return ITEM_INTERACT_BLOCKING
 
-		var/obj/item/stack/conveyor/belt_item = attacking_item
+		var/obj/item/stack/conveyor/belt_item = tool
 		belt_item.use(1)
 		new /obj/machinery/conveyor(target_turf, forwards, id)
+		return ITEM_INTERACT_SUCCESS
 
-	else if(!user.combat_mode || (attacking_item.item_flags & NOBLUDGEON))
-		user.transferItemToLoc(attacking_item, drop_location())
+	if(!user.combat_mode || (tool.item_flags & NOBLUDGEON))
+		user.transfer_item_to_turf(tool, drop_location())
+		return ITEM_INTERACT_SUCCESS
+
+	return NONE
+
+/obj/machinery/conveyor/crowbar_act(mob/living/user, obj/item/tool)
+	user.visible_message(span_notice("[user] struggles to pry up [src] with [tool]."), \
+	span_notice("You struggle to pry up [src] with [tool]."))
+
+	if(!tool.use_tool(src, user, 4 SECONDS, volume = 40))
+		return ITEM_INTERACT_BLOCKING
+	set_operating(FALSE)
+	var/obj/item/stack/conveyor/belt_item = new /obj/item/stack/conveyor(loc, 1, TRUE, null, null, id)
+	if(!QDELETED(belt_item)) //God I hate stacks
+		transfer_fingerprints_to(belt_item)
+
+	to_chat(user, span_notice("You remove [src]."))
+	qdel(src)
+	return ITEM_INTERACT_SUCCESS
+
+/obj/machinery/conveyor/wrench_act(mob/living/user, obj/item/tool)
+	tool.play_tool_sound(src)
+	setDir(turn(dir, -45))
+	to_chat(user, span_notice("You rotate [src]."))
+	return ITEM_INTERACT_SUCCESS
+
+/obj/machinery/conveyor/screwdriver_act(mob/living/user, obj/item/tool)
+	tool.play_tool_sound(src)
+	inverted = !inverted
+	update_move_direction()
+	to_chat(user, span_notice("You set [src]'s direction [inverted ? "backwards" : "back to default"]."))
+	return ITEM_INTERACT_SUCCESS
+
+/obj/machinery/conveyor/multitool_act(mob/living/user, obj/item/tool)
+	tool.play_tool_sound(src)
+	wire_mode = !wire_mode
+	update_cable()
+	power_change()
+	if(wire_mode)
+		START_PROCESSING(SSmachines, src)
 	else
-		return ..()
+		STOP_PROCESSING(SSmachines, src)
+	to_chat(user, span_notice("You set [src]'s wire mode [wire_mode ? "on" : "off"]."))
+	return ITEM_INTERACT_SUCCESS
 
-/obj/machinery/conveyor/attackby_secondary(obj/item/attacking_item, mob/living/user, params)
-	if(attacking_item.tool_behaviour == TOOL_SCREWDRIVER)
-		attacking_item.play_tool_sound(src)
-		flipped = !flipped
-		update_move_direction()
-		to_chat(user, span_notice("You flip [src]'s belt [flipped ? "around" : "back to normal"]."))
+/obj/machinery/conveyor/item_interaction_secondary(mob/living/user, obj/item/tool, list/modifiers)
+	if(user.combat_mode)
+		return NONE
+	user.transferItemToLoc(tool, drop_location())
+	return ITEM_INTERACT_SUCCESS
 
-	else if(!user.combat_mode)
-		user.transferItemToLoc(attacking_item, drop_location())
+/obj/machinery/conveyor/screwdriver_act_secondary(mob/living/user, obj/item/tool)
+	tool.play_tool_sound(src)
+	flipped = !flipped
+	update_move_direction()
+	to_chat(user, span_notice("You flip [src]'s belt [flipped ? "around" : "back to normal"]."))
+	return ITEM_INTERACT_SUCCESS
 
-	return SECONDARY_ATTACK_CANCEL_ATTACK_CHAIN
-
-
-// attack with hand, move pulled object onto conveyor
-/obj/machinery/conveyor/attack_hand(mob/user, list/modifiers)
-	. = ..()
-	if(.)
-		return
-	user.Move_Pulled(src)
+/obj/machinery/conveyor/wrench_act_secondary(mob/living/user, obj/item/tool)
+	tool.play_tool_sound(src)
+	setDir(turn(dir, 45))
+	to_chat(user, span_notice("You rotate [src]."))
+	return ITEM_INTERACT_SUCCESS
 
 /obj/machinery/conveyor/powered(chan = power_channel, ignore_use_power = FALSE)
 	if(!wire_mode)
@@ -377,8 +396,12 @@ GLOBAL_LIST_EMPTY(conveyors_by_id)
 		return
 	if(powered())
 		powernet.load += active_power_usage
+		if(!powered_wire)
+			powered_wire = TRUE
+			power_change()
 	else
 		power_change()
+		powered_wire = FALSE
 
 
 /obj/machinery/conveyor/proc/update_cable()
@@ -427,9 +450,7 @@ GLOBAL_LIST_EMPTY(conveyors_by_id)
 	update_appearance()
 	LAZYADD(GLOB.conveyors_by_id[id], src)
 	set_wires(new /datum/wires/conveyor(src))
-	AddComponent(/datum/component/usb_port, list(
-		/obj/item/circuit_component/conveyor_switch,
-	))
+	AddComponent(/datum/component/usb_port, typecacheof(list(/obj/item/circuit_component/conveyor_switch), only_root_path = TRUE))
 	register_context()
 
 /obj/machinery/conveyor_switch/Destroy()
@@ -479,6 +500,7 @@ GLOBAL_LIST_EMPTY(conveyors_by_id)
 /// Updates all conveyor belts that are linked to this switch, and tells them to start processing.
 /obj/machinery/conveyor_switch/proc/update_linked_conveyors()
 	for(var/obj/machinery/conveyor/belt in GLOB.conveyors_by_id[id])
+		belt.last_command = position
 		belt.set_operating(position)
 		belt.speed = conveyor_speed
 		CHECK_TICK
@@ -536,10 +558,11 @@ GLOBAL_LIST_EMPTY(conveyors_by_id)
 /obj/machinery/conveyor_switch/attack_robot_secondary(mob/user, list/modifiers)
 	return attack_hand_secondary(user, modifiers)
 
-/obj/machinery/conveyor_switch/attackby(obj/item/attacking_item, mob/user, params)
-	if(is_wire_tool(attacking_item))
-		wires.interact(user)
-		return TRUE
+/obj/machinery/conveyor_switch/item_interaction(mob/living/user, obj/item/tool, list/modifiers)
+	if(!is_wire_tool(tool))
+		return NONE
+	wires.interact(user)
+	return ITEM_INTERACT_SUCCESS
 
 /obj/machinery/conveyor_switch/multitool_act(mob/living/user, obj/item/I)
 	var/input_speed = tgui_input_number(user, "Set the speed of the conveyor belts in seconds", "Speed", conveyor_speed, 20, 0.2, round_value = FALSE)
@@ -594,6 +617,7 @@ GLOBAL_LIST_EMPTY(conveyors_by_id)
 	icon = 'icons/obj/machines/recycling.dmi'
 	icon_state = "switch-off"
 	w_class = WEIGHT_CLASS_BULKY
+	custom_materials = list(/datum/material/iron = SMALL_MATERIAL_AMOUNT * 4.5, /datum/material/glass = SMALL_MATERIAL_AMOUNT * 2)
 	// ID of the switch-in-the-making, to link conveyor belts to it.
 	var/id = ""
 
@@ -632,6 +656,7 @@ GLOBAL_LIST_EMPTY(conveyors_by_id)
 	singular_name = "conveyor belt"
 	w_class = WEIGHT_CLASS_BULKY
 	merge_type = /obj/item/stack/conveyor
+	mats_per_unit = list(/datum/material/iron = SHEET_MATERIAL_AMOUNT * 1.5)
 	/// ID for linking a belt to one or more switches, all conveyors with the same ID will be controlled the same switch(es).
 	var/id = ""
 
@@ -651,12 +676,13 @@ GLOBAL_LIST_EMPTY(conveyors_by_id)
 	use(1)
 	return ITEM_INTERACT_SUCCESS
 
-/obj/item/stack/conveyor/attackby(obj/item/item_used, mob/user, params)
-	..()
-	if(istype(item_used, /obj/item/conveyor_switch_construct))
-		to_chat(user, span_notice("You link the switch to the conveyor belt assembly."))
-		var/obj/item/conveyor_switch_construct/switch_construct = item_used
-		id = switch_construct.id
+/obj/item/stack/conveyor/item_interaction(mob/living/user, obj/item/tool, list/modifiers)
+	if(!istype(tool, /obj/item/conveyor_switch_construct))
+		return NONE
+	to_chat(user, span_notice("You link the switch to the conveyor belt assembly."))
+	var/obj/item/conveyor_switch_construct/switch_construct = tool
+	id = switch_construct.id
+	return ITEM_INTERACT_SUCCESS
 
 /obj/item/stack/conveyor/update_weight()
 	return FALSE

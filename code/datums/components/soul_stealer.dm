@@ -42,13 +42,13 @@
 		if(10 to INFINITY)
 			examine_list += span_notice("A staggering <b>[num_souls]</b> souls have been claimed by it! And it hungers for more!")
 
-/datum/component/soul_stealer/proc/on_afterattack(obj/item/source, atom/target, mob/living/user, click_parameters)
+/datum/component/soul_stealer/proc/on_afterattack(obj/item/source, atom/target, mob/living/user, list/modifiers)
 	SIGNAL_HANDLER
 
 	if(ishuman(target))
 		INVOKE_ASYNC(src, PROC_REF(try_capture), target, user)
 
-/datum/component/soul_stealer/proc/try_transfer_soul(obj/item/source, mob/user, atom/target, click_parameters)
+/datum/component/soul_stealer/proc/try_transfer_soul(obj/item/source, mob/user, atom/target, list/modifiers)
 	SIGNAL_HANDLER
 
 	if(istype(target, /obj/structure/constructshell) && length(soulstones))
@@ -62,7 +62,7 @@
 		return ITEM_INTERACT_SUCCESS
 
 /datum/component/soul_stealer/proc/try_capture(mob/living/carbon/human/victim, mob/living/captor)
-	if(victim.stat == CONSCIOUS)
+	if(!IS_UNCONSCIOUS_OR_CRIT(victim))
 		return
 	var/obj/item/soulstone/soulstone = new soulstone_type(parent)
 	soulstone.attack(victim, captor)

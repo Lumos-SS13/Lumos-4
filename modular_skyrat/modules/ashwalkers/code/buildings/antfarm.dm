@@ -5,6 +5,7 @@
 	icon_state = "anthill"
 	density = TRUE
 	anchored = TRUE
+	custom_materials = list(/datum/material/sand = SHEET_MATERIAL_AMOUNT * 20)
 	/// If the farm is occupied by ants
 	var/has_ants = FALSE
 	/// the chance for the farm to get ants
@@ -27,17 +28,18 @@
 
 /obj/structure/antfarm/Initialize(mapload)
 	. = ..()
-	var/turf/src_turf = get_turf(src)
-	if(!src_turf.GetComponent(/datum/component/simple_farm))
-		src_turf.balloon_alert_to_viewers("must be on farmable surface")
-		return INITIALIZE_HINT_QDEL
+	if(!mapload)
+		var/turf/src_turf = get_turf(src)
+		if(!src_turf.GetComponent(/datum/component/simple_farm))
+			src_turf.balloon_alert_to_viewers("must be on farmable surface")
+			return INITIALIZE_HINT_QDEL
 
-	for(var/obj/structure/antfarm/found_farm in range(2, get_turf(src)))
-		if(found_farm == src)
-			continue
+		for(var/obj/structure/antfarm/found_farm in range(2, get_turf(src)))
+			if(found_farm == src)
+				continue
 
-		src_turf.balloon_alert_to_viewers("too close to another farm")
-		return INITIALIZE_HINT_QDEL
+			src_turf.balloon_alert_to_viewers("too close to another farm")
+			return INITIALIZE_HINT_QDEL
 
 	START_PROCESSING(SSobj, src)
 	COOLDOWN_START(src, ant_timer, 30 SECONDS)
@@ -72,7 +74,7 @@
 	if(istype(attacking_item, /obj/item/food))
 		qdel(attacking_item)
 		balloon_alert(user, "food has been placed")
-		user.mind.adjust_experience(/datum/skill/primitive, 5)
+		user.mind?.adjust_experience(/datum/skill/primitive, 5)
 		ant_chance++
 		if(prob(user.mind.get_skill_modifier(/datum/skill/primitive, SKILL_PROBS_MODIFIER)))
 			ant_chance++
@@ -86,7 +88,7 @@
 				return
 
 			qdel(selected_food)
-			user.mind.adjust_experience(/datum/skill/primitive, 5)
+			user.mind?.adjust_experience(/datum/skill/primitive, 5)
 			ant_chance++
 			if(prob(user.mind.get_skill_modifier(/datum/skill/primitive, SKILL_PROBS_MODIFIER)))
 				ant_chance++
@@ -97,3 +99,7 @@
 
 /obj/item/stack/ore/glass/ten
 	amount = 10
+
+/obj/structure/antfarm/natural
+	name = "ant farm"
+	desc = "A natural ant farm."

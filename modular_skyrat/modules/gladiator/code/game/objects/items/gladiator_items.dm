@@ -34,8 +34,12 @@
 	worn_icon = 'modular_skyrat/modules/gladiator/icons/berserk_suit.dmi'
 	icon_state = "berk_cape"
 	inhand_icon_state = "" //lul
-	uses_advanced_reskins = FALSE
 	resistance_flags = INDESTRUCTIBLE
+
+/obj/item/clothing/neck/warrior_cape/loadout //Subtype for loadout item so i can make it not "indestructible"
+	name = "tattered cloak"
+	desc = "A cloak from a once feared foe now worn by those that have faced death in the eyes and prevailed, it looks rather worn as not as pristine as it used to be"
+	resistance_flags = FIRE_PROOF
 
 /obj/item/clothing/neck/warrior_cape/examine()
 	. = ..()
@@ -54,28 +58,15 @@
 	resistance_flags = INDESTRUCTIBLE
 
 /datum/armor/berserker_gatsu
-	melee = 40
+	melee = 30
 	bullet = 30
-	laser = 15
-	energy = 25
-	bomb = 70
-	bio = 70
+	laser = 10
+	energy = 20
+	bomb = 50
+	bio = 60
 	fire = 100
 	acid = 100
-	
-/datum/armor/drake_empowerment //Modular Override: nerfs beserker armour so I can keep this armour balanced
-	laser = 10
-	energy = 0
-
-/datum/armor/drake_empowerment_gatsu
-	melee = 35
-	laser = 10
-	bomb = 20
-
-/obj/item/clothing/suit/hooded/berserker/gatsu/Initialize(mapload)
-	. = ..()
-	AddComponent(/datum/component/armor_plate, maxamount = 1, upgrade_item = /obj/item/drake_remains, armor_mod = /datum/armor/drake_empowerment_gatsu, upgrade_prefix = "empowered")
-	allowed = GLOB.mining_suit_allowed
+	wound = 10
 
 /obj/item/clothing/suit/hooded/berserker/gatsu/examine()
 	. = ..()
@@ -95,8 +86,6 @@
 /obj/item/clothing/head/hooded/berserker/gatsu/Initialize(mapload)
 	. = ..()
 	ADD_TRAIT(src, TRAIT_NODROP, LOCKED_HELMET_TRAIT)
-	AddComponent(/datum/component/anti_magic, ALL, inventory_flags = ITEM_SLOT_OCLOTHING)
-	AddComponent(/datum/component/armor_plate, maxamount = 1, upgrade_item = /obj/item/drake_remains, armor_mod = /datum/armor/drake_empowerment_gatsu, upgrade_prefix = "empowered")
 
 /obj/item/clothing/head/hooded/berserker/gatsu/examine()
 	. = ..()
@@ -142,7 +131,7 @@
 	slot_flags = null
 	force = 20
 	wound_bonus = 10
-	bare_wound_bonus = 5
+	exposed_wound_bonus = 5
 	resistance_flags = INDESTRUCTIBLE
 	armour_penetration = 35 //this boss is really hard and this sword is really big
 	block_chance = 25
@@ -155,6 +144,9 @@
 	var/roll_stamcost = 10
 	/// how far do we roll?
 	var/roll_range = 3
+	var/roll_delay = 2 SECONDS
+	// prevents you from becoming a bayblade
+	COOLDOWN_DECLARE(dodgeroll_cooldown)
 
 /obj/item/claymore/dragonslayer/examine()
 	. = ..()
@@ -162,7 +154,7 @@
 
 /obj/item/claymore/dragonslayer/attack(mob/living/target, mob/living/carbon/human/user)
 	var/is_nemesis_faction = FALSE
-	for(var/found_faction in target.faction)
+	for(var/found_faction in target.get_faction())
 		if(found_faction in nemesis_factions)
 			is_nemesis_faction = TRUE
 			force += faction_bonus_force
@@ -172,9 +164,10 @@
 		force -= faction_bonus_force
 
 /obj/item/claymore/dragonslayer/ranged_interact_with_atom_secondary(atom/interacting_with, mob/living/user, list/modifiers)
-	if(user.IsImmobilized()) // no free dodgerolls
+	if(user.IsImmobilized() || !COOLDOWN_FINISHED(src, dodgeroll_cooldown)) // can't dodge
 		return NONE
 	var/turf/where_to = get_turf(interacting_with)
+	COOLDOWN_START(src, dodgeroll_cooldown, roll_delay)
 	user.apply_damage(damage = roll_stamcost, damagetype = STAMINA)
 	user.Immobilize(0.1 SECONDS) // you dont get to adjust your roll
 	user.throw_at(where_to, range = roll_range, speed = 1, force = MOVE_FORCE_NORMAL)

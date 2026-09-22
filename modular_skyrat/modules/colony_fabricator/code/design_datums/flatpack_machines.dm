@@ -26,7 +26,7 @@
 		"flatpack_turbine_team_fortress_two",
 		"flatpack_bootleg_teg",
 	)
-	research_costs = list(TECHWEB_POINT_TYPE_GENERIC = INFINITE) // God save you
+	research_costs = list(TECHWEB_POINT_TYPE_GENERIC = INFINITY) // God save you
 	hidden = TRUE
 	show_on_wiki = FALSE
 	starting_node = TRUE
@@ -47,6 +47,7 @@
 		/datum/material/gold = HALF_SHEET_MATERIAL_AMOUNT,
 		/datum/material/silver = HALF_SHEET_MATERIAL_AMOUNT,
 	)
+	inherit_materials = DESIGN_DONT_INHERIT_MATS
 	build_path = /obj/item/flatpacked_machine
 	category = list(
 		RND_CATEGORY_INITIAL,

@@ -1,6 +1,7 @@
 /obj/machinery/computer/mechpad
 	name = "orbital mech pad console"
 	desc = "A computer designed to handle the calculations and routing required for sending and receiving mechs from orbit. Requires a link to a nearby Orbital Mech Pad to function."
+	icon_state = MAP_SWITCH("computer", "/obj/machinery/computer/mechpad")
 	icon_screen = "mechpad"
 	icon_keyboard = "teleport_key"
 	circuit = /obj/item/circuitboard/computer/mechpad
@@ -105,12 +106,12 @@
 			remove_pad(buffered_pad)
 		connect_launchpad(buffered_pad)
 		multitool.set_buffer(null)
-		to_chat(user, span_notice("You connect the console to the pad with data from the [multitool.name]'s buffer."))
+		to_chat(user, span_notice("You connect the console to the pad with data from \the [multitool]'s buffer."))
 		return ITEM_INTERACT_SUCCESS
 
 	add_pad(buffered_pad)
 	multitool.set_buffer(null)
-	to_chat(user, span_notice("You upload the data from the [multitool.name]'s buffer."))
+	to_chat(user, span_notice("You upload the data from \the [multitool]'s buffer."))
 	return ITEM_INTERACT_SUCCESS
 
 /obj/machinery/computer/mechpad/proc/add_pad(obj/machinery/mechpad/pad)

@@ -26,8 +26,8 @@
 		return COMPONENT_INCOMPATIBLE
 	src.connections = connections
 	src.range = range
-	set_tracked(tracked)
 	src.works_in_containers = works_in_containers
+	set_tracked(tracked)
 
 /datum/component/connect_range/Destroy()
 	set_tracked(null)
@@ -75,14 +75,13 @@
 		turfs = list()
 		return
 
-	if(ismovable(target.loc))
+	var/loc_is_movable = ismovable(target.loc)
+
+	if(loc_is_movable)
 		if(!works_in_containers)
 			unregister_signals(old_loc, turfs)
 			turfs = list()
 			return
-		//Keep track of possible movement of all movables the target is in.
-		for(var/atom/movable/container as anything in get_nested_locs(target))
-			RegisterSignal(container, COMSIG_MOVABLE_MOVED, PROC_REF(on_moved))
 
 	//Only register/unregister turf signals if it's moved to a new turf.
 	if(current_turf == get_turf(old_loc))
@@ -91,6 +90,10 @@
 	var/list/old_turfs = turfs
 	turfs = RANGE_TURFS(range, current_turf)
 	unregister_signals(old_loc, old_turfs - turfs)
+	if(loc_is_movable)
+		//Keep track of possible movement of all movables the target is in.
+		for(var/atom/movable/container as anything in get_nested_locs(target))
+			RegisterSignal(container, COMSIG_MOVABLE_MOVED, PROC_REF(on_moved))
 	for(var/turf/target_turf as anything in turfs - old_turfs)
 		for(var/signal in connections)
 			parent.RegisterSignal(target_turf, signal, connections[signal])
@@ -111,4 +114,6 @@
 
 /datum/component/connect_range/proc/on_moved(atom/movable/movable, atom/old_loc)
 	SIGNAL_HANDLER
+	if(QDELETED(src)) //Basically, if a mob moves it will trigger the movable signal on its own field. If the mob finds a target when moving it will qdel this, but because it also moved into the field this will run, crash, and burn. so we're checking qdeleted.
+		return
 	update_signals(movable, old_loc)

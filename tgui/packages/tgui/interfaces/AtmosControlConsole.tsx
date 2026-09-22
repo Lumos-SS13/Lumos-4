@@ -15,7 +15,7 @@ import {
   AtmosHandbookContent,
   atmosHandbookHooks,
 } from './common/AtmosHandbook';
-import { Gasmix, GasmixParser } from './common/GasmixParser';
+import { type Gasmix, GasmixParser } from './common/GasmixParser';
 
 type Chamber = {
   id: string;
@@ -70,7 +70,7 @@ export const AtmosControlConsole = (props) => {
             )
           }
         >
-          {!!selectedChamber && !!selectedChamber.gasmix ? (
+          {selectedChamber?.gasmix ? (
             <GasmixParser
               gasmix={selectedChamber.gasmix}
               gasesOnClick={setActiveGasId}

@@ -3,7 +3,7 @@
 	desc = "A little mesh that, when paired with sand, has the possibility of filtering out large seeds."
 	icon = 'modular_skyrat/modules/ashwalkers/icons/misc_tools.dmi'
 	icon_state = "mesh"
-	var/list/static/seeds_blacklist = list(
+	var/static/list/seeds_blacklist = list(
 		/obj/item/seeds/lavaland,
 	)
 
@@ -28,14 +28,14 @@
 				user.balloon_alert(user, "unable to use five of [ore_item]!")
 				return
 
-			user.mind.adjust_experience(/datum/skill/primitive, 5)
+			user.mind?.adjust_experience(/datum/skill/primitive, 5)
 			if(prob(70))
 				user.balloon_alert(user, "[ore_item] reveals nothing!")
 				continue
 
 			var/spawn_seed = pick(subtypesof(/obj/item/seeds) - seeds_blacklist)
 			new spawn_seed(get_turf(src))
-			user.mind.adjust_experience(/datum/skill/primitive, 10)
+			user.mind?.adjust_experience(/datum/skill/primitive, 10)
 			user.balloon_alert(user, "[ore_item] revealed something!")
 
 	return ..()

@@ -5,12 +5,14 @@
 	name = "cyborg digitigrade right leg"
 	icon_static = 'modular_skyrat/modules/digitigrade_cybernetics/icons/digitigrade_parts.dmi'
 	icon = 'modular_skyrat/modules/digitigrade_cybernetics/icons/digitigrade_parts.dmi'
+	custom_materials = list(/datum/material/iron= SHEET_MATERIAL_AMOUNT * 2)
 	bodyshape = parent_type::bodyshape | BODYSHAPE_DIGITIGRADE
 
 /obj/item/bodypart/leg/left/robot/digi
 	name = "cyborg digitigrade left leg"
 	icon_static = 'modular_skyrat/modules/digitigrade_cybernetics/icons/digitigrade_parts.dmi'
 	icon = 'modular_skyrat/modules/digitigrade_cybernetics/icons/digitigrade_parts.dmi'
+	custom_materials = list(/datum/material/iron= SHEET_MATERIAL_AMOUNT * 2)
 	bodyshape = parent_type::bodyshape | BODYSHAPE_DIGITIGRADE
 
 /obj/item/bodypart/leg/right/robot/android/digi
@@ -42,9 +44,11 @@
 	icon_static = 'modular_skyrat/modules/digitigrade_cybernetics/icons/advanced_digitigrade_parts.dmi'
 	icon = 'modular_skyrat/modules/digitigrade_cybernetics/icons/advanced_digitigrade_parts.dmi'
 	bodyshape = parent_type::bodyshape | BODYSHAPE_DIGITIGRADE
+	is_emissive = FALSE
 
 /obj/item/bodypart/leg/left/robot/advanced/digi
 	name = "advanced digitigrade right leg"
 	icon_static = 'modular_skyrat/modules/digitigrade_cybernetics/icons/advanced_digitigrade_parts.dmi'
 	icon = 'modular_skyrat/modules/digitigrade_cybernetics/icons/advanced_digitigrade_parts.dmi'
 	bodyshape = parent_type::bodyshape | BODYSHAPE_DIGITIGRADE
+	is_emissive = FALSE

@@ -18,7 +18,7 @@
 /obj/structure/cargo_shelf/debug
 	capacity = 12
 
-/obj/structure/cargo_shelf/Initialize()
+/obj/structure/cargo_shelf/Initialize(mapload)
 	. = ..()
 	shelf_contents = new/list(capacity) // Initialize our shelf's contents list, this will be used later.
 	var/stack_layer // This is used to generate the sprite layering of the shelf pieces.
@@ -60,7 +60,7 @@
 /obj/structure/cargo_shelf/relay_container_resist_act(mob/living/user, obj/structure/closet/crate)
 	to_chat(user, span_notice("You begin attempting to knock [crate] out of [src]"))
 	if(do_after(user, 30 SECONDS, target = crate))
-		if(!user || user.stat != CONSCIOUS || user.loc != crate || crate.loc != src)
+		if(!user || IS_UNCONSCIOUS_OR_CRIT(user) || user.loc != crate || crate.loc != src)
 			return // If the user is in a strange condition, return early.
 		visible_message(span_warning("[crate] falls off of [src]!"),
 						span_notice("You manage to knock [crate] free of [src]"),
@@ -126,7 +126,6 @@
 		step(crate, pick(GLOB.alldirs)) // Shuffle the crates around as though they've fallen down.
 		crate.SpinAnimation(rand(4,7), 1) // Spin the crates around a little as they fall. Randomness is applied so it doesn't look weird.
 		switch(pick(1, 1, 1, 1, 2, 2, 3)) // Randomly pick whether to do nothing, open the crate, or break it open.
-			if(1) // Believe it or not, this does nothing.
 			if(2) // Open the crate!
 				if(crate.open()) // Break some open, cause a little chaos.
 					crate.visible_message(span_warning("[crate]'s lid falls open!"))
@@ -162,13 +161,14 @@
 	icon = 'modular_zubbers/icons/obj/structures.dmi'
 	icon_state = "rack_parts"
 	desc = "Parts of a cargo shelf, for storing crates."
+	custom_materials = list(/datum/material/iron = SHEET_MATERIAL_AMOUNT * 4)
 
 /obj/item/rack_parts/cargo_shelf/attack_self(mob/user)
 	if(building)
 		return
 	building = TRUE
 	to_chat(user, span_notice("You start constructing a cargo shelf..."))
-	if(do_after(user, 50, target = user, progress=TRUE))
+	if(do_after(user, 50, target = user, show_progress = TRUE))
 		if(!user.temporarilyRemoveItemFromInventory(src))
 			return
 		var/obj/structure/cargo_shelf/R = new /obj/structure/cargo_shelf(get_turf(src))
@@ -187,13 +187,14 @@
 /obj/item/rack_parts/gun
 	name = "gun rack parts"
 	desc = "Parts of a gun rack."
+	custom_materials = list(/datum/material/iron = SHEET_MATERIAL_AMOUNT * 2)
 
 /obj/item/rack_parts/gun/attack_self(mob/user)
 	if(building)
 		return
 	building = TRUE
 	to_chat(user, span_notice("You start constructing a gun rack..."))
-	if(do_after(user, 50, target = user, progress=TRUE))
+	if(do_after(user, 50, target = user, show_progress = TRUE))
 		if(!user.temporarilyRemoveItemFromInventory(src))
 			return
 		var/obj/structure/rack/gunrack/R = new /obj/structure/rack/gunrack(get_turf(src))
@@ -212,13 +213,14 @@
 /obj/item/rack_parts/shelf
 	name = "shelf parts"
 	desc = "Parts of a standard shelf."
+	custom_materials = list(/datum/material/iron = SHEET_MATERIAL_AMOUNT * 2)
 
 /obj/item/rack_parts/shelf/attack_self(mob/user)
 	if(building)
 		return
 	building = TRUE
 	to_chat(user, span_notice("You start constructing a standard shelf..."))
-	if(do_after(user, 50, target = user, progress=TRUE))
+	if(do_after(user, 50, target = user, show_progress = TRUE))
 		if(!user.temporarilyRemoveItemFromInventory(src))
 			return
 		var/obj/structure/rack/shelf/R = new /obj/structure/rack/shelf(get_turf(src))
@@ -233,3 +235,7 @@
 	var/obj/item/rack_parts/shelf/newparts = new(loc)
 	transfer_fingerprints_to(newparts)
 	qdel(src)
+
+#undef DEFAULT_SHELF_CAPACITY
+#undef DEFAULT_SHELF_USE_DELAY
+#undef DEFAULT_SHELF_VERTICAL_OFFSET

@@ -24,10 +24,10 @@
 	ckey_reference = player_mob.ckey
 	register_mob()
 
-/datum/component/ctf_player/PostTransfer()
-	if(!istype(parent, /datum/mind))
+/datum/component/ctf_player/PostTransfer(datum/new_parent)
+	if(!istype(new_parent, /datum/mind))
 		return COMPONENT_INCOMPATIBLE
-	var/datum/mind/true_parent = parent
+	var/datum/mind/true_parent = new_parent
 	player_mob = true_parent.current
 	register_mob()
 
@@ -46,7 +46,7 @@
 ///Dusts the player and starts a respawn countdown.
 /datum/component/ctf_player/proc/ctf_dust()
 	SIGNAL_HANDLER
-	if(!HAS_TRAIT(player_mob, TRAIT_CRITICAL_CONDITION) && !player_mob.stat == DEAD && player_mob.client)
+	if(player_mob.stat != DEAD && player_mob.client)
 		return
 	UnregisterSignal(player_mob, list(COMSIG_MOB_AFTER_APPLY_DAMAGE, COMSIG_MOB_GHOSTIZED))
 	var/turf/death_turf = get_turf(player_mob)

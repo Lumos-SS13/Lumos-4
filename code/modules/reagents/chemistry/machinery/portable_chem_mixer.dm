@@ -12,6 +12,7 @@
 	interaction_flags_click = FORBID_TELEKINESIS_REACH
 	interaction_flags_mouse_drop = FORBID_TELEKINESIS_REACH
 	storage_type = /datum/storage/portable_chem_mixer
+	custom_materials = list(/datum/material/iron = SHEET_MATERIAL_AMOUNT * 5, /datum/material/plastic = SHEET_MATERIAL_AMOUNT * 2.5, /datum/material/glass = SHEET_MATERIAL_AMOUNT * 1.5)
 
 	///Creating an empty slot for a beaker that can be added to dispense into
 	var/obj/item/reagent_containers/beaker
@@ -22,8 +23,8 @@
 
 /obj/item/storage/portable_chem_mixer/Initialize(mapload)
 	. = ..()
-
 	register_context()
+	AddElement(/datum/element/drag_pickup)
 
 /obj/item/storage/portable_chem_mixer/Destroy()
 	dispensable_reagents.Cut()
@@ -182,7 +183,7 @@
 		beaker_data["maxVolume"] = beaker.volume
 		beaker_data["transferAmounts"] = beaker.possible_transfer_amounts
 		beaker_data["pH"] = round(beaker.reagents.ph, 0.01)
-		beaker_data["currentVolume"] = round(beaker.reagents.total_volume, CHEMICAL_VOLUME_ROUNDING)
+		beaker_data["currentVolume"] = beaker.reagents.total_volume
 		var/list/beakerContents = list()
 		if(length(beaker.reagents.reagent_list))
 			for(var/datum/reagent/reagent in beaker.reagents.reagent_list)
@@ -205,7 +206,7 @@
 			if(isnull(target))
 				return
 
-			amount = target
+			amount = round(target, CHEMICAL_VOLUME_ROUNDING)
 			return TRUE
 
 		if("dispense")
@@ -239,13 +240,6 @@
 			update_appearance()
 			return TRUE
 
-/obj/item/storage/portable_chem_mixer/mouse_drop_dragged(atom/over_object)
-	if(ismob(loc))
-		var/mob/M = loc
-		if(istype(over_object, /atom/movable/screen/inventory/hand))
-			var/atom/movable/screen/inventory/hand/H = over_object
-			M.putItemFromInventoryInHandIfPossible(src, H.held_index)
-
 /obj/item/storage/portable_chem_mixer/click_alt(mob/living/user)
 	if(!atom_storage.locked)
 		balloon_alert(user, "lock first to use alt eject!")
@@ -257,12 +251,7 @@
 
 /obj/item/storage/portable_chem_mixer/item_ctrl_click(mob/user)
 	if(atom_storage.locked == STORAGE_FULLY_LOCKED)
-		atom_storage.locked = STORAGE_NOT_LOCKED
 		replace_beaker(user)
 		SStgui.close_uis(src)
-	else
-		atom_storage.locked = STORAGE_FULLY_LOCKED
-		atom_storage.hide_contents(user)
-
-	update_appearance()
+	atom_storage.set_locked(atom_storage.locked ? STORAGE_NOT_LOCKED : STORAGE_FULLY_LOCKED)
 	return CLICK_ACTION_SUCCESS

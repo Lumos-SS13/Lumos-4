@@ -86,7 +86,7 @@
 	..()
 	return TRUE
 
-/obj/machinery/mod_installer/close_machine(mob/living/carbon/user, density_to_set = TRUE)
+/obj/machinery/mod_installer/close_machine(atom/movable/target, density_to_set = TRUE)
 	if(!state_open)
 		return FALSE
 	..()
@@ -97,7 +97,7 @@
 	var/message
 	if(busy)
 		message = "it won't budge!"
-	else if(user.stat != CONSCIOUS)
+	else if(IS_UNCONSCIOUS_OR_CRIT(user))
 		message = "you don't have the energy!"
 	if(!isnull(message))
 		if (COOLDOWN_FINISHED(src, message_cooldown))
@@ -108,7 +108,7 @@
 
 /obj/machinery/mod_installer/interact(mob/user)
 	if(state_open)
-		close_machine(null, user)
+		close_machine()
 		return
 	else if(busy)
 		balloon_alert(user, "it's locked!")

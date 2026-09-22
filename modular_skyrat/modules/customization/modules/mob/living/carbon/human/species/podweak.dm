@@ -25,12 +25,13 @@
 		TRAIT_LITERATE,
 		TRAIT_MUTANT_COLORS,
 	)
+	sort_bottom = FALSE //We don't want this to sort to the bottom like regular podpeople, because it's not a ghostrole species
 
 	always_customizable = FALSE
 
-/datum/species/pod/podweak/spec_life(mob/living/carbon/human/H, seconds_per_tick, times_fired)
-	. = ..()
-	if(H.stat != CONSCIOUS)
+/datum/species/pod/podweak/proc/on_life(mob/living/carbon/human/H, seconds_per_tick)
+	SIGNAL_HANDLER
+	if(IS_UNCONSCIOUS(H))
 		return
 
 	var/light_amount = 0 //how much light there is in the place, affects receiving nutrition and healing
@@ -42,16 +43,16 @@
 			H.set_nutrition(NUTRITION_LEVEL_ALMOST_FULL)
 		if(light_amount > 0.2) //if there's enough light, heal
 			H.heal_overall_damage(0.2 * seconds_per_tick, 0.2 * seconds_per_tick, 0)
-			H.adjustStaminaLoss(-0.2 * seconds_per_tick)
-			H.adjustToxLoss(-0.2 * seconds_per_tick)
-			H.adjustOxyLoss(-0.2 * seconds_per_tick)
+			H.adjust_stamina_loss(-0.2 * seconds_per_tick)
+			H.adjust_tox_loss(-0.2 * seconds_per_tick)
+			H.adjust_oxy_loss(-0.2 * seconds_per_tick)
 
 	if(H.nutrition < NUTRITION_LEVEL_STARVING + 50)
 		H.take_overall_damage(1 * seconds_per_tick, 0)
 
 
 /datum/species/pod/prepare_human_for_preview(mob/living/carbon/human/human)
-	human.dna.mutant_bodyparts["pod_hair"] = list(MUTANT_INDEX_NAME = "Ivy", MUTANT_INDEX_COLOR_LIST = list(COLOR_VIBRANT_LIME, COLOR_VIBRANT_LIME, COLOR_VIBRANT_LIME))
+	human.dna.features[FEATURE_MUTANT_COLOR] = COLOR_OLIVE_GREEN
+	human.dna.mutant_bodyparts[FEATURE_POD_HAIR] = list(MUTANT_INDEX_NAME = "Ivy", MUTANT_INDEX_COLOR_LIST = list("#9E4141"))
 	regenerate_organs(human, src, visual_only = TRUE)
-	human.update_body(TRUE)
-
+	human.update_body(is_creating = TRUE)

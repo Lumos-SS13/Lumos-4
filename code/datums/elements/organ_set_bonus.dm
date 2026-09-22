@@ -30,7 +30,7 @@
 	var/datum/status_effect/organ_set_bonus/set_bonus = receiver.has_status_effect(bonus_type)
 	if(!set_bonus)
 		set_bonus = receiver.apply_status_effect(bonus_type)
-	set_bonus.set_organs(set_bonus.organs + 1)
+	set_bonus.set_organs(set_bonus.organs + 1, target)
 
 /datum/element/organ_set_bonus/proc/on_removed(obj/item/organ/target, mob/living/carbon/loser)
 	SIGNAL_HANDLER
@@ -38,12 +38,12 @@
 	//get status effect or remove it
 	var/datum/status_effect/organ_set_bonus/set_bonus = loser.has_status_effect(bonus_type)
 	if(set_bonus)
-		set_bonus.set_organs(set_bonus.organs - 1)
+		set_bonus.set_organs(set_bonus.organs - 1, target)
 
 /datum/status_effect/organ_set_bonus
 	id = "organ_set_bonus"
-	duration = -1
-	tick_interval = -1
+	duration = STATUS_EFFECT_PERMANENT
+	tick_interval = STATUS_EFFECT_NO_TICK
 	alert_type = null
 	///how many organs the carbon with this has in the set
 	var/organs = 0
@@ -57,20 +57,26 @@
 	var/required_biotype = MOB_ORGANIC
 	/// A list of traits added to the mob upon bonus activation, can be of any length.
 	var/list/bonus_traits = list()
-	/// Limb overlay to apply upon activation
-	var/limb_overlay
+	/// Bonus biotype(s) to add on bonus activation.
+	var/bonus_biotype
+	/// what biotype(s) was added - used to check if we should remove the biotype or not, on organ set loss.
+	var/biotype_added = NONE
+	/// Limb texture to apply upon activation
+	var/limb_texture
+	/// Color priority for limb limb_texture
+	var/color_overlay_priority
 
-/datum/status_effect/organ_set_bonus/proc/set_organs(new_value)
+/datum/status_effect/organ_set_bonus/proc/set_organs(new_value, obj/item/organ/organ)
 	organs = new_value
 	if(!organs) //initial value but won't kick in without calling the setter
 		qdel(src)
 	if(organs >= organs_needed)
 		if(!bonus_active)
-			INVOKE_ASYNC(src, PROC_REF(enable_bonus))
+			INVOKE_ASYNC(src, PROC_REF(enable_bonus), organ)
 	else if(bonus_active)
-		INVOKE_ASYNC(src, PROC_REF(disable_bonus))
+		INVOKE_ASYNC(src, PROC_REF(disable_bonus), organ)
 
-/datum/status_effect/organ_set_bonus/proc/enable_bonus()
+/datum/status_effect/organ_set_bonus/proc/enable_bonus(obj/item/organ/inserted_organ)
 	SHOULD_CALL_PARENT(TRUE)
 	if(required_biotype)
 		if(!(owner.mob_biotypes & required_biotype))
@@ -78,32 +84,94 @@
 		if((required_biotype == MOB_ORGANIC) && !owner.can_mutate())
 			return FALSE
 	bonus_active = TRUE
+	// Add traits
 	if(length(bonus_traits))
-		owner.add_traits(bonus_traits, REF(src))
+		owner.add_traits(bonus_traits, TRAIT_STATUS_EFFECT(id))
+
+	// Add biotype
+	if(bonus_biotype)
+		biotype_added = bonus_biotype & ~owner.mob_biotypes
+		owner.mob_biotypes |= biotype_added
+		RegisterSignal(owner, COMSIG_SPECIES_LOSS, PROC_REF(on_species_loss))
+		RegisterSignal(owner, COMSIG_SPECIES_GAIN, PROC_REF(on_species_gain))
+
 	if(bonus_activate_text)
 		to_chat(owner, bonus_activate_text)
-	if(!iscarbon(owner) || !limb_overlay)
+
+	// Add limb texture
+	if(!limb_texture)
 		return TRUE
-	var/mob/living/carbon/carbon_owner = owner
-	for(var/obj/item/bodypart/limb in carbon_owner.bodyparts)
-		limb.add_bodypart_overlay(new limb_overlay())
-		limb.variable_color = COLOR_WHITE
-	carbon_owner.update_body()
+
+	RegisterSignal(owner, COMSIG_CARBON_ATTACH_LIMB, PROC_REF(texture_limb))
+	RegisterSignal(owner, COMSIG_CARBON_REMOVE_LIMB, PROC_REF(untexture_limb))
+
+	for(var/obj/item/bodypart/limb as anything in owner.get_bodyparts())
+		if (!(limb.bodytype & BODYTYPE_ORGANIC))
+			continue
+		limb.add_bodypart_texture(limb_texture, update = FALSE)
+		if (color_overlay_priority)
+			limb.add_color_override(COLOR_WHITE, color_overlay_priority)
+
+	owner.update_body()
 	return TRUE
 
-/datum/status_effect/organ_set_bonus/proc/disable_bonus()
+/datum/status_effect/organ_set_bonus/proc/disable_bonus(obj/item/organ/removed_organ)
 	SHOULD_CALL_PARENT(TRUE)
 	bonus_active = FALSE
+
+	// Remove traits
 	if(length(bonus_traits))
-		owner.remove_traits(bonus_traits, REF(src))
+		owner.remove_traits(bonus_traits, TRAIT_STATUS_EFFECT(id))
+	// Remove biotype (if added)
+	if(biotype_added)
+		owner.mob_biotypes &= ~biotype_added
+		biotype_added = NONE
+
 	if(bonus_deactivate_text)
 		to_chat(owner, bonus_deactivate_text)
-	if(!iscarbon(owner) || QDELETED(owner) || !limb_overlay)
+
+	// Remove limb overlay
+	if(!limb_texture)
 		return
-	var/mob/living/carbon/carbon_owner = owner
-	for(var/obj/item/bodypart/limb in carbon_owner.bodyparts)
-		var/overlay = locate(limb_overlay) in limb.bodypart_overlays
-		if(overlay)
-			limb.remove_bodypart_overlay(overlay)
-			limb.variable_color = null
-	carbon_owner.update_body()
+
+	UnregisterSignal(owner, list(COMSIG_CARBON_ATTACH_LIMB, COMSIG_CARBON_REMOVE_LIMB, COMSIG_SPECIES_LOSS, COMSIG_SPECIES_GAIN))
+
+	if(QDELETED(owner))
+		return
+
+	for(var/obj/item/bodypart/limb as anything in owner.get_bodyparts())
+		limb.remove_bodypart_texture(limb_texture, update = FALSE)
+		if (color_overlay_priority)
+			limb.remove_color_override(color_overlay_priority)
+
+	owner.update_body()
+
+///We need to recalculate the mob biotypes, so first, remove the added biotypes from the mob before the new species changes the standard biotypes.
+/datum/status_effect/organ_set_bonus/proc/on_species_loss(mob/living/carbon/human, datum/species/new_species, datum/species/old_species)
+	SIGNAL_HANDLER
+	human.mob_biotypes &= ~biotype_added
+	biotype_added = NONE
+
+///After the new species has added its biotypes to the mob, check if they already have or don't have the bonus biotype now.
+/datum/status_effect/organ_set_bonus/proc/on_species_gain(mob/living/carbon/human, datum/species/new_species, datum/species/old_species)
+	SIGNAL_HANDLER
+	biotype_added = bonus_biotype & ~owner.mob_biotypes
+	owner.mob_biotypes |= biotype_added
+
+/datum/status_effect/organ_set_bonus/proc/texture_limb(atom/source, obj/item/bodypart/limb)
+	SIGNAL_HANDLER
+
+	if (!(limb.bodytype & BODYTYPE_ORGANIC))
+		return
+
+	// Not updating because enable/disable_bonus(obj/item/organ/removed_organ) call it down the line, and calls coming from comsigs update the owner's body themselves
+	limb.add_bodypart_texture(limb_texture, update = FALSE)
+	if(color_overlay_priority)
+		limb.add_color_override(COLOR_WHITE, color_overlay_priority)
+
+/datum/status_effect/organ_set_bonus/proc/untexture_limb(atom/source, obj/item/bodypart/limb)
+	SIGNAL_HANDLER
+
+	limb.remove_bodypart_texture(limb_texture, update = FALSE)
+	if(color_overlay_priority)
+		limb.remove_color_override(color_overlay_priority)

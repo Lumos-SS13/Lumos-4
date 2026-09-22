@@ -132,7 +132,7 @@
 		span_notice("You lean on the back of [src] and start pushing the door open... (this will take about [DisplayTimeText(breakout_time)].)"), \
 		span_hear("You hear a metallic creaking from [src]."))
 	if(do_after(user,(breakout_time), target = src))
-		if(!user || user.stat != CONSCIOUS || user.loc != src || state_open)
+		if(!user || IS_UNCONSCIOUS_OR_CRIT(user) || user.loc != src || state_open)
 			return
 		user.visible_message(span_warning("[user] successfully broke out of [src]!"), \
 			span_notice("You successfully break out of [src]!"))
@@ -162,12 +162,12 @@
 	injection_cooldown = 0
 	replenish_cooldown = 300
 
-/obj/machinery/implantchair/genepurge/implant_action(mob/living/carbon/human/H,mob/user)
-	if(!istype(H))
+/obj/machinery/implantchair/genepurge/implant_action(mob/living/carbon/human/human, mob/user)
+	if(!istype(human))
 		return FALSE
-	H.set_species(/datum/species/human, 1)//lizards go home
-	purrbation_remove(H)//remove cats
-	H.dna.remove_all_mutations()//hulks out
+	human.dna.remove_all_mutations()//hulks out
+	human.set_species(/datum/species/human, 1)//lizards go home
+	purrbation_remove(human)//remove cats
 	return TRUE
 
 

@@ -41,9 +41,10 @@
 	if(isnull(slapcraft_recipes))
 		CRASH("NULL SLAPCRAFT RECIPES?")
 
+	//mobs that can't craft (ex: borgs) can't slapcraft.
 	var/datum/component/personal_crafting/craft_sheet = user.GetComponent(/datum/component/personal_crafting)
 	if(!craft_sheet)
-		CRASH("No craft sheet on user ??")
+		return
 
 	var/list/valid_recipes
 	for(var/datum/crafting_recipe/recipe as anything in slapcraft_recipes)
@@ -73,7 +74,7 @@
 
 	var/list/result_to_recipe = list()
 
-	var/final_recipe = valid_recipes[1]
+	var/datum/crafting_recipe/final_recipe = valid_recipes[1]
 	var/string_chosen_recipe
 	if(length(valid_recipes) > 1)
 		for(var/datum/crafting_recipe/recipe as anything in valid_recipes)
@@ -91,25 +92,20 @@
 	if(string_chosen_recipe)
 		final_recipe = result_to_recipe[string_chosen_recipe]
 
+	if(ispath(final_recipe))
+		var/recipe_path = final_recipe
+		final_recipe = GLOB.cooking_recipes_by_typepath[recipe_path] || GLOB.crafting_recipes_by_typepath[recipe_path]
+		if(!final_recipe)
+			CRASH("Recipe not located in cooking or crafting recipes: [recipe_path]")
 
-	var/datum/crafting_recipe/actual_recipe = final_recipe
-
-	if(istype(actual_recipe, /datum/crafting_recipe/food))
-		actual_recipe = locate(final_recipe) in GLOB.cooking_recipes
-	else
-		actual_recipe = locate(final_recipe) in GLOB.crafting_recipes
-
-	if(!actual_recipe)
-		CRASH("Recipe not located in cooking or crafting recipes: [final_recipe]")
-
-	var/atom/final_result = initial(actual_recipe.result)
+	var/atom/final_result = initial(final_recipe.result)
 
 	to_chat(user, span_notice("You start crafting \a [initial(final_result.name)]..."))
 
-	var/error_string = craft_sheet.construct_item(user, actual_recipe)
+	var/error_string = craft_sheet.construct_item(user, final_recipe)
 
-	if(!isatom(error_string))
-		to_chat(user, span_warning("crafting failed" + error_string))
+	if(istext(error_string))
+		to_chat(user, span_warning("Crafting failed[error_string]"))
 
 /// Alerts any examiners to the recipe, if they wish to know more.
 /datum/element/slapcrafting/proc/get_examine_info(atom/source, mob/user, list/examine_list)
@@ -134,7 +130,7 @@
 
 	for(var/datum/crafting_recipe/recipe as anything in slapcraft_recipes)
 		var/atom/result = initial(recipe.result)
-		examine_list += "<a href='?src=[REF(source)];check_recipe=[REF(recipe)]'>See Recipe For [initial(result.name)]</a>"
+		examine_list += "<a href='byond://?src=[REF(source)];check_recipe=[REF(recipe)]'>See Recipe For [initial(result.name)]</a>"
 
 /datum/element/slapcrafting/proc/topic_handler(atom/source, user, href_list)
 	SIGNAL_HANDLER
@@ -180,7 +176,7 @@
 	// If we did find ingredients then add them onto the list.
 	if(length(string_ingredient_list))
 		to_chat(user, span_boldnotice("Extra Ingredients:"))
-		to_chat(user, examine_block(span_notice(string_ingredient_list)))
+		to_chat(user, boxed_message(span_notice(string_ingredient_list)))
 
 	var/list/tool_list = ""
 
@@ -194,7 +190,6 @@
 
 	if(length(tool_list))
 		to_chat(user, span_boldnotice("Required Tools:"))
-		to_chat(user, examine_block(span_notice(tool_list)))
+		to_chat(user, boxed_message(span_notice(tool_list)))
 
 	qdel(cur_recipe)
-

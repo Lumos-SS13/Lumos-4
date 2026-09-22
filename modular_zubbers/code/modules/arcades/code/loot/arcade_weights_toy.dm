@@ -68,5 +68,8 @@ GLOBAL_LIST_INIT(arcade_prize_pool_toy, list(
 	/obj/item/stamp/cat = 5,
 	/obj/item/storage/belt/champion = 5,
 	/obj/item/storage/box/party_poppers = 50,
-	/obj/item/surprise_egg = 100
+	/obj/item/surprise_egg = 100,
+	/obj/item/toy/plush/goatplushie = 2,
+	/obj/item/foam_baton = 20,
+	/obj/item/foam_baton/sword = 20,
 ))

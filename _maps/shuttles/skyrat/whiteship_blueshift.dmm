@@ -48,7 +48,7 @@
 /turf/open/floor/plating,
 /area/shuttle/abandoned/crew)
 "aq" = (
-/obj/machinery/light/small/built/directional/west,
+/obj/machinery/light/small/empty/directional/west,
 /obj/effect/decal/cleanable/dirt,
 /turf/open/floor/iron,
 /area/shuttle/abandoned)
@@ -70,7 +70,7 @@
 	},
 /obj/effect/decal/cleanable/dirt,
 /obj/effect/decal/cleanable/dirt,
-/obj/effect/decal/cleanable/oil,
+/obj/effect/decal/cleanable/blood/oil,
 /turf/open/floor/iron/dark,
 /area/shuttle/abandoned/cargo)
 "aU" = (
@@ -156,7 +156,7 @@
 /turf/open/floor/iron/cafeteria,
 /area/shuttle/abandoned/crew)
 "bE" = (
-/obj/machinery/light/small/built/directional/north,
+/obj/machinery/light/small/empty/directional/north,
 /obj/effect/decal/cleanable/dirt,
 /obj/machinery/atmospherics/components/unary/vent_pump/on,
 /obj/structure/alien/weeds/node,
@@ -228,7 +228,7 @@
 /turf/open/floor/plating,
 /area/shuttle/abandoned/crew)
 "cG" = (
-/obj/machinery/light/small/built/directional/north,
+/obj/machinery/light/small/empty/directional/north,
 /obj/effect/decal/cleanable/dirt,
 /obj/machinery/atmospherics/pipe/smart/simple/supply/hidden{
 	dir = 8
@@ -266,7 +266,7 @@
 "dg" = (
 /obj/effect/decal/cleanable/dirt,
 /obj/effect/decal/cleanable/dirt,
-/obj/machinery/light/small/built/directional/west,
+/obj/machinery/light/small/empty/directional/west,
 /obj/effect/turf_decal/tile/blue,
 /obj/effect/turf_decal/tile/blue{
 	dir = 8
@@ -310,7 +310,7 @@
 /turf/open/floor/iron,
 /area/shuttle/abandoned/crew)
 "dw" = (
-/obj/machinery/light/small/built/directional/south,
+/obj/machinery/light/small/empty/directional/south,
 /obj/effect/decal/cleanable/dirt,
 /obj/effect/turf_decal/tile/neutral{
 	dir = 4
@@ -347,7 +347,7 @@
 /obj/item/reagent_containers/cup/glass/drinkingglass{
 	pixel_y = 3
 	},
-/obj/item/reagent_containers/cup/rag,
+/obj/item/rag,
 /turf/open/floor/iron/dark,
 /area/shuttle/abandoned/bar)
 "dI" = (
@@ -368,7 +368,7 @@
 /area/shuttle/abandoned)
 "dN" = (
 /obj/effect/decal/cleanable/dirt,
-/obj/effect/decal/cleanable/oil,
+/obj/effect/decal/cleanable/blood/oil,
 /obj/structure/alien/weeds,
 /turf/open/floor/iron/dark,
 /area/shuttle/abandoned/cargo)
@@ -377,8 +377,7 @@
 /area/shuttle/abandoned/bar)
 "dW" = (
 /obj/structure/table,
-/obj/item/ai_module/supplied/freeform,
-/obj/item/ai_module/reset,
+/obj/item/ai_module/law/supplied/freeform,
 /turf/open/floor/circuit,
 /area/shuttle/abandoned/engine)
 "ec" = (
@@ -391,14 +390,14 @@
 "ei" = (
 /obj/effect/turf_decal/box,
 /obj/effect/turf_decal/stripes,
-/obj/machinery/computer/upload/ai{
+/obj/machinery/ai_law_rack/base/core{
 	dir = 8
 	},
 /obj/effect/decal/cleanable/dirt,
 /turf/open/floor/iron/dark,
 /area/shuttle/abandoned/engine)
 "ev" = (
-/obj/machinery/light/built/directional/west,
+/obj/machinery/light/empty/directional/west,
 /obj/effect/decal/cleanable/dirt,
 /obj/effect/decal/cleanable/dirt,
 /obj/structure/closet/crate/large,
@@ -481,7 +480,7 @@
 /turf/open/floor/iron,
 /area/shuttle/abandoned/engine)
 "fj" = (
-/obj/machinery/light/small/built/directional/west,
+/obj/machinery/light/small/empty/directional/west,
 /obj/effect/decal/cleanable/dirt,
 /obj/structure/cable,
 /obj/structure/alien/weeds,
@@ -640,7 +639,7 @@
 /obj/effect/turf_decal/box/white/corners,
 /obj/effect/decal/cleanable/dirt,
 /obj/structure/alien/weeds,
-/obj/effect/decal/cleanable/xenoblood/xgibs/body,
+/obj/effect/decal/cleanable/blood/gibs/xeno/body,
 /turf/open/floor/iron/dark,
 /area/shuttle/abandoned/cargo)
 "gv" = (
@@ -1187,7 +1186,7 @@
 /turf/open/floor/iron/freezer,
 /area/shuttle/abandoned/crew)
 "lO" = (
-/obj/machinery/light/small/built/directional/east,
+/obj/machinery/light/small/empty/directional/east,
 /obj/effect/decal/cleanable/dirt,
 /obj/effect/decal/cleanable/dirt,
 /obj/effect/turf_decal/tile/neutral{
@@ -1362,7 +1361,7 @@
 /turf/open/floor/iron/dark,
 /area/shuttle/abandoned/cargo)
 "mO" = (
-/obj/machinery/light/small/built/directional/east,
+/obj/machinery/light/small/empty/directional/east,
 /obj/effect/decal/cleanable/dirt,
 /obj/effect/decal/cleanable/dirt,
 /obj/effect/decal/cleanable/dirt,
@@ -1381,7 +1380,7 @@
 /turf/open/floor/iron/dark,
 /area/shuttle/abandoned/crew)
 "mP" = (
-/obj/machinery/light/built/directional/east,
+/obj/machinery/light/empty/directional/east,
 /obj/effect/decal/cleanable/dirt,
 /obj/machinery/airalarm/directional/west,
 /obj/effect/mapping_helpers/airalarm/all_access,
@@ -1396,7 +1395,7 @@
 /obj/structure/sign/warning/vacuum/external{
 	pixel_x = -32
 	},
-/obj/machinery/light/small/built/directional/west,
+/obj/machinery/light/small/empty/directional/west,
 /turf/open/floor/plating,
 /area/shuttle/abandoned/crew)
 "mZ" = (
@@ -1529,7 +1528,6 @@
 "og" = (
 /obj/effect/turf_decal/stripes/box,
 /obj/effect/decal/cleanable/dirt,
-/obj/effect/mob_spawn/corpse/ai,
 /turf/open/floor/circuit,
 /area/shuttle/abandoned/engine)
 "om" = (
@@ -1689,8 +1687,8 @@
 /obj/effect/decal/cleanable/dirt,
 /obj/effect/turf_decal/bot_white,
 /obj/structure/guncase,
-/obj/item/ammo_box/a357,
-/obj/item/ammo_box/a357,
+/obj/item/ammo_box/speedloader/c357,
+/obj/item/ammo_box/speedloader/c357,
 /obj/item/gun/ballistic/revolver,
 /obj/item/ammo_box/magazine/wt550m9,
 /obj/item/ammo_box/magazine/wt550m9,
@@ -1761,7 +1759,7 @@
 /obj/effect/turf_decal/tile/neutral{
 	dir = 8
 	},
-/obj/effect/decal/cleanable/xenoblood/xsplatter,
+/obj/effect/decal/cleanable/blood/splatter/xeno,
 /turf/open/floor/iron/dark,
 /area/shuttle/abandoned/cargo)
 "qj" = (
@@ -1808,7 +1806,7 @@
 /turf/open/floor/iron/dark,
 /area/shuttle/abandoned)
 "qu" = (
-/obj/machinery/light/small/built/directional/south,
+/obj/machinery/light/small/empty/directional/south,
 /obj/effect/turf_decal/stripes/white/line{
 	dir = 5
 	},
@@ -2059,7 +2057,7 @@
 "sq" = (
 /obj/effect/decal/cleanable/dirt,
 /obj/structure/alien/weeds,
-/obj/effect/decal/cleanable/xenoblood/xgibs/core,
+/obj/effect/decal/cleanable/blood/gibs/xeno/core,
 /turf/open/floor/iron/dark,
 /area/shuttle/abandoned/cargo)
 "ss" = (
@@ -2106,7 +2104,7 @@
 /area/shuttle/abandoned/medbay)
 "tb" = (
 /obj/effect/decal/cleanable/dirt,
-/obj/effect/decal/cleanable/xenoblood/xsplatter,
+/obj/effect/decal/cleanable/blood/splatter/xeno,
 /turf/open/floor/iron/dark,
 /area/shuttle/abandoned/cargo)
 "tc" = (
@@ -2149,7 +2147,7 @@
 /obj/machinery/atmospherics/pipe/smart/simple/supply/hidden{
 	dir = 8
 	},
-/obj/effect/decal/cleanable/xenoblood/xsplatter,
+/obj/effect/decal/cleanable/blood/splatter/xeno,
 /turf/open/floor/iron/dark,
 /area/shuttle/abandoned/cargo)
 "ts" = (
@@ -2209,7 +2207,7 @@
 	dir = 6
 	},
 /obj/effect/decal/cleanable/dirt,
-/obj/machinery/light/small/built/directional/north,
+/obj/machinery/light/small/empty/directional/north,
 /obj/effect/decal/cleanable/dirt,
 /obj/structure/tank_dispenser,
 /obj/structure/alien/weeds,
@@ -2236,7 +2234,7 @@
 /obj/effect/decal/cleanable/dirt,
 /obj/effect/turf_decal/bot_white,
 /obj/structure/guncase/shotgun,
-/obj/machinery/light/small/built/directional/east,
+/obj/machinery/light/small/empty/directional/east,
 /obj/item/storage/box/lethalshot,
 /obj/item/gun/ballistic/shotgun/riot{
 	pixel_y = 3
@@ -2389,7 +2387,7 @@
 	},
 /obj/item/soap,
 /obj/structure/curtain,
-/obj/machinery/light/small/built/directional/south,
+/obj/machinery/light/small/empty/directional/south,
 /obj/effect/decal/cleanable/dirt,
 /obj/structure/drain,
 /obj/structure/alien/weeds,
@@ -2630,7 +2628,7 @@
 /turf/open/floor/iron/dark,
 /area/shuttle/abandoned/cargo)
 "yM" = (
-/obj/machinery/light/small/built/directional/north,
+/obj/machinery/light/small/empty/directional/north,
 /obj/effect/decal/cleanable/dirt,
 /obj/machinery/firealarm/directional/north,
 /obj/machinery/atmospherics/pipe/smart/simple/supply/hidden{
@@ -2679,7 +2677,7 @@
 /obj/structure/sign/warning/vacuum/external{
 	pixel_x = 32
 	},
-/obj/machinery/light/small/built/directional/east,
+/obj/machinery/light/small/empty/directional/east,
 /obj/effect/decal/cleanable/dirt,
 /obj/effect/decal/cleanable/dirt,
 /obj/structure/alien/weeds,
@@ -2903,7 +2901,6 @@
 /area/shuttle/abandoned/medbay)
 "BB" = (
 /obj/machinery/turretid{
-	icon_state = "control_kill";
 	lethal = 1;
 	locked = 0;
 	pixel_x = -28;
@@ -3251,7 +3248,7 @@
 /area/shuttle/abandoned/cargo)
 "Fi" = (
 /obj/effect/decal/cleanable/dirt,
-/obj/machinery/light/small/built/directional/east,
+/obj/machinery/light/small/empty/directional/east,
 /obj/effect/turf_decal/bot,
 /obj/structure/alien/weeds/node,
 /obj/machinery/breath_machine/anesthetic,
@@ -3385,7 +3382,7 @@
 	dir = 10
 	},
 /obj/effect/decal/cleanable/dirt,
-/obj/machinery/light/small/built/directional/north,
+/obj/machinery/light/small/empty/directional/north,
 /obj/structure/reagent_dispensers/fueltank,
 /obj/structure/alien/weeds,
 /turf/open/floor/iron/dark{
@@ -3553,7 +3550,7 @@
 /turf/open/floor/iron/dark,
 /area/shuttle/abandoned/crew)
 "Ia" = (
-/obj/machinery/light/small/built/directional/west,
+/obj/machinery/light/small/empty/directional/west,
 /obj/effect/decal/cleanable/dirt,
 /obj/structure/table,
 /obj/machinery/microwave{
@@ -3849,7 +3846,7 @@
 /turf/open/floor/plating,
 /area/shuttle/abandoned/cargo)
 "KD" = (
-/obj/machinery/light/built/directional/east,
+/obj/machinery/light/empty/directional/east,
 /obj/effect/decal/cleanable/dirt,
 /obj/effect/decal/cleanable/dirt,
 /obj/machinery/firealarm/directional/east,
@@ -3927,7 +3924,7 @@
 	},
 /area/shuttle/abandoned/crew)
 "LU" = (
-/obj/machinery/light/small/built/directional/south,
+/obj/machinery/light/small/empty/directional/south,
 /obj/effect/decal/cleanable/dirt,
 /obj/effect/decal/cleanable/dirt,
 /obj/effect/turf_decal/stripes/white/line,
@@ -3966,8 +3963,8 @@
 /area/shuttle/abandoned/cargo)
 "Mj" = (
 /obj/effect/decal/cleanable/dirt,
-/obj/effect/decal/cleanable/xenoblood/xgibs/limb,
-/obj/effect/decal/cleanable/xenoblood/xsplatter,
+/obj/effect/decal/cleanable/blood/gibs/xeno/limb,
+/obj/effect/decal/cleanable/blood/splatter/xeno,
 /turf/open/floor/iron/dark,
 /area/shuttle/abandoned/cargo)
 "Mn" = (
@@ -4112,7 +4109,7 @@
 /obj/structure/sign/warning/vacuum/external{
 	pixel_x = 32
 	},
-/obj/machinery/light/small/built/directional/east,
+/obj/machinery/light/small/empty/directional/east,
 /obj/effect/decal/cleanable/dirt,
 /obj/structure/alien/weeds,
 /obj/item/spear,
@@ -4123,7 +4120,7 @@
 /obj/effect/decal/cleanable/dirt,
 /obj/effect/decal/cleanable/dirt,
 /obj/machinery/firealarm/directional/east,
-/obj/machinery/light/small/built/directional/east,
+/obj/machinery/light/small/empty/directional/east,
 /obj/effect/turf_decal/tile/blue{
 	dir = 4
 	},
@@ -4285,7 +4282,7 @@
 	dir = 8
 	},
 /obj/structure/window/reinforced/spawner/directional/west,
-/obj/machinery/computer/secure_data,
+/obj/machinery/computer/records/security,
 /turf/open/floor/iron/dark,
 /area/shuttle/abandoned)
 "Pm" = (
@@ -4431,7 +4428,7 @@
 /turf/open/floor/iron/dark,
 /area/shuttle/abandoned)
 "QH" = (
-/obj/machinery/light/built/directional/west,
+/obj/machinery/light/empty/directional/west,
 /obj/effect/decal/cleanable/dirt,
 /obj/machinery/firealarm/directional/west,
 /obj/structure/closet/crate/internals,
@@ -4459,7 +4456,7 @@
 /area/shuttle/abandoned/cargo)
 "QS" = (
 /obj/effect/decal/cleanable/dirt,
-/obj/machinery/light/small/built/directional/west,
+/obj/machinery/light/small/empty/directional/west,
 /obj/effect/turf_decal/tile/blue{
 	dir = 1
 	},
@@ -4659,7 +4656,7 @@
 "SV" = (
 /obj/effect/decal/cleanable/dirt,
 /obj/effect/decal/cleanable/dirt,
-/obj/machinery/light/small/built/directional/east,
+/obj/machinery/light/small/empty/directional/east,
 /obj/effect/turf_decal/tile/blue,
 /obj/machinery/atmospherics/pipe/smart/simple/supply/hidden,
 /obj/structure/alien/weeds,
@@ -4797,7 +4794,7 @@
 /area/shuttle/abandoned/engine)
 "UA" = (
 /obj/effect/decal/cleanable/dirt,
-/obj/machinery/light/small/built/directional/east,
+/obj/machinery/light/small/empty/directional/east,
 /obj/structure/alien/weeds/node,
 /turf/open/floor/iron/dark,
 /area/shuttle/abandoned)
@@ -4960,7 +4957,7 @@
 /turf/template_noop,
 /area/shuttle/abandoned)
 "VK" = (
-/obj/machinery/light/small/built/directional/west,
+/obj/machinery/light/small/empty/directional/west,
 /obj/effect/decal/cleanable/dirt,
 /obj/effect/decal/cleanable/dirt,
 /obj/structure/cable,
@@ -5294,7 +5291,7 @@
 	pixel_x = -32
 	},
 /obj/effect/decal/cleanable/dirt,
-/obj/machinery/light/small/built/directional/west,
+/obj/machinery/light/small/empty/directional/west,
 /turf/open/floor/plating,
 /area/shuttle/abandoned/crew)
 "Yo" = (

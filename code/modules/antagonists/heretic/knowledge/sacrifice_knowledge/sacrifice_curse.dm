@@ -43,7 +43,7 @@
 /// If we attack the guy who cursed us, that's no good
 /datum/status_effect/heretic_curse/proc/on_curser_attacked(datum/source, mob/attacker)
 	SIGNAL_HANDLER
-	if (attacker != owner || !HAS_TRAIT(source, TRAIT_ALLOW_HERETIC_CASTING))
+	if (attacker != owner)
 		return
 	log_combat(owner, the_curser, "attacked", addition = "and lost some organs because they had previously been sacrificed by them.")
 	experience_the_consequences()
@@ -51,14 +51,14 @@
 /// If we are attacked by the guy who cursed us, that's also no good
 /datum/status_effect/heretic_curse/proc/on_owner_attacked(datum/source, mob/attacker)
 	SIGNAL_HANDLER
-	if (attacker != the_curser || !HAS_TRAIT(attacker, TRAIT_ALLOW_HERETIC_CASTING))
+	if (attacker != the_curser)
 		return
 	log_combat(the_curser, owner, "attacked", addition = "and as they had previously sacrificed them, removed some of their organs.")
 	experience_the_consequences()
 
 /// Experience something you may not enjoy which may also significantly shorten your lifespan
 /datum/status_effect/heretic_curse/proc/experience_the_consequences()
-	if (!COOLDOWN_FINISHED(src, consequence_cooldown) || owner.stat != CONSCIOUS)
+	if (!COOLDOWN_FINISHED(src, consequence_cooldown) || IS_UNCONSCIOUS_OR_CRIT(owner))
 		return
 
 	var/mob/living/carbon/carbon_owner = owner
@@ -68,15 +68,15 @@
 		return
 
 	var/list/removable_organs = list()
-	for(var/obj/item/organ/internal/bodypart_organ in organ_storage.contents)
-		if(bodypart_organ.organ_flags & ORGAN_UNREMOVABLE)
+	for(var/obj/item/organ/bodypart_organ in organ_storage.contents)
+		if(bodypart_organ.organ_flags & (ORGAN_EXTERNAL|ORGAN_UNREMOVABLE))
 			continue
 		removable_organs += bodypart_organ
 
 	if (!length(removable_organs))
 		return // This one is a little more possible but they're probably already in pretty bad shape by this point
 
-	var/obj/item/organ/internal/removing_organ = pick(removable_organs)
+	var/obj/item/organ/removing_organ = pick(removable_organs)
 
 	if (carbon_owner.vomit(vomit_flags = VOMIT_CATEGORY_BLOOD))
 		carbon_owner.visible_message(span_boldwarning("[carbon_owner] vomits out [carbon_owner.p_their()] [removing_organ]"))

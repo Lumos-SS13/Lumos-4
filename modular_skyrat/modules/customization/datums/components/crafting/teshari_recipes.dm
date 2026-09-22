@@ -39,12 +39,13 @@
 		/obj/item/food/piru_pasta = 1,
 		/obj/item/food/grown/kiri = 1,
 		/obj/item/food/grown/muli = 1,
-		/obj/item/food/grown/carrot = 1,
+		/obj/item/food/grown/carrotlike/carrot = 1,
 	)
 	result = /obj/item/food/sweet_piru_noodles
 	category = CAT_TESHARI
 
 /datum/crafting_recipe/food/kiri_curry
+	added_foodtypes = FRUIT | SUGAR
 	name = "Kiri Curry"
 	reqs = list(
 		/obj/item/reagent_containers/cup/bowl = 1,
@@ -85,7 +86,7 @@
 		/datum/reagent/consumable/muli_juice = 10,
 		/obj/item/food/meat/cutlet = 2,
 		/obj/item/food/grown/cabbage = 1,
-		/obj/item/food/grown/carrot = 1,
+		/obj/item/food/grown/carrotlike/carrot = 1,
 		/datum/reagent/consumable/nakati_spice = 5,
 	)
 	result = /obj/item/food/stewed_muli
@@ -104,6 +105,7 @@
 	category = CAT_TESHARI
 
 /datum/crafting_recipe/food/caramel_jelly_toast
+	added_foodtypes = FRUIT | SUGAR
 	name = "Caramel-jelly Toast"
 	reqs = list(
 		/obj/item/food/breadslice/piru = 1,
@@ -114,6 +116,7 @@
 	category = CAT_TESHARI
 
 /datum/crafting_recipe/food/kiri_jellypuff
+	added_foodtypes = FRUIT | SUGAR
 	name = "Kiri Jellypuff"
 	reqs = list(
 		/obj/item/food/breadslice/piru = 1,

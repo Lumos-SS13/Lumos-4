@@ -150,7 +150,7 @@ Can accept both a type path, and an instance of a datum. Type path has priority.
 /datum/component/trader/proc/check_menu(mob/customer)
 	if(!istype(customer))
 		return FALSE
-	if(IS_DEAD_OR_INCAP(customer) || !customer.Adjacent(parent))
+	if(customer.incapacitated || !customer.Adjacent(parent))
 		return FALSE
 	return TRUE
 
@@ -394,7 +394,7 @@ Can accept both a type path, and an instance of a datum. Type path has priority.
 		else
 			buy_info += span_notice("&bull; [initial(thing.name)] for [product_info[TRADER_PRODUCT_INFO_PRICE]] [trader_data.currency_name][product_info[TRADER_PRODUCT_INFO_PRICE_MOD_DESCRIPTION]]; willing to buy [span_green("[tern_op_result]")]")
 
-	to_chat(customer, examine_block(buy_info.Join("\n")))
+	to_chat(customer, boxed_message(buy_info.Join("\n")))
 
 ///Displays to the customer what the trader is selling and how much is in stock
 /datum/component/trader/proc/trader_sells_what(mob/customer)
@@ -413,7 +413,7 @@ Can accept both a type path, and an instance of a datum. Type path has priority.
 			sell_info += span_notice("&bull; [span_red("(OUT OF STOCK)")] [initial(thing.name)] for [product_info[TRADER_PRODUCT_INFO_PRICE]] [trader_data.currency_name]; [span_red("[tern_op_result]")] left in stock")
 		else
 			sell_info += span_notice("&bull; [initial(thing.name)] for [product_info[TRADER_PRODUCT_INFO_PRICE]] [trader_data.currency_name]; [span_green("[tern_op_result]")] left in stock")
-	to_chat(customer, examine_block(sell_info.Join("\n")))
+	to_chat(customer, boxed_message(sell_info.Join("\n")))
 
 ///Sets quantity of all products to initial(quanity); this proc is currently called during initialize
 /datum/component/trader/proc/restock_products()
@@ -429,7 +429,7 @@ Can accept both a type path, and an instance of a datum. Type path has priority.
 	if(trader.combat_mode)
 		trader.balloon_alert(customer, "in combat!")
 		return FALSE
-	if(IS_DEAD_OR_INCAP(trader))
+	if(trader.incapacitated)
 		trader.balloon_alert(customer, "indisposed!")
 		return FALSE
 	return TRUE

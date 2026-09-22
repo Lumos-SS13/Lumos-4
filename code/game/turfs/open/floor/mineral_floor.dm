@@ -15,7 +15,7 @@
 	material_flags = MATERIAL_EFFECTS
 	rust_resistance = RUST_RESISTANCE_BASIC
 	var/list/icons
-	tiled_dirt = FALSE
+	tiled_turf = FALSE
 
 
 
@@ -155,6 +155,8 @@
 /turf/open/floor/mineral/titanium/tiled/purple/airless
 	initial_gas_mix = AIRLESS_ATMOS
 
+
+
 //PLASTITANIUM (syndieshuttle)
 /turf/open/floor/mineral/plastitanium
 	name = "shuttle floor"
@@ -176,9 +178,30 @@
 /turf/open/floor/mineral/plastitanium/red/airless
 	initial_gas_mix = AIRLESS_ATMOS
 
+/turf/open/floor/mineral/plastitanium/pod
+	name = "pod floor"
+	icon_state = "podfloor"
+	floor_tile = /obj/item/stack/tile/mineral/plastitanium/pod
+
+/turf/open/floor/mineral/plastitanium/pod/light
+	icon_state = "podfloor_light"
+	floor_tile = /obj/item/stack/tile/mineral/plastitanium/pod/light
+
+/turf/open/floor/mineral/plastitanium/pod/dark
+	icon_state = "podfloor_dark"
+	floor_tile = /obj/item/stack/tile/mineral/plastitanium/pod/dark
+
+/turf/open/floor/mineral/plastitanium/pod/redlight
+	icon_state = "podfloor_red_light"
+	floor_tile = /obj/item/stack/tile/mineral/plastitanium/pod/redlight
+
+/turf/open/floor/mineral/plastitanium/pod/red
+	icon_state = "podfloor_red"
+	floor_tile = /obj/item/stack/tile/mineral/plastitanium/pod/red
+
 //Used in SnowCabin.dm
 /turf/open/floor/mineral/plastitanium/red/snow_cabin
-	temperature = 180
+	temperature = ICEBOX_MIN_TEMPERATURE
 
 //BANANIUM
 
@@ -199,7 +222,7 @@
 	if(isliving(arrived))
 		squeak()
 
-/turf/open/floor/mineral/bananium/attackby(obj/item/W, mob/user, params)
+/turf/open/floor/mineral/bananium/attackby(obj/item/W, mob/user, list/modifiers)
 	.=..()
 	if(!.)
 		honk()
@@ -257,7 +280,7 @@
 	if(isliving(arrived))
 		radiate()
 
-/turf/open/floor/mineral/uranium/attackby(obj/item/W, mob/user, params)
+/turf/open/floor/mineral/uranium/attackby(obj/item/W, mob/user, list/modifiers)
 	.=..()
 	if(!.)
 		radiate()

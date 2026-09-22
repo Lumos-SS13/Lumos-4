@@ -4,11 +4,12 @@
 	name = "alien bonesetter"
 	desc = "A reversed engineered bonesetter... <b> This does not look nice to be on the receiving end of... </b>."
 	icon = 'modular_skyrat/modules/filtersandsetters/icons/surgery_tools.dmi'
+	custom_materials = list(/datum/material/iron =SHEET_MATERIAL_AMOUNT, /datum/material/silver =HALF_SHEET_MATERIAL_AMOUNT * 1.5, /datum/material/plasma =SMALL_MATERIAL_AMOUNT*5, /datum/material/titanium =HALF_SHEET_MATERIAL_AMOUNT * 1.5)
 	icon_state = "bonesetter"
 	toolspeed = 0.25
 
 /obj/item/bonesetter/alien/get_all_tool_behaviours()
-    return list(TOOL_BONESET, TOOL_ALIEN_BONESET)
+	return list(TOOL_BONESET, TOOL_ALIEN_BONESET)
 
 /datum/wound/item_can_treat(obj/item/potential_treater, mob/user)
 	. = ..()
@@ -21,6 +22,9 @@
 	treatable_tools = list(TOOL_ALIEN_BONESET)
 
 /datum/wound/blunt/bone/severe/treat(obj/item/I, mob/user)
+	if(!(TOOL_ALIEN_BONESET in I.get_all_tool_behaviours()))
+		return ..()
+
 	var/scanned = HAS_TRAIT(src, TRAIT_WOUND_SCANNED)
 	var/self_penalty_mult = user == victim ? 1.5 : 1
 	var/scanned_mult = scanned ? 0.5 : 1
@@ -50,6 +54,9 @@
 	treatable_tools = list(TOOL_ALIEN_BONESET)
 
 /datum/wound/blunt/bone/critical/treat(obj/item/I, mob/user)
+	if(!(TOOL_ALIEN_BONESET in I.get_all_tool_behaviours()))
+		return ..()
+
 	var/scanned = HAS_TRAIT(src, TRAIT_WOUND_SCANNED)
 	var/self_penalty_mult = user == victim ? 1.5 : 1
 	var/scanned_mult = scanned ? 0.5 : 1
@@ -91,6 +98,7 @@
 	name = "alien bloodfilter"
 	desc = "A reversed engineered bloodfilter... <b> This does not look nice to be on the receiving end of... </b>."
 	icon = 'modular_skyrat/modules/filtersandsetters/icons/surgery_tools.dmi'
+	custom_materials = list(/datum/material/iron =SHEET_MATERIAL_AMOUNT, /datum/material/silver =HALF_SHEET_MATERIAL_AMOUNT * 1.5, /datum/material/plasma =SMALL_MATERIAL_AMOUNT*5, /datum/material/titanium =HALF_SHEET_MATERIAL_AMOUNT * 1.5)
 	icon_state = "bloodfilter"
 	toolspeed = 0.25
 
@@ -117,6 +125,12 @@
 	righthand_file = 'icons/mob/inhands/equipment/medical_righthand.dmi'
 	w_class = WEIGHT_CLASS_NORMAL
 	toolspeed = 0.7
+
+/obj/item/blood_filter/advanced/attack_self_secondary(mob/user)
+	ui_interact(user)
+
+/obj/item/blood_filter/advanced/BorgCtrlClick(mob/user)
+	ui_interact(user)
 
 /obj/item/blood_filter/advanced/get_all_tool_behaviours()
 	return list(TOOL_BLOODFILTER, TOOL_BONESET)
@@ -175,3 +189,4 @@
 	)
 	return ..()
 
+#undef TOOL_ALIEN_BONESET

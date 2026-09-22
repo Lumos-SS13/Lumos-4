@@ -61,7 +61,7 @@
 	. = "<br>Projectile can seek for [get_shot_range()] tiles.<br>"
 	. += "Fire a slow seeking blood bolt at your enemy.<br>"
 	if(level_current >= THAUMATURGY_SHIELD_LEVEL)
-		. += "Right click the button to create a blood shield<br>"
+		. += "Click the button to create a blood shield<br>"
 	if(level_current >= THAUMATURGY_DOOR_BREAK_LEVEL)
 		. += "The projectile will open doors/lockers"
 	if(level_current >= THAUMATURGY_BLOOD_STEAL_LEVEL)
@@ -74,7 +74,7 @@
 	. += "If the Blood blast hits a person, it will deal [get_blood_bolt_damage()] [initial(magic_9ball.damage_type)] damage, and is blocked by [initial(magic_9ball.armor_flag)] armor."
 	. += "You can use Blood blast [get_max_charges()] times before needing to recast Thaumaturgy. After each shot you will have to wait [DisplayTimeText(get_shot_cooldown())]."
 	. += "At level [THAUMATURGY_SHIELD_LEVEL] it will grant you a shield that will block [BLOOD_SHIELD_BLOCK_CHANCE]% of incoming damage, costing you [THAUMATURGY_BLOOD_COST_PER_CHARGE] blood each time."
-	. += "To activate the shield, right click the action button."
+	. += "To activate the shield, simply click the action button. You can then fire projectiles by rightclicking."
 	. += "At level [THAUMATURGY_DOOR_BREAK_LEVEL], it will also break open lockers and doors."
 	. += "At level [THAUMATURGY_BLOOD_STEAL_LEVEL], it will also steal blood to feed yourself, just as much as each charge costs."
 	. += "The cooldown increases by [DisplayTimeText(THAUMATURGY_COOLDOWN_PER_CHARGE)] per charge used, and each blast costs [THAUMATURGY_BLOOD_COST_PER_CHARGE] blood."
@@ -95,7 +95,7 @@
 	if(blood_shield)
 		var/shield = blood_shield?.resolve()
 		owner.visible_message(
-			span_warning("[owner]\'s [blood_shield] looses it's form and dissapears into [src]'\s hands "),
+			span_warning("[owner]\'s [blood_shield] loses its form and disappears into [owner.p_their()] hands "),
 			span_warning("We unform our Blood shield!"),
 			span_hear("You hear liquids sloshing around."),
 		)
@@ -188,11 +188,11 @@
 	magic_9ball.power_ref = WEAKREF(src)
 	magic_9ball.damage = get_blood_bolt_damage()
 	magic_9ball.def_zone = ran_zone(user.zone_selected, min(level_current * 10, 90))
-	magic_9ball.preparePixelProjectile(target, user)
+	magic_9ball.aim_projectile(target, user)
 	// autotarget if we aim at a turf
 	if(isturf(target))
 		var/list/targets = list()
-		for(var/mob/living/possible_target as anything in orange(1, target))
+		for(var/mob/living/possible_target in orange(1, target))
 			if(!ismob(possible_target))
 				continue
 			var/datum/antagonist/ghoul/ghoul = IS_GHOUL(possible_target)
@@ -219,8 +219,7 @@
 	damage = 1
 	wound_bonus = 20
 	armour_penetration = 30
-	speed = 1
-	pixel_speed_multiplier = 0.6
+	speed = 0.6
 	impact_effect_type = /obj/effect/temp_visual/impact_effect/red_laser
 	range = 30
 	armor_flag = LASER
@@ -268,7 +267,7 @@
 	righthand_file = 'modular_zubbers/icons/mob/inhands/weapons/bloodsucker_righthand.dmi'
 	block_chance = BLOOD_SHIELD_BLOCK_CHANCE
 
-/obj/item/shield/bloodsucker/Initialize()
+/obj/item/shield/bloodsucker/Initialize(mapload)
 	. = ..()
 	ADD_TRAIT(src, TRAIT_NODROP, BLOODSUCKER_TRAIT)
 
@@ -286,3 +285,4 @@
 #undef THAUMATURGY_SHIELD_LEVEL
 #undef THAUMATURGY_DOOR_BREAK_LEVEL
 #undef THAUMATURGY_BLOOD_STEAL_LEVEL
+#undef THAUMATURGY_EXTRA_DAMAGE_LEVEL

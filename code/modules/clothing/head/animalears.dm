@@ -3,14 +3,14 @@
 	desc = "A pair of kitty ears. Meow!"
 	icon_state = "kitty"
 	color = "#999999"
-
+	clothing_traits = list(TRAIT_CAT_EMOTES_ALLOWED)
 	dog_fashion = /datum/dog_fashion/head/kitty
 
 /obj/item/clothing/head/costume/kitty/visual_equipped(mob/living/carbon/human/user, slot)
 	if(ishuman(user) && (slot & ITEM_SLOT_HEAD))
 		update_icon(ALL, user)
 		user.update_worn_head() //Color might have been changed by update_appearance.
-	..()
+	return ..()
 
 /obj/item/clothing/head/costume/kitty/update_icon(updates=ALL, mob/living/carbon/human/user)
 	. = ..()

@@ -16,7 +16,7 @@
 						continue
 					if(G.is_hidden(src))
 						continue
-					var/obj/item/organ/external/genital/ORG = get_organ_slot(G.associated_organ_slot)
+					var/obj/item/organ/genital/ORG = get_organ_slot(G.associated_organ_slot)
 					if(!ORG)
 						continue
 					line += ORG.get_description_string(G)
@@ -71,12 +71,11 @@
 /mob/living/carbon/human/species/skrell
 	race = /datum/species/skrell
 
-/mob/living/carbon/human/verb/toggle_undies()
-	set category = "IC"
-	set name = "Toggle underwear visibility"
-	set desc = "Allows you to toggle which underwear should show or be hidden. Underwear will obscure genitals."
+/mob/living/carbon/human/species/serpentid
+	race = /datum/species/gas
 
-	if(stat != CONSCIOUS)
+GAME_VERB_DESC(/mob/living/carbon/human, toggle_undies, "Toggle underwear visibility", "Allows you to toggle which underwear should show or be hidden. Underwear will obscure genitals.", "IC")
+	if(IS_UNCONSCIOUS_OR_CRIT(src))
 		to_chat(usr, span_warning("You can't toggle underwear visibility right now..."))
 		return
 
@@ -102,6 +101,7 @@
 			if("hide")
 				underwear_visibility = UNDERWEAR_HIDE_UNDIES | UNDERWEAR_HIDE_SHIRT | UNDERWEAR_HIDE_SOCKS | UNDERWEAR_HIDE_BRA
 		update_body()
+		SEND_SIGNAL(src, COMSIG_HUMAN_TOGGLE_UNDERWEAR, picked_choice)
 	return
 
 /mob/living/carbon/human/revive(full_heal_flags = NONE, excess_healing = 0, force_grab_ghost = FALSE)
@@ -110,11 +110,7 @@
 		if(dna && dna.species)
 			dna.species.spec_revival(src)
 
-/mob/living/carbon/human/verb/toggle_mutant_part_visibility()
-	set category = "IC"
-	set name = "Show/Hide Mutant Parts"
-	set desc = "Allows you to choose to try and hide your mutant bodyparts under your clothes."
-
+GAME_VERB_DESC(/mob/living/carbon/human, toggle_mutant_part_visibility, "Show/Hide Mutant Parts", "Allows you to choose to try and hide your mutant bodyparts under your clothes.", "IC")
 	mutant_part_visibility()
 
 /mob/living/carbon/human/proc/mutant_part_visibility(quick_toggle, re_do)
@@ -133,7 +129,7 @@
 	)
 
 	// Stat check
-	if(stat != CONSCIOUS)
+	if(IS_UNCONSCIOUS_OR_CRIT(usr))
 		to_chat(usr, span_warning("You can't do this right now..."))
 		return
 
@@ -168,12 +164,12 @@
 	var/list/choices = list()
 	for(var/choice in available_selection)
 		var/datum/radial_menu_choice/option = new
-		var/image/part_image = image(icon = HIDING_RADIAL_DMI, icon_state = initial(choice))
+		var/image/part_image = image(icon = HIDING_RADIAL_DMI, icon_state = choice)
 
 		option.image = part_image
 		if(choice in try_hide_mutant_parts)
 			part_image.underlays += image(icon = HIDING_RADIAL_DMI, icon_state = "module_unable")
-		choices[initial(choice)] = option
+		choices[choice] = option
 	// Radial choices
 	sort_list(choices)
 	var/pick = show_radial_menu(usr, src, choices, custom_check = FALSE, tooltips = TRUE)
@@ -197,17 +193,12 @@
 	// automatically re-do the menu after making a selection
 	mutant_part_visibility(re_do = TRUE)
 
-
 // Feign impairment verb
 #define DEFAULT_TIME 30
 #define MAX_TIME 36000 // 10 hours
 
-/mob/living/carbon/human/verb/acting()
-	set category = "IC"
-	set name = "Feign Impairment"
-	set desc = "Pretend to be impaired for a defined duration."
-
-	if(stat != CONSCIOUS)
+GAME_VERB_DESC(/mob/living/carbon/human, acting, "Feign Impairment", "Pretend to be impaired for a defined duration.", "IC")
+	if(IS_UNCONSCIOUS_OR_CRIT(usr))
 		to_chat(usr, span_warning("You can't do this right now..."))
 		return
 

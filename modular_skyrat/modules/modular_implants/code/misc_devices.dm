@@ -7,13 +7,18 @@
 	to invent their own devices. This one is a 'Wrangler' model NIF-Cutter, used for crudely wiping programs directly off a user's Framework."
 	icon = 'modular_skyrat/modules/modular_implants/icons/obj/devices.dmi'
 	icon_state = "nifsoft_remover"
+	custom_materials = list(
+		/datum/material/silver = HALF_SHEET_MATERIAL_AMOUNT,
+		/datum/material/uranium = HALF_SHEET_MATERIAL_AMOUNT,
+		/datum/material/iron = SMALL_MATERIAL_AMOUNT
+		)
 
 	///Is a disk with the corresponding NIFSoft created when said NIFSoft is removed?
 	var/create_disk = FALSE
 
 /obj/item/nifsoft_remover/attack(mob/living/carbon/human/target_mob, mob/living/user)
 	. = ..()
-	var/obj/item/organ/internal/cyberimp/brain/nif/target_nif = target_mob.get_organ_by_type(/obj/item/organ/internal/cyberimp/brain/nif)
+	var/obj/item/organ/cyberimp/brain/nif/target_nif = target_mob.get_organ_by_type(/obj/item/organ/cyberimp/brain/nif)
 
 	if(!target_nif || !length(target_nif.loaded_nifsofts))
 		balloon_alert(user, "[target_mob] has no NIFSofts!")
@@ -55,12 +60,6 @@
 	icon_state = "nifsoft_remover_syndie"
 	create_disk = TRUE
 
-/datum/uplink_item/device_tools/nifsoft_remover
-	name = "Cybersun 'Scalpel' NIF-Cutter"
-	desc = "A modified version of a NIFSoft remover that allows the user to remove a NIFSoft and have a blank copy of the removed NIFSoft saved to a disk."
-	item = /obj/item/nifsoft_remover/syndie
-	cost = 3
-
 ///NIF Repair Kit.
 /obj/item/nif_repair_kit
 	name = "Cerulean NIF Regenerator"
@@ -80,7 +79,7 @@
 /obj/item/nif_repair_kit/attack(mob/living/carbon/human/mob_to_repair, mob/living/user)
 	. = ..()
 
-	var/obj/item/organ/internal/cyberimp/brain/nif/installed_nif = mob_to_repair.get_organ_by_type(/obj/item/organ/internal/cyberimp/brain/nif)
+	var/obj/item/organ/cyberimp/brain/nif/installed_nif = mob_to_repair.get_organ_by_type(/obj/item/organ/cyberimp/brain/nif)
 	if(!installed_nif)
 		balloon_alert(user, "[mob_to_repair] lacks a NIF")
 

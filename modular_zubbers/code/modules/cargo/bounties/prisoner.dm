@@ -16,14 +16,14 @@
 	name = "Monkey Hide"
 	description = "One of the scientists at CentCom is interested in testing products on monkey skin. Your mission is to acquire monkey's hide and ship it."
 	reward = CARGO_CRATE_VALUE * 3
-	wanted_types = list(/obj/item/stack/sheet/animalhide/monkey = TRUE)
+	wanted_types = list(/obj/item/stack/sheet/animalhide/carbon/monkey = TRUE)
 
 /datum/bounty/item/prisoner/poppy
 	name = "Poppies"
 	description = "Stop asking questions, send the poppies, get paid. INMATE!"
 	reward = CARGO_CRATE_VALUE * 2
 	required_count = 3
-	wanted_types = list(/obj/item/food/grown/poppy = TRUE)
+	wanted_types = list(/obj/item/food/grown/flower/poppy = TRUE)
 	include_subtypes = FALSE
 
 /datum/bounty/item/prisoner/lilly
@@ -31,7 +31,7 @@
 	description = "Stop asking questions, send the lillies, get paid. INMATE!"
 	reward = CARGO_CRATE_VALUE * 3
 	required_count = 3
-	wanted_types = list(/obj/item/food/grown/poppy/lily = TRUE)
+	wanted_types = list(/obj/item/food/grown/flower/poppy/lily = TRUE)
 	include_subtypes = FALSE
 
 /datum/bounty/item/prisoner/geranium
@@ -39,7 +39,7 @@
 	description = "Stop asking questions, send the geraniums, get paid. INMATE!"
 	reward = CARGO_CRATE_VALUE * 3
 	required_count = 3
-	wanted_types = list(/obj/item/food/grown/poppy/geranium = TRUE)
+	wanted_types = list(/obj/item/food/grown/flower/poppy/geranium = TRUE)
 	include_subtypes = FALSE
 
 /datum/bounty/item/prisoner/tomatoes
@@ -55,7 +55,7 @@
 	description = "Stop asking questions, send the carrots, get paid. INMATE!"
 	reward = CARGO_CRATE_VALUE * 3
 	required_count = 5
-	wanted_types = list(/obj/item/food/grown/carrot = TRUE)
+	wanted_types = list(/obj/item/food/grown/carrotlike/carrot = TRUE)
 	include_subtypes = FALSE
 
 /datum/bounty/item/prisoner/onion

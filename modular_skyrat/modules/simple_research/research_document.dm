@@ -11,7 +11,7 @@
 /obj/item/research_paper
 	name = "research paper"
 	desc = "Some people want to return to simpler technology, and some want to only begin researching those simple technologies."
-	icon = 'modular_skyrat/modules/simple_research/researching.dmi'
+	icon = 'modular_skyrat/modules/simple_research/icons/researching.dmi'
 	icon_state = "scroll"
 	///the list of discovered items
 	var/list/discovered_items = list()
@@ -39,9 +39,9 @@
 			GLOB.simple_research += list("[shape_pattern]" = datum_path)
 
 	radial_icons_cache = list(
-		"pyramid" = image(icon = 'modular_skyrat/modules/simple_research/researching.dmi', icon_state = "pyramid"),
-		"cube" = image(icon = 'modular_skyrat/modules/simple_research/researching.dmi', icon_state = "cube"),
-		"sphere" = image(icon = 'modular_skyrat/modules/simple_research/researching.dmi', icon_state = "sphere"),
+		"pyramid" = image(icon = 'modular_skyrat/modules/simple_research/icons/researching.dmi', icon_state = "pyramid"),
+		"cube" = image(icon = 'modular_skyrat/modules/simple_research/icons/researching.dmi', icon_state = "cube"),
+		"sphere" = image(icon = 'modular_skyrat/modules/simple_research/icons/researching.dmi', icon_state = "sphere"),
 	)
 
 /obj/item/research_paper/attack_self(mob/user, modifiers)
@@ -53,7 +53,7 @@
 		to_chat(user, span_warning("You stopped researching."))
 		return
 
-	user.mind.adjust_experience(/datum/skill/research, 5)
+	user.mind?.adjust_experience(/datum/skill/research, 5)
 
 	var/shape_two = show_radial_menu(user, src, radial_icons_cache, require_near = TRUE)
 	to_chat(user, span_notice("You begin to [pick(thinking_list)] about the [shape_two]... and then [pick(thinking_list)] about their [pick(shape_parts)]..."))
@@ -61,7 +61,7 @@
 		to_chat(user, span_warning("You stopped researching."))
 		return
 
-	user.mind.adjust_experience(/datum/skill/research, 5)
+	user.mind?.adjust_experience(/datum/skill/research, 5)
 
 	var/shape_three = show_radial_menu(user, src, radial_icons_cache, require_near = TRUE)
 	to_chat(user, span_notice("You begin to [pick(thinking_list)] about the [shape_three]... and then [pick(thinking_list)] about their [pick(shape_parts)]..."))
@@ -69,7 +69,7 @@
 		to_chat(user, span_warning("You stopped researching."))
 		return
 
-	user.mind.adjust_experience(/datum/skill/research, 5)
+	user.mind?.adjust_experience(/datum/skill/research, 5)
 
 	var/datum/simple_research/find_research = GLOB.simple_research["[shape_one][shape_two][shape_three]"]
 	if(!find_research)
@@ -99,13 +99,13 @@
 	else
 		spawned_scrap.spawning_item = find_research.research_item
 
-	user.mind.adjust_experience(/datum/skill/research, 10)
+	user.mind?.adjust_experience(/datum/skill/research, 10)
 	qdel(find_research)
 
 /obj/item/research_scrap
 	name = "research scrap"
 	desc = "Small sketches of an item are drawn on the scrap-- if you use the materials, you might be able to craft the item on the scrap!"
-	icon = 'modular_skyrat/modules/simple_research/researching.dmi'
+	icon = 'modular_skyrat/modules/simple_research/icons/researching.dmi'
 	icon_state = "scrap"
 	///what will be spawned
 	var/obj/spawning_item
@@ -142,5 +142,5 @@
 	if(material_satisfied[1] && material_satisfied[2])
 		new spawning_item(get_turf(src))
 		to_chat(user, span_notice("You completed [src]."))
-		user.mind.adjust_experience(/datum/skill/research, 5)
+		user.mind?.adjust_experience(/datum/skill/research, 5)
 		qdel(src)

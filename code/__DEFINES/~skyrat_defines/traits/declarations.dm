@@ -13,7 +13,6 @@ Remember to update _globalvars/traits.dm if you're adding/removing/renaming trai
 #define TRAIT_NO_HUSK "no_husk"
 #define TRAIT_NORUNNING "norunning" // You walk!
 #define TRAIT_EXCITABLE "wagwag" //Will wag when patted!
-#define TRAIT_OXYIMMUNE	"oxyimmune" // Immune to oxygen damage, ideally give this to all non-breathing species or bad stuff will happen
 #define TRAIT_AFFECTION_AVERSION "affection_aversion" // No more dogborg licking. "Dogborg bad" is no longer a personality
 #define TRAIT_PERSONALSPACE "personalspace" // Block/counter-attack ass-slaps
 #define TRAIT_QUICKREFLEXES "quickreflexes" // Counters hugs and headpats
@@ -49,9 +48,6 @@ Remember to update _globalvars/traits.dm if you're adding/removing/renaming trai
 // Trait sources
 #define TRAIT_GHOSTROLE "ghostrole" // SKYRAT EDIT ADDITION -- Ghost Cafe Traits
 
-/// One can breath under water, you get me?
-#define TRAIT_WATER_BREATHING "water_breathing"
-
 /// Trait to assign to pets who've already had a space treat to prevent double-feeding
 #define TRAIT_PET_SPACE_TREAT "space_pet_treat"
 
@@ -72,6 +68,12 @@ Remember to update _globalvars/traits.dm if you're adding/removing/renaming trai
 
 // avian traits
 #define TRAIT_AVIAN "avian_aspect"
+
+// bovine traits
+#define TRAIT_BOVINE "bovine_aspect"
+
+// mouse traits
+#define TRAIT_MURIDAE "mouse_aspect"
 
 // chameleon mutation
 #define TRAIT_CHAMELEON_SKIN "chameleon_skin"
@@ -138,10 +140,16 @@ Remember to update _globalvars/traits.dm if you're adding/removing/renaming trai
 #define TRAIT_R_WIDE "wide_borg"
 /// 32x64 skins
 #define TRAIT_R_TALL "tall_borg"
+// 64x64 skins (Only affects dragons currently)
+#define TRAIT_R_BIG "big_borg"
 /// Any model small enough to reject the shrinker upgrade.
 #define TRAIT_R_SMALL "small_chassis"
 /// Any model that has a custom front panel
 #define TRAIT_R_UNIQUEPANEL "unique_openpanel"
+/// Any model that has unique lights while resting
+#define TRAIT_R_HAS_UNIQUE_RESTING_LIGHTS "has_unique_resting_lights"
+/// Any model that cannot use a borg expander
+#define TRAIT_R_EXPANDER_BLOCKED "expander_blocked"
 
 // Lewd traits
 #define TRAIT_MASOCHISM "masochism"

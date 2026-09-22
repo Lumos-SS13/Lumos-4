@@ -118,7 +118,10 @@
 	if(paintleft <= 0)
 		return NONE
 	paintleft--
-	interacting_with.add_atom_colour(paint_color, WASHABLE_COLOUR_PRIORITY)
+	var/color_type = SATURATION_MULTIPLY
+	if (LAZYACCESS(modifiers, RIGHT_CLICK))
+		color_type = SATURATION_OVERRIDE
+	interacting_with.add_atom_colour(color_transition_filter(paint_color, color_type), WASHABLE_COLOUR_PRIORITY)
 	if(paintleft <= 0)
 		icon_state = "paint_empty"
 	return ITEM_INTERACT_SUCCESS
@@ -128,6 +131,7 @@
 	name = "paint remover"
 	desc = "Used to remove color from anything."
 	icon_state = "paint_neutral"
+	custom_materials = list(/datum/material/iron = HALF_SHEET_MATERIAL_AMOUNT)
 
 /obj/item/paint/paint_remover/interact_with_atom(atom/interacting_with, mob/living/user, list/modifiers)
 	if(!isturf(interacting_with) || !isobj(interacting_with))

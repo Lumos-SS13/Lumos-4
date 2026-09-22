@@ -22,6 +22,12 @@
 	/// Are we taking damage?
 	var/life_support_failed = FALSE
 
+/datum/quirk/equipping/entombed/add(client/client_source)
+	if(modsuit) return
+	modsuit = quirk_holder.get_item_by_slot(ITEM_SLOT_BACK)
+	if(!istype(modsuit))
+		modsuit = null
+
 /datum/quirk/equipping/entombed/process(seconds_per_tick)
 	var/mob/living/carbon/human/human_holder = quirk_holder
 	if(human_holder.stat == DEAD)
@@ -29,9 +35,11 @@
 		// This also helps for when the modsuit is out of power, as (to my awareness), there is no way currently to turn on someone else's entombed modsuit.
 		return
 	if (!modsuit || life_support_failed)
-		// we've got no modsuit or life support. take damage ow
-		human_holder.adjustToxLoss(ENTOMBED_TICK_DAMAGE * seconds_per_tick, updating_health = TRUE, forced = TRUE)
-		human_holder.set_jitter_if_lower(10 SECONDS)
+		if (!HAS_TRAIT(human_holder, TRAIT_STASIS))
+			// we've got no modsuit or life support and we're not on stasis. take damage ow
+			human_holder.adjust_tox_loss(ENTOMBED_TICK_DAMAGE * seconds_per_tick, updating_health = TRUE, forced = TRUE)
+			human_holder.set_jitter_if_lower(10 SECONDS)
+			return
 
 	if (!modsuit.active)
 		if (!life_support_timer)
@@ -58,7 +66,7 @@
 	var/mob/living/carbon/human/human_holder = quirk_holder
 
 	human_holder.visible_message(span_danger("[human_holder] suddenly staggers, a dire pallor overtaking [human_holder.p_their()] features as a feeble 'breep' emanates from their suit..."), span_userdanger("Terror descends as your suit's life support system breeps feebly, and then goes horrifyingly silent."))
-	human_holder.balloon_alert(human_holder, "SUIT LIFE SUPPORT FAILING!")
+	human_holder.balloon_alert(human_holder, UNLINT("SUIT LIFE SUPPORT FAILING!"))
 	playsound(human_holder, 'sound/effects/alert.ogg', 25, TRUE, SILENCED_SOUND_EXTRARANGE) // OH GOD THE STRESS NOISE
 	life_support_failed = TRUE
 
@@ -84,11 +92,29 @@
 
 	// set all of our customization stuff from prefs, if we have it
 	var/modsuit_skin = client_source?.prefs.read_preference(/datum/preference/choiced/entombed_skin)
+	var/modsuit_hardlight = client_source?.prefs.read_preference(/datum/preference/choiced/entombed_hardlight_theme)
 
 	if (modsuit_skin == NONE)
 		modsuit_skin = "civilian"
 
-	modsuit.skin = lowertext(modsuit_skin)
+	modsuit.skin = LOWER_TEXT(modsuit_skin)
+
+	var/static/list/hardlight_display_names = list(
+		"Standard Blue" = STANDARD_BLUE,
+		"Alert Amber" = ALERT_AMBER,
+		"Contractor Red" = CONTRACTOR_RED,
+		"Extrashield Green" = EXTRASHIELD_GREEN,
+		"Evil Green" = EVIL_GREEN,
+		"Royal Purple" = ROYAL_PURPLE,
+		"Hazard Orange" = HAZARD_ORANGE,
+		"Cosmic Blue" = COSMIC_BLUE,
+	)
+
+	// themes are shared singletons, so the choice goes on this suit only
+	if (modsuit_hardlight != NONE)
+		modsuit.hardlight_color_override = hardlight_display_names[modsuit_hardlight]
+
+	add_unique_skin()
 
 	var/modsuit_name = client_source?.prefs.read_preference(/datum/preference/text/entombed_mod_name)
 	if (modsuit_name)
@@ -100,7 +126,7 @@
 
 	var/modsuit_skin_prefix = client_source?.prefs.read_preference(/datum/preference/text/entombed_mod_prefix)
 	if (modsuit_skin_prefix)
-		modsuit.theme.name = lowertext(modsuit_skin_prefix)
+		modsuit.theme.name = LOWER_TEXT(modsuit_skin_prefix)
 
 	// ensure we're applying our config theme changes, just in case
 	for(var/obj/item/part as anything in modsuit.get_parts())
@@ -113,7 +139,23 @@
 	if (force_dropped_items)
 		var/obj/item/old_bag = locate() in force_dropped_items
 		if (old_bag.atom_storage)
-			old_bag.atom_storage.dump_content_at(modsuit, human_holder)
+			old_bag.atom_storage.dump_content_at(modsuit, modsuit.get_dumping_location(), human_holder)
+
+/datum/quirk/equipping/entombed/proc/add_unique_skin() // Let's all agree: this is snowflakey. But I just want entombed players not to complain, sue me.
+	var/skin_override
+	var/mob_override
+	var/list/parts = modsuit.get_parts()
+	if (modsuit.skin == "lustwish")
+		skin_override = 'modular_zubbers/icons/obj/clothing/modsuit/mod_lustwish.dmi'
+		mob_override = 'modular_zubbers/icons/mob/clothing/modsuit/mod_lustwish.dmi'
+
+	if(isnull(skin_override) || isnull(mob_override))
+		return
+
+	for(var/obj/item/part as anything in parts + modsuit)
+		part.icon = skin_override
+		part.worn_icon = mob_override
+		modsuit.wearer?.update_clothing(part.slot_flags)
 
 /datum/quirk/equipping/entombed/post_add()
 	. = ..()
@@ -121,6 +163,8 @@
 	modsuit.quick_activation()
 
 /datum/quirk/equipping/entombed/remove()
+	if(!cleanup)
+		return
 	var/mob/living/carbon/human/human_holder = quirk_holder
 	if (deploy_locked && HAS_TRAIT_FROM(human_holder, TRAIT_NODISMEMBER, QUIRK_TRAIT))
 		REMOVE_TRAIT(human_holder, TRAIT_NODISMEMBER, QUIRK_TRAIT)
@@ -142,6 +186,7 @@
 	associated_typepath = /datum/quirk/equipping/entombed
 	customization_options = list(
 		/datum/preference/choiced/entombed_skin,
+		/datum/preference/choiced/entombed_hardlight_theme,
 		/datum/preference/text/entombed_mod_desc,
 		/datum/preference/text/entombed_mod_name,
 		/datum/preference/text/entombed_mod_prefix,
@@ -169,6 +214,34 @@
 		"Mining",
 		"Prototype",
 		"Security",
+		"Lustwish"
+	)
+
+/datum/preference/choiced/entombed_hardlight_theme
+	category = PREFERENCE_CATEGORY_MANUALLY_RENDERED
+	savefile_key = "entombed_hardlight_theme"
+	savefile_identifier = PREFERENCE_CHARACTER
+	can_randomize = FALSE
+
+/datum/preference/choiced/entombed_hardlight_theme/apply_to_human(mob/living/carbon/human/target, value)
+	return
+
+/datum/preference/choiced/entombed_hardlight_theme/is_accessible(datum/preferences/preferences)
+	if (!..())
+		return FALSE
+
+	return "Entombed" in preferences.all_quirks
+
+/datum/preference/choiced/entombed_hardlight_theme/init_possible_values()
+	return list(
+		"Standard Blue",
+		"Alert Amber",
+		"Contractor Red",
+		"Extrashield Green",
+		"Evil Green",
+		"Royal Purple",
+		"Hazard Orange",
+		"Cosmic Blue",
 	)
 
 /datum/preference/choiced/entombed_skin/create_default_value()

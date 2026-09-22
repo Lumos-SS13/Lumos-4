@@ -65,10 +65,6 @@
 *	NECKTIES
 */
 
-/datum/loadout_item/neck/bowtie_black
-	name = "Black Bowtie"
-	item_path = /obj/item/clothing/neck/bowtie
-
 /datum/loadout_item/neck/necktie_black
 	name = "Black Necktie"
 	item_path = /obj/item/clothing/neck/tie/black
@@ -248,10 +244,6 @@
 /datum/loadout_item/neck/stethoscope
 	name = "Stethoscope"
 	item_path = /obj/item/clothing/neck/stethoscope
-
-/datum/loadout_item/neck/maid
-	name = "Maid Neck Cover"
-	item_path = /obj/item/clothing/neck/maid
 
 /*
 *	DONATOR

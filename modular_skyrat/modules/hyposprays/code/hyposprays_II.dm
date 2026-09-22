@@ -18,11 +18,16 @@
 
 /obj/item/hypospray/mkii
 	name = "hypospray Mk.II"
+	icon = 'modular_skyrat/modules/hyposprays/icons/hypokits.dmi'
 	icon_state = "hypo2"
-	icon = 'modular_skyrat/modules/hyposprays/icons/hyposprays.dmi'
 	greyscale_config = /datum/greyscale_config/hypospray_mkii
 	desc = "A new development from DeForest Medical, this hypospray takes 50-unit vials as the drug supply for easy swapping."
 	w_class = WEIGHT_CLASS_TINY
+	custom_materials = list(
+		/datum/material/plastic = SHEET_MATERIAL_AMOUNT * 5,
+		/datum/material/glass = SHEET_MATERIAL_AMOUNT * 3,
+		/datum/material/silver = SHEET_MATERIAL_AMOUNT,
+	)
 	var/list/allowed_containers = list(/obj/item/reagent_containers/cup/vial/small)
 	/// Is the hypospray only able to use small vials. Relates to the loaded overlays
 	var/small_only = TRUE
@@ -46,6 +51,8 @@
 	var/penetrates = null
 	/// Used for GAGS-ified hypos.
 	var/gags_bodystate = "hypo2_normal"
+	/// The original icon file where our overlays reside.
+	var/original_icon = 'modular_skyrat/modules/hyposprays/icons/hypokits.dmi'
 
 /obj/item/hypospray/mkii/combat
 	name = "hypospray Mk.II combat"
@@ -70,14 +77,15 @@
 	penetrates = INJECT_CHECK_PENETRATE_THICK
 
 // Deluxe hypo upgrade Kit
-/obj/item/device/custom_kit/deluxe_hypo2
+/obj/item/custom_kit/deluxe_hypo2
 	name = "hypospray Mk. II deluxe bodykit"
 	desc = "Upgrades the DeForest Hypospray Mk. II to support larger vials."
 	// don't tinker with a loaded (medi)gun. fool
 	from_obj = /obj/item/hypospray/mkii
 	to_obj = /obj/item/hypospray/mkii/deluxe
+	custom_materials = list(/datum/material/plastic = SHEET_MATERIAL_AMOUNT * 8)
 
-/obj/item/device/custom_kit/deluxe_hypo2/pre_convert_check(obj/target_obj, mob/user)
+/obj/item/custom_kit/deluxe_hypo2/pre_convert_check(obj/target_obj, mob/user)
 	var/obj/item/hypospray/mkii/our_hypo = target_obj
 	if(our_hypo.type in subtypesof(/obj/item/hypospray/mkii/))
 		balloon_alert(user, "only works on basic mk. ii hypos!")
@@ -138,17 +146,17 @@
 			vial_spritetype += "[vial.type_suffix]"
 		else
 			vial_spritetype += "-s"
-		var/mutable_appearance/chem_loaded = mutable_appearance(initial(icon), vial_spritetype)
+		var/mutable_appearance/chem_loaded = mutable_appearance(original_icon, vial_spritetype)
 		chem_loaded.color = vial.chem_color
 		. += chem_loaded
 	if(vial.greyscale_colors != null)
-		var/mutable_appearance/vial_overlay = mutable_appearance(initial(icon), "[vial.icon_state]-body")
+		var/mutable_appearance/vial_overlay = mutable_appearance(original_icon, "[vial.icon_state]-body")
 		vial_overlay.color = vial.greyscale_colors
 		. += vial_overlay
-		var/mutable_appearance/vial_overlay_glass = mutable_appearance(initial(icon), "[vial.icon_state]-glass")
+		var/mutable_appearance/vial_overlay_glass = mutable_appearance(original_icon, "[vial.icon_state]-glass")
 		. += vial_overlay_glass
 	else
-		var/mutable_appearance/vial_overlay = mutable_appearance(initial(icon), vial.icon_state)
+		var/mutable_appearance/vial_overlay = mutable_appearance(original_icon, vial.icon_state)
 		. += vial_overlay
 
 /obj/item/hypospray/mkii/examine(mob/user)
@@ -175,7 +183,7 @@
 		menu.ui_interact(usr)
 	else
 		icon_state = initial(icon_state)
-		icon = initial(icon)
+		icon = original_icon
 		greyscale_colors = null
 
 /obj/item/hypospray/mkii/proc/unload_hypo(obj/item/hypo, mob/user)

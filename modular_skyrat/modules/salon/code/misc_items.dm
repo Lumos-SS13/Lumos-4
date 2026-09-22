@@ -12,47 +12,15 @@
 /obj/item/lipstick/quantum
 	name = "quantum lipstick"
 
-/obj/item/lipstick/quantum/attack(mob/attacked_mob, mob/user)
-	if(!open || !ismob(attacked_mob))
-		return
-
-	if(!ishuman(attacked_mob))
-		to_chat(user, span_warning("Where are the lips on that?"))
-		return
-
-	INVOKE_ASYNC(src, PROC_REF(async_set_color), attacked_mob, user)
-
-/obj/item/lipstick/quantum/proc/async_set_color(mob/attacked_mob, mob/user)
-	// BUBBERSTATION EDIT START: TGUI COLOR PICKER
-	var/new_color = tgui_color_picker(
-			user,
-			"Select lipstick color",
-			null,
-			COLOR_WHITE,
-		)
-	// BUBBERSTATION EDIT END: TGUI COLOR PICKER
-
-	var/mob/living/carbon/human/target = attacked_mob
-	if(target.is_mouth_covered())
-		to_chat(user, span_warning("Remove [ target == user ? "your" : "[target.p_their()]" ] mask!"))
-		return
-	if(target.lip_style) //if they already have lipstick on
-		to_chat(user, span_warning("You need to wipe off the old lipstick first!"))
-		return
-
-	if(target == user)
-		user.visible_message(span_notice("[user] does [user.p_their()] lips with \the [src]."), \
-			span_notice("You take a moment to apply \the [src]. Perfect!"))
-		target.update_lips("lipstick", new_color, lipstick_trait)
-		return
-
-	user.visible_message(span_warning("[user] begins to do [target]'s lips with \the [src]."), \
-		span_notice("You begin to apply \the [src] on [target]'s lips..."))
-	if(!do_after(user, 2 SECONDS, target = target))
-		return
-	user.visible_message(span_notice("[user] does [target]'s lips with \the [src]."), \
-		span_notice("You apply \the [src] on [target]'s lips."))
-	target.update_lips("lipstick", new_color, lipstick_trait)
+/obj/item/lipstick/quantum/display_radial_menu(mob/living/carbon/human/user)
+	lipstick_color = tgui_color_picker(
+		user,
+		"Select lipstick color",
+		null,
+		COLOR_WHITE,
+	)
+	update_appearance()
+	. = ..()
 
 /obj/item/hairbrush/comb
 	name = "comb"
@@ -78,8 +46,10 @@
 	desc = "The latest and greatest power razor born from the science of shaving."
 	icon = 'modular_skyrat/modules/salon/icons/items.dmi'
 	icon_state = "razor"
+	inhand_icon_state = null
 	obj_flags = CONDUCTS_ELECTRICITY
 	w_class = WEIGHT_CLASS_TINY
+	sound_vary = FALSE
 	// How long do we take to shave someone's (facial) hair?
 	var/shaving_time = 5 SECONDS
 
@@ -120,8 +90,9 @@
 			to_chat(user, span_warning("There is no facial hair to shave!"))
 			return
 
-		if(!get_location_accessible(target_human, location))
-			to_chat(user, span_warning("The mask is in the way!"))
+		var/covering = target_human.is_mouth_covered()
+		if(covering)
+			to_chat(user, span_warning("[covering] is in the way!"))
 			return
 
 		if(HAS_TRAIT(target_human, TRAIT_SHAVED))
@@ -147,7 +118,7 @@
 			to_chat(user, span_warning("There is no hair to shave!"))
 			return
 
-		if(!get_location_accessible(target_human, location))
+		if(!target_human.is_location_accessible(location))
 			to_chat(user, span_warning("The headgear is in the way!"))
 			return
 
@@ -180,17 +151,12 @@
 	icon_state = "barber"
 	buildable_sign = FALSE // Don't want them removed, they look too jank.
 
-/obj/item/storage/box/perfume
-	name = "box of perfumes"
+MAPPING_DIRECTIONAL_HELPERS(/obj/structure/sign/barber, 13)
 
-/obj/item/storage/box/perfume/PopulateContents()
-	new /obj/item/perfume/cologne(src)
-	new /obj/item/perfume/wood(src)
-	new /obj/item/perfume/rose(src)
-	new /obj/item/perfume/jasmine(src)
-	new /obj/item/perfume/mint(src)
-	new /obj/item/perfume/vanilla(src)
-	new /obj/item/perfume/pear(src)
-	new /obj/item/perfume/strawberry(src)
-	new /obj/item/perfume/cherry(src)
-	new /obj/item/perfume/amber(src)
+/obj/structure/sign/barber/Initialize(mapload)
+	. = ..()
+	if(mapload)
+		find_and_mount_on_atom()
+
+/obj/structure/sign/barber/get_turfs_to_mount_on()
+	return list(get_step(src, dir))

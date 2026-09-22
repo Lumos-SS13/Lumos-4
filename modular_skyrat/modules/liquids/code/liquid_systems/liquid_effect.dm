@@ -336,7 +336,7 @@
 	color = mix_color_from_reagent_list(reagent_list)
 
 /obj/effect/abstract/liquid_turf/proc/calculate_height()
-	var/new_height = CEILING(total_reagents, 1)/LIQUID_HEIGHT_DIVISOR
+	var/new_height = ceil(total_reagents)/LIQUID_HEIGHT_DIVISOR
 	set_height(new_height)
 	var/determined_new_state
 	//We add the turf height if it's positive to state calculations
@@ -357,7 +357,7 @@
 		set_new_liquid_state(determined_new_state)
 
 /obj/effect/abstract/liquid_turf/immutable/calculate_height()
-	var/new_height = CEILING(total_reagents, 1)/LIQUID_HEIGHT_DIVISOR
+	var/new_height = ceil(total_reagents)/LIQUID_HEIGHT_DIVISOR
 	set_height(new_height)
 	var/determined_new_state
 	switch(new_height)
@@ -381,10 +381,10 @@
 		//Splash
 		if(prob(WATER_HEIGH_DIFFERENCE_SOUND_CHANCE))
 			var/sound_to_play = pick(list(
-				'modular_skyrat/modules/liquids/sound/effects/water_wade1.ogg',
-				'modular_skyrat/modules/liquids/sound/effects/water_wade2.ogg',
-				'modular_skyrat/modules/liquids/sound/effects/water_wade3.ogg',
-				'modular_skyrat/modules/liquids/sound/effects/water_wade4.ogg'
+				'modular_zubbers/sound/effects/water_wade1.ogg',
+				'modular_zubbers/sound/effects/water_wade2.ogg',
+				'modular_zubbers/sound/effects/water_wade3.ogg',
+				'modular_zubbers/sound/effects/water_wade4.ogg'
 				))
 			playsound(my_turf, sound_to_play, 60, 0)
 		var/obj/splashy = new /obj/effect/temp_visual/liquid_splash(my_turf)
@@ -409,13 +409,14 @@
 				for(var/thing in my_turf)
 					AM = thing
 					if(!AM.anchored && !AM.pulledby && !isobserver(AM) && (AM.move_resist < INFINITY))
-						if(iscarbon(AM))
-							var/mob/living/carbon/C = AM
-							if(!(C.shoes && C.shoes.clothing_flags))
-								step(C, dir)
-								if(prob(60) && C.body_position != LYING_DOWN)
-									to_chat(C, span_userdanger("The current knocks you down!"))
-									C.Paralyze(60)
+						var/mob/living/carbon/carbon = AM
+						if(istype(carbon))
+							var/obj/item/clothing/shoes/shoes = carbon.get_item_by_slot(ITEM_SLOT_FEET)
+							if(!(shoes && shoes.clothing_flags))
+								step(carbon, dir)
+								if(prob(60) && carbon.body_position != LYING_DOWN)
+									to_chat(carbon, span_userdanger("The current knocks you down!"))
+									carbon.Knockdown(1 SECONDS)
 						else
 							step(AM, dir)
 
@@ -430,10 +431,10 @@
 	if(liquid_state >= LIQUID_STATE_ANKLES)
 		if(prob(30))
 			var/sound_to_play = pick(list(
-				'modular_skyrat/modules/liquids/sound/effects/water_wade1.ogg',
-				'modular_skyrat/modules/liquids/sound/effects/water_wade2.ogg',
-				'modular_skyrat/modules/liquids/sound/effects/water_wade3.ogg',
-				'modular_skyrat/modules/liquids/sound/effects/water_wade4.ogg'
+				'modular_zubbers/sound/effects/water_wade1.ogg',
+				'modular_zubbers/sound/effects/water_wade2.ogg',
+				'modular_zubbers/sound/effects/water_wade3.ogg',
+				'modular_zubbers/sound/effects/water_wade4.ogg'
 				))
 			playsound(T, sound_to_play, 50, 0)
 		if(iscarbon(AM))
@@ -442,7 +443,7 @@
 	else if (isliving(AM))
 		var/mob/living/L = AM
 		if(prob(7) && !(L.movement_type & FLYING))
-			L.slip(60, T, NO_SLIP_WHEN_WALKING, 20, TRUE)
+			L.slip(1 SECONDS, T, NO_SLIP_WHEN_WALKING, 2 SECONDS, TRUE)
 	if(fire_state)
 		AM.fire_act((T20C+50) + (50*fire_state), 125)
 
@@ -450,7 +451,7 @@
 	SIGNAL_HANDLER
 	var/turf/T = source
 	if(liquid_state >= LIQUID_STATE_ANKLES && T.has_gravity(T))
-		playsound(T, 'modular_skyrat/modules/liquids/sound/effects/splash.ogg', 50, 0)
+		playsound(T, 'modular_zubbers/sound/effects/splash.ogg', 50, 0)
 		if(iscarbon(M))
 			var/mob/living/carbon/falling_carbon = M
 
@@ -458,13 +459,14 @@
 			if(falling_carbon.stat >= DEAD)
 				return
 
-			if(falling_carbon.wear_mask && falling_carbon.wear_mask.flags_cover & MASKCOVERSMOUTH)
+			var/obj/item/clothing/mask/wear_mask = falling_carbon.get_item_by_slot(ITEM_SLOT_MASK)
+			if(wear_mask && wear_mask.flags_cover & MASKCOVERSMOUTH)
 				to_chat(falling_carbon, span_userdanger("You fall in the [reagents_to_text()]!"))
 			else
 				var/datum/reagents/tempr = take_reagents_flat(CHOKE_REAGENTS_INGEST_ON_FALL_AMOUNT)
 				tempr.trans_to(falling_carbon, tempr.total_volume, methods = INGEST)
 				qdel(tempr)
-				falling_carbon.adjustOxyLoss(5)
+				falling_carbon.adjust_oxy_loss(5)
 				//C.emote("cough")
 				INVOKE_ASYNC(falling_carbon, TYPE_PROC_REF(/mob, emote), "cough")
 				to_chat(falling_carbon, span_userdanger("You fall in and swallow some [reagents_to_text()]!"))
@@ -520,7 +522,8 @@
 //Exposes my turf with simulated reagents
 /obj/effect/abstract/liquid_turf/proc/ExposeMyTurf()
 	var/datum/reagents/tempr = simulate_reagents_threshold(LIQUID_REAGENT_THRESHOLD_TURF_EXPOSURE)
-	tempr.expose(my_turf, TOUCH, tempr.total_volume)
+	if(tempr.total_volume > 0)
+		tempr.expose(my_turf, TOUCH, tempr.total_volume)
 	qdel(tempr)
 
 /obj/effect/abstract/liquid_turf/proc/ChangeToNewTurf(turf/NewT)
@@ -562,11 +565,7 @@
 
 	var/liquid_state_template = liquid_state_messages["[liquid_state]"]
 
-	examine_list += EXAMINE_SECTION_BREAK
-
 	if(examiner.can_see_reagents())
-		examine_list += EXAMINE_SECTION_BREAK
-
 		if(length(reagent_list) == 1)
 			// Single reagent text.
 			var/datum/reagent/reagent_type = reagent_list[1]
@@ -583,12 +582,11 @@
 				var/volume = round(reagent_list[reagent_type], 0.01)
 				examine_list += "&bull; [volume] units of [reagent_name]"
 
-		examine_list += span_notice("The solution has a temperature of [temp]K.")
-		examine_list += EXAMINE_SECTION_BREAK
+		examine_list += span_notice("The solution has a temperature of [temp]K.[EXAMINE_SECTION_BREAK]")
 		return
 
 	// Otherwise, just show the total volume
-	examine_list += span_notice("There is [replacetext(liquid_state_template, "$", "liquid")] here.")
+	examine_list += span_notice("There is [replacetext(liquid_state_template, "$", "liquid")] here.[EXAMINE_SECTION_BREAK]")
 
 /**
  * Creates a string of the reagents that make up this liquid.
@@ -623,7 +621,7 @@
 					reagents_string += "and "
 	while(reagents_remaining)
 
-	return lowertext(reagents_string)
+	return LOWER_TEXT(reagents_string)
 
 /obj/effect/temp_visual/liquid_splash
 	icon = 'modular_skyrat/modules/liquids/icons/obj/effects/splash.dmi'

@@ -9,7 +9,9 @@
 	name = "exosuit drill"
 	desc = "Equipment for engineering and combat exosuits. This is the drill that'll pierce the heavens!"
 	icon_state = "mecha_drill"
-	equip_cooldown = 15
+	equipment_slot = MECHA_UTILITY
+	can_be_toggled = TRUE
+	equip_cooldown = 1.5 SECONDS
 	energy_drain = 0.01 * STANDARD_CELL_CHARGE
 	force = 15
 	harmful = TRUE
@@ -17,6 +19,7 @@
 	tool_behaviour = TOOL_DRILL
 	toolspeed = 0.9
 	mech_flags = EXOSUIT_MODULE_WORKING | EXOSUIT_MODULE_COMBAT
+	custom_materials = list(/datum/material/iron = SHEET_MATERIAL_AMOUNT * 5)
 	var/drill_delay = 7
 	var/drill_level = DRILL_BASIC
 
@@ -31,6 +34,17 @@
 	)
 	ADD_TRAIT(src, TRAIT_INSTANTLY_PROCESSES_BOULDERS, INNATE_TRAIT)
 	ADD_TRAIT(src, TRAIT_BOULDER_BREAKER, INNATE_TRAIT)
+
+/obj/item/mecha_parts/mecha_equipment/drill/handle_ui_act(action, list/params)
+	if(action != "toggle")
+		return
+	if(active)
+		RegisterSignal(chassis, COMSIG_MECHA_MELEE_CLICK, PROC_REF(on_mech_click))
+		log_message("Activated.", LOG_MECHA)
+	else
+		UnregisterSignal(chassis, COMSIG_MECHA_MELEE_CLICK)
+		log_message("Deactivated.", LOG_MECHA)
+	return TRUE
 
 /obj/item/mecha_parts/mecha_equipment/drill/attach(obj/vehicle/sealed/mecha/new_mecha, attach_right)
 	. = ..()
@@ -64,6 +78,14 @@
 		return FALSE
 	return ..()
 
+///Redirects clicks to use the drill if possible when enabled
+/obj/item/mecha_parts/mecha_equipment/drill/proc/on_mech_click(atom/mech, mob/source, atom/target, on_cooldown, adjacent)
+	SIGNAL_HANDLER
+	if(on_cooldown || !adjacent)
+		return
+	INVOKE_ASYNC(src, PROC_REF(action), source, target, null, FALSE)
+	return COMPONENT_CANCEL_MELEE_CLICK
+
 /obj/item/mecha_parts/mecha_equipment/drill/action(mob/source, atom/target, list/modifiers, bumped)
 	//If bumped, only bother drilling mineral turfs
 	if(bumped)
@@ -90,26 +112,26 @@
 			if(target_obj.resistance_flags & (UNACIDABLE | INDESTRUCTIBLE))
 				return
 
+	// Check if we can even use the equipment to begin with.
+	if(!action_checks(target))
+		return
+
 	// You can't drill harder by clicking more.
 	if(DOING_INTERACTION_WITH_TARGET(source, target) && do_after_cooldown(target, source, DOAFTER_SOURCE_MECHADRILL))
 		return
 
 	target.visible_message(span_warning("[chassis] starts to drill [target]."), \
-				span_userdanger("[chassis] starts to drill [target]..."), \
+				span_userdanger("[chassis] starts to drill you!"), \
 				span_hear("You hear drilling."))
 
 	log_message("Started drilling [target]", LOG_MECHA)
 
 	// Drilling a turf is a one-and-done procedure.
 	if(isturf(target))
-		// Check if we can even use the equipment to begin with.
-		if(!action_checks(target))
-			return
-
 		var/turf/T = target
+		. = ..()
 		T.drill_act(src, source)
-
-		return ..()
+		return
 
 	// Drilling objects and mobs is a repeating procedure.
 	while(do_after_mecha(target, source, drill_delay))
@@ -131,6 +153,11 @@
 			break
 
 	return ..()
+
+/obj/item/mecha_parts/mecha_equipment/drill/get_equip_cooldown(atom/target)
+	if (isturf(target))
+		return equip_cooldown * 0.1
+	return equip_cooldown
 
 /turf/proc/drill_act(obj/item/mecha_parts/mecha_equipment/drill/drill, mob/user)
 	return
@@ -157,7 +184,7 @@
 
 /turf/open/misc/asteroid/drill_act(obj/item/mecha_parts/mecha_equipment/drill/drill)
 	for(var/turf/open/misc/asteroid/floor in range(1, drill.chassis))
-		if((get_dir(drill.chassis, floor) & drill.chassis.dir) && !floor.dug)
+		if((get_dir(drill.chassis, floor) & drill.chassis.dir) && floor.can_dig())
 			floor.getDug()
 	drill.log_message("Drilled through [src]", LOG_MECHA)
 	drill.move_ores()
@@ -169,7 +196,7 @@
 	target.visible_message(span_danger("[chassis] is drilling [target] with [src]!"), \
 						span_userdanger("[chassis] is drilling you with [src]!"))
 	log_combat(user, target, "drilled", "[name]", "Combat mode: [user.combat_mode ? "On" : "Off"])(DAMTYPE: [uppertext(damtype)])")
-	if(target.stat == DEAD && target.getBruteLoss() >= (target.maxHealth * 2))
+	if(target.stat == DEAD && target.get_brute_loss() >= (target.maxHealth * 2))
 		log_combat(user, target, "gibbed", name)
 		if(LAZYLEN(target.butcher_results) || LAZYLEN(target.guaranteed_butcher_results))
 			SEND_SIGNAL(src, COMSIG_MECHA_DRILL_MOB, chassis, target)
@@ -179,21 +206,19 @@
 		return
 
 	//drill makes a hole
-	var/def_zone = target.get_random_valid_zone(BODY_ZONE_CHEST)
-	var/obj/item/bodypart/target_part = target.get_bodypart(def_zone)
-	var/blocked = target.run_armor_check(def_zone, MELEE)
-	target.apply_damage(10, BRUTE, def_zone, blocked)
+	var/def_zone = target.get_random_valid_zone(user.zone_selected)
+	target.apply_damage(
+		10,
+		BRUTE,
+		def_zone,
+		blocked = target.run_armor_check(def_zone, MELEE),
+		wound_bonus = 30,
+		exposed_wound_bonus = 50,
+		sharpness = SHARP_POINTY
+	)
 
 	//blood splatters
-	var/splatter_dir = get_dir(chassis, target)
-	if(isalien(target))
-		new /obj/effect/temp_visual/dir_setting/bloodsplatter/xenosplatter(target.drop_location(), splatter_dir)
-	else
-		new /obj/effect/temp_visual/dir_setting/bloodsplatter(target.drop_location(), splatter_dir)
-
-	//organs go everywhere
-	if(target_part && blocked < 100 && prob(10 * drill_level))
-		target_part.dismember(BRUTE)
+	target.create_splatter(get_dir(chassis, target))
 
 /obj/item/mecha_parts/mecha_equipment/drill/diamonddrill
 	name = "diamond-tipped exosuit drill"
@@ -204,6 +229,7 @@
 	drill_level = DRILL_HARDENED
 	force = 15
 	toolspeed = 0.7
+	custom_materials = list(/datum/material/iron = SHEET_MATERIAL_AMOUNT * 5, /datum/material/diamond = SHEET_MATERIAL_AMOUNT * 3.25)
 
 /obj/item/mecha_parts/mecha_equipment/mining_scanner
 	name = "exosuit mining scanner"
@@ -212,6 +238,7 @@
 	equip_cooldown = 1.5 SECONDS
 	equipment_slot = MECHA_UTILITY
 	mech_flags = EXOSUIT_MODULE_WORKING
+	custom_materials = list(/datum/material/iron = SHEET_MATERIAL_AMOUNT * 2.5, /datum/material/glass = SHEET_MATERIAL_AMOUNT * 1.25)
 	var/scanning_time = 0
 	COOLDOWN_DECLARE(area_scan_cooldown)
 
@@ -229,7 +256,7 @@
 		return
 	if(!LAZYLEN(chassis.occupants))
 		return
-	scanning_time = world.time + equip_cooldown
+	scanning_time = world.time + get_equip_cooldown()
 	mineral_scan_pulse(get_turf(src), scanner = src)
 
 /obj/item/mecha_parts/mecha_equipment/mining_scanner/get_snowflake_data()
@@ -244,10 +271,9 @@
 			if(!COOLDOWN_FINISHED(src, area_scan_cooldown))
 				return FALSE
 			COOLDOWN_START(src, area_scan_cooldown, 15 SECONDS)
-			for(var/mob/living/carbon/human/driver in chassis.return_drivers())
-				for(var/obj/structure/ore_vent/vent as anything in range(5, chassis))
-					if(istype(vent, /obj/structure/ore_vent))
-						vent.scan_and_confirm(driver, TRUE)
+			for(var/mob/living/driver in chassis.return_drivers())
+				for(var/obj/structure/ore_vent/vent in range(5, chassis))
+					vent.scan_and_confirm(driver, TRUE)
 			return TRUE
 
 #undef DRILL_BASIC

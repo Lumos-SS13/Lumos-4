@@ -3,11 +3,13 @@
 	icon = 'icons/obj/clothing/masks.dmi'
 	lefthand_file = 'icons/mob/inhands/clothing/masks_lefthand.dmi'
 	righthand_file = 'icons/mob/inhands/clothing/masks_righthand.dmi'
+	abstract_type = /obj/item/clothing/mask
 	body_parts_covered = HEAD
 	slot_flags = ITEM_SLOT_MASK
-	strip_delay = 40
-	equip_delay_other = 40
+	strip_delay = 4 SECONDS
+	equip_delay_other = 4 SECONDS
 	visor_vars_to_toggle = NONE
+
 	var/adjusted_flags = null
 	///Did we install a filtering cloth?
 	var/has_filter = FALSE
@@ -15,8 +17,27 @@
 	var/voice_override
 	/// If set to true, activates the radio effect on TTS. Used for sec hailers, but other masks can utilize it for their own vocal effect.
 	var/use_radio_beeps_tts = FALSE
+	/// A list of sound overrides for emotes, which can play when the mask is worn on the mask slot
+	var/list/emote_sounds
 	/// The unique sound effect of dying while wearing this
 	var/unique_death
+
+/obj/item/clothing/mask/equipped(mob/living/equipper, slot)
+	. = ..()
+	if (!(slot & ITEM_SLOT_MASK))
+		return
+	for(var/key in emote_sounds)
+		RegisterSignal(equipper, COMSIG_MOB_EMOTE_SOUND(key), PROC_REF(get_emote_sound))
+
+/obj/item/clothing/mask/dropped(mob/living/dropper)
+	. = ..()
+	for(var/key in emote_sounds)
+		UnregisterSignal(dropper, COMSIG_MOB_EMOTE_SOUND(key))
+
+/obj/item/clothing/mask/proc/get_emote_sound(mob/living/source, key, list/sounds)
+	SIGNAL_HANDLER
+	var/sound_override = get_emote_sound_from_list(emote_sounds[key], source)
+	sounds[sound_override] = EMOTE_SOUND_MASK
 
 /obj/item/clothing/mask/attack_self(mob/user)
 	if((clothing_flags & VOICEBOX_TOGGLABLE))
@@ -24,16 +45,27 @@
 		var/status = !(clothing_flags & VOICEBOX_DISABLED)
 		to_chat(user, span_notice("You turn the voice box in [src] [status ? "on" : "off"]."))
 
-/obj/item/clothing/mask/worn_overlays(mutable_appearance/standing, isinhands = FALSE)
+/obj/item/clothing/mask/worn_overlays(mutable_appearance/standing, isinhands = FALSE, icon_file, bodyshape = NONE)
 	. = ..()
-	if(isinhands)
+	if(isinhands || !(body_parts_covered & HEAD))
 		return
-
-	if(body_parts_covered & HEAD)
-		if(damaged_clothes)
+	if(damaged_clothes)
+		//BUBBER EDIT BEGIN - Species specific damage states.
+		//. += mutable_appearance('icons/effects/item_damage.dmi', "damagedmask") //ORIGINAL
+		var/mob/living/carbon/human/wearer = loc
+		if(ishuman(wearer) && icon_exists('modular_zubbers/icons/effects/item_damage_species.dmi', "damagedmask_[wearer.dna.species.id]"))
+			. += mutable_appearance('modular_zubbers/icons/effects/item_damage_species.dmi', "damagedmask_[wearer.dna.species.id]")
+		else
 			. += mutable_appearance('icons/effects/item_damage.dmi', "damagedmask")
-		if(GET_ATOM_BLOOD_DNA_LENGTH(src))
-			. += mutable_appearance('icons/effects/blood.dmi', "maskblood")
+		//BUBBER EDIT END
+
+/obj/item/clothing/mask/separate_worn_overlays(mutable_appearance/standing, mutable_appearance/draw_target, isinhands, icon_file, bodyshape = NONE)
+	. = ..()
+	if (isinhands || !(body_parts_covered & HEAD))
+		return
+	var/blood_overlay = get_blood_overlay("mask", bodyshape)
+	if (blood_overlay)
+		. += blood_overlay
 
 /obj/item/clothing/mask/update_clothes_damaged_state(damaged_state = CLOTHING_DAMAGED)
 	..()
@@ -52,7 +84,7 @@
 
 /obj/item/clothing/mask/update_icon_state()
 	. = ..()
-	icon_state = "[initial(icon_state)][up ? "_up" : ""]"
+	icon_state = "[base_icon_state || initial(post_init_icon_state) || initial(icon_state)][up ? "_up" : ""]"
 
 /**
  * Proc called in lungs.dm to act if wearing a mask with filters, used to reduce the filters durability, return a changed gas mixture depending on the filter status

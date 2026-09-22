@@ -30,7 +30,7 @@
 	holder = c
 	buttons = list()
 	li_cb = CALLBACK(src, PROC_REF(post_login))
-	holder.player_details.post_login_callbacks += li_cb
+	holder.persistent_client.post_login_callbacks += li_cb
 	holder.show_popup_menus = FALSE
 	create_buttons()
 	holder.screen += buttons
@@ -47,7 +47,7 @@
 /datum/buildmode/Destroy()
 	close_switchstates()
 	close_preview()
-	holder.player_details.post_login_callbacks -= li_cb
+	holder.persistent_client.post_login_callbacks -= li_cb
 	li_cb = null
 	holder = null
 	modebutton = null
@@ -170,9 +170,8 @@
 	mode.handle_click(user.client, params, object)
 	return TRUE // no doing underlying actions
 
-/proc/togglebuildmode(mob/M as mob in GLOB.player_list)
-	set name = "Toggle Build Mode"
-	set category = "Event"
+GAME_VERB_GLOBAL_PROC(togglebuildmode, "Toggle Build Mode", "", "Event")
+	VERB_ARG_TYPED(M, VERB_ARG_TYPE_MOB, VERB_ARG_SOURCE_WORLD, /mob)
 
 	if(M.client)
 		if(istype(M.client.click_intercept,/datum/buildmode))

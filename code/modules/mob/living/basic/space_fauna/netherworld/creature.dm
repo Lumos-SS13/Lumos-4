@@ -27,7 +27,8 @@
 	lighting_cutoff_green = 25
 	lighting_cutoff_blue = 15
 
-	ai_controller = /datum/ai_controller/basic_controller/simple_hostile_obstacles
+	ai_controller = /datum/ai_controller/basic_controller/simple/simple_hostile_obstacles
+	damage_coeff = list(BRUTE = 1, BURN = 1, TOX = 1, STAMINA = 0, OXY = 1)
 	var/health_scaling = TRUE
 
 /mob/living/basic/creature/Initialize(mapload)
@@ -46,7 +47,7 @@
 /mob/living/basic/creature/proc/can_be_seen(turf/location)
 	// Check for darkness
 	if(location?.lighting_object)
-		if(location.get_lumcount() < 0.1) // No one can see us in the darkness, right?
+		if(location.check_lumcount_below(0.1)) // No one can see us in the darkness, right?
 			return null
 
 	// We aren't in darkness, loop for viewers.
@@ -105,10 +106,11 @@
 
 /mob/living/basic/creature/tiggles
 	name = "Miss Tiggles"
+	gold_core_spawnable = NO_SPAWN
 
 /mob/living/basic/creature/hatchling
 	name = "hatchling"
 	health = 25
 	maxHealth = 25
 	health_scaling = FALSE
-	current_size = 0.85
+	initial_size = 0.85

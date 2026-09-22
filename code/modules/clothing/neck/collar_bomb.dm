@@ -38,11 +38,12 @@
 		return
 	. += span_tinynotice("It has a [EXAMINE_HINT("wire")] panel that could be interacted with...")
 
-/obj/item/clothing/neck/collar_bomb/attackby(obj/item/item, mob/user, params)
-	if(is_wire_tool(item))
-		wires.interact(user)
-	else
+/obj/item/clothing/neck/collar_bomb/item_interaction(mob/living/user, obj/item/tool, list/modifiers)
+	if(!is_wire_tool(tool))
 		return ..()
+
+	wires.interact(user)
+	return ITEM_INTERACT_SUCCESS
 
 /obj/item/clothing/neck/collar_bomb/equipped(mob/user, slot, initial = FALSE)
 	. = ..()
@@ -109,7 +110,7 @@
 		return
 	var/mob/living/carbon/human/brian = collar.loc
 	if(brian.get_item_by_slot(ITEM_SLOT_NECK) == collar)
-		brian.investigate_log("has has their [collar] triggered by [user] via yellow button.", INVESTIGATE_DEATHS)
+		brian.investigate_log("has had their [collar] triggered by [user] via yellow button.", INVESTIGATE_DEATHS)
 
 
 /obj/item/collar_bomb_button/Destroy()
